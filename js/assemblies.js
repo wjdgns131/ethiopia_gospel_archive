@@ -114,7 +114,7 @@ class FellowshipComponent {
           const canvas = document.createElement("canvas");
           let w = img.width;
           let h = img.height;
-          const maxDim = 1920;
+          const maxDim = 900;
           if (w > maxDim || h > maxDim) {
             if (w > h) {
               h = Math.round((h * maxDim) / w);
@@ -130,7 +130,7 @@ class FellowshipComponent {
           ctx.imageSmoothingEnabled = true;
           ctx.imageSmoothingQuality = "high";
           ctx.drawImage(img, 0, 0, w, h);
-          const dataUrl = canvas.toDataURL("image/jpeg", 0.92);
+          const dataUrl = canvas.toDataURL("image/jpeg", 0.75);
 
           if (!this.tempFellowshipImages) this.tempFellowshipImages = [];
           this.tempFellowshipImages.push(dataUrl);

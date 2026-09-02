@@ -132,7 +132,7 @@ class TimelineComponent {
           const canvas = document.createElement("canvas");
           let w = img.width;
           let h = img.height;
-          const maxDim = 1920; // Full HD Crisp Resolution
+          const maxDim = 900; // Optimized for crisp web display & fast saving
           if (w > maxDim || h > maxDim) {
             if (w > h) {
               h = Math.round((h * maxDim) / w);
@@ -148,7 +148,7 @@ class TimelineComponent {
           ctx.imageSmoothingEnabled = true;
           ctx.imageSmoothingQuality = "high";
           ctx.drawImage(img, 0, 0, w, h);
-          const compressedDataUrl = canvas.toDataURL("image/jpeg", 0.92); // High-Definition 92% Quality
+          const compressedDataUrl = canvas.toDataURL("image/jpeg", 0.75); // Fast & lightweight 75% quality
 
           if (!this.tempHistoryImages) this.tempHistoryImages = [];
           this.tempHistoryImages.push(compressedDataUrl);
