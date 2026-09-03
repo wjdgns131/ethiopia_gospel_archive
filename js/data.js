@@ -1802,22 +1802,16 @@ class DataStore {
 
   init() {
     try {
-      const CURRENT_DATA_VERSION = "9.0_restored_user_backup_20260903";
-      const savedVersion = localStorage.getItem("ethiopia_data_ver");
-
-      if (savedVersion !== CURRENT_DATA_VERSION) {
-        console.log("🔄 Force restoring user backup dataset version: " + CURRENT_DATA_VERSION);
-        localStorage.setItem("ethiopia_data_ver", CURRENT_DATA_VERSION);
-        localStorage.setItem("ethiopia_history", JSON.stringify(DEFAULT_HISTORY));
-        localStorage.setItem("ethiopia_members", JSON.stringify(DEFAULT_MEMBERS));
-        localStorage.setItem("ethiopia_assemblies", JSON.stringify(DEFAULT_ASSEMBLIES));
-        localStorage.setItem("ethiopia_events", JSON.stringify(DEFAULT_EVENTS));
-        localStorage.setItem("ethiopia_user_custom_edits", JSON.stringify(DEFAULT_HISTORY));
-      }
+      let userCustomHistory = null;
+      try { userCustomHistory = JSON.parse(localStorage.getItem("ethiopia_user_custom_edits")); } catch(e) {}
 
       let historyData = null;
       try { historyData = JSON.parse(localStorage.getItem("ethiopia_history")); } catch(e) {}
-      if (!historyData || !Array.isArray(historyData) || historyData.length === 0) {
+
+      if (userCustomHistory && Array.isArray(userCustomHistory) && userCustomHistory.length > 0) {
+        historyData = userCustomHistory;
+        try { localStorage.setItem("ethiopia_history", JSON.stringify(historyData)); } catch(e) {}
+      } else if (!historyData || !Array.isArray(historyData) || historyData.length === 0) {
         historyData = JSON.parse(JSON.stringify(DEFAULT_HISTORY));
         try { localStorage.setItem("ethiopia_history", JSON.stringify(historyData)); } catch(e) {}
       }

@@ -115,39 +115,11 @@ document.addEventListener("DOMContentLoaded", () => {
   } catch (e) { console.error("AdminComponent init error:", e); }
 
   // Initial Render of All Tabs Safely
-  window.renderAppCurrentTab = function() {
-    const langBtnText = document.getElementById("langToggleText");
-    if (langBtnText && window.i18n) {
-      langBtnText.innerText = window.i18n.t("lang_switch");
-    }
-
-    const titleEl = document.querySelector(".brand-title");
-    const subTitleEl = document.querySelector(".brand-subtitle");
-    if (titleEl && window.i18n) titleEl.innerText = window.i18n.t("site_title");
-    if (subTitleEl && window.i18n) subTitleEl.innerText = window.i18n.t("site_subtitle");
-
-    document.querySelectorAll(".nav-tab").forEach(tab => {
-      const target = tab.getAttribute("data-tab");
-      const span = tab.querySelector("span");
-      if (span && window.i18n) {
-        if (target === "directory") span.innerText = window.i18n.t("tab_members");
-        else if (target === "timeline") span.innerText = window.i18n.t("tab_history");
-        else if (target === "assemblies") span.innerText = window.i18n.t("tab_assemblies");
-      }
-    });
-
-    try { if (window.directoryComponent) window.directoryComponent.render(); } catch (e) { console.error("Directory render error:", e); }
-    try { if (window.mapComponent) window.mapComponent.render(window.db ? window.db.getMembers() : []); } catch (e) { console.error("Map render error:", e); }
-    try { if (window.timelineComponent) window.timelineComponent.render(); } catch (e) { console.error("Timeline render error:", e); }
-    try { if (window.assembliesComponent) window.assembliesComponent.render(); } catch (e) { console.error("Assemblies render error:", e); }
-    try { if (window.calendarComponent) window.calendarComponent.render(); } catch (e) { console.error("Calendar render error:", e); }
-  };
-
-  if (window.i18n) {
-    window.i18n.subscribe(() => window.renderAppCurrentTab());
-  }
-
-  window.renderAppCurrentTab();
+  try { if (window.directoryComponent) window.directoryComponent.render(); } catch (e) { console.error("Directory render error:", e); }
+  try { if (window.mapComponent) window.mapComponent.render(window.db ? window.db.getMembers() : []); } catch (e) { console.error("Map render error:", e); }
+  try { if (window.timelineComponent) window.timelineComponent.render(); } catch (e) { console.error("Timeline render error:", e); }
+  try { if (window.assembliesComponent) window.assembliesComponent.render(); } catch (e) { console.error("Assemblies render error:", e); }
+  try { if (window.calendarComponent) window.calendarComponent.render(); } catch (e) { console.error("Calendar render error:", e); }
 
   // 4. Modal Close Handlers
   try {

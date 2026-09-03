@@ -649,40 +649,31 @@ class TimelineComponent {
     const prevItem = activeIndex > 0 ? historyList[activeIndex - 1] : null;
     const nextItem = activeIndex < totalCount - 1 ? historyList[activeIndex + 1] : null;
 
-    const displayTitle = window.i18n ? window.i18n.translateDynamic(activeItem.title) : activeItem.title;
-    const displayDesc = window.i18n ? window.i18n.translateDynamic(activeItem.desc) : activeItem.desc;
-    const displayLocation = window.i18n ? window.i18n.translateDynamic(activeItem.location) : activeItem.location;
-    const displayDate = window.i18n ? window.i18n.translateDynamic(activeItem.date) : activeItem.date;
-
-    const editBtnText = window.i18n && window.i18n.isEn() ? "Edit Text & Photos" : "문구 및 사진 수정";
-    const photosTitleText = window.i18n && window.i18n.isEn() ? "Activity Photos" : "현장 활동 사진";
-    const photosCountUnit = window.i18n && window.i18n.isEn() ? "photos" : "장";
-
     return `
       <div class="timeline-item-header" style="display:flex; align-items:center; justify-content:space-between; width:100%; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem;">
         
         <!-- Left Side: LARGE YEAR & LOCATION -->
         <div class="timeline-meta-group" style="display:flex; align-items:center; gap:1.2rem; flex-wrap:wrap;">
-          <span class="timeline-date-badge" style="font-size:1.22rem !important; font-weight:800 !important; padding:0.45rem 1.1rem !important;"><i class="fa-solid fa-calendar-days" style="margin-right:6px;"></i> ${displayDate}</span>
-          ${displayLocation ? `<span class="timeline-location-badge" style="font-size:1.12rem !important; font-weight:700 !important;"><i class="fa-solid fa-location-dot" style="margin-right:6px;"></i> ${displayLocation}</span>` : ''}
+          <span class="timeline-date-badge" style="font-size:1.22rem !important; font-weight:800 !important; padding:0.45rem 1.1rem !important;"><i class="fa-solid fa-calendar-days" style="margin-right:6px;"></i> ${activeItem.date}</span>
+          ${activeItem.location ? `<span class="timeline-location-badge" style="font-size:1.12rem !important; font-weight:700 !important;"><i class="fa-solid fa-location-dot" style="margin-right:6px;"></i> ${activeItem.location}</span>` : ''}
         </div>
 
         <!-- Right Side: Edit & Delete Buttons -->
         <div class="timeline-action-buttons" style="margin-left:auto;">
-          <button type="button" class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); window.timelineComponent.openEditModal('${activeItem.id}')" title="${editBtnText}">
-            <i class="fa-solid fa-pen-to-square"></i> ${editBtnText}
+          <button type="button" class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); window.timelineComponent.openEditModal('${activeItem.id}')" title="문구 및 사진 수정">
+            <i class="fa-solid fa-pen-to-square"></i> 문구 및 사진 수정
           </button>
-          <button type="button" class="btn btn-danger btn-sm icon-only" onclick="event.stopPropagation(); window.timelineComponent.deleteHistory('${activeItem.id}')" title="${window.i18n && window.i18n.isEn() ? 'Delete' : '삭제'}">
+          <button type="button" class="btn btn-danger btn-sm icon-only" onclick="event.stopPropagation(); window.timelineComponent.deleteHistory('${activeItem.id}')" title="삭제">
             <i class="fa-solid fa-trash-can"></i>
           </button>
         </div>
       </div>
 
-      <h2 class="timeline-item-title" style="font-size:1.65rem; margin:1rem 0 1.2rem 0; font-weight:800; color:var(--text-primary); border-left: 4px solid #0284c7; padding-left: 0.8rem;">${displayTitle}</h2>
+      <h2 class="timeline-item-title" style="font-size:1.65rem; margin:1rem 0 1.2rem 0; font-weight:800; color:var(--text-primary); border-left: 4px solid #0284c7; padding-left: 0.8rem;">${activeItem.title}</h2>
 
       <!-- SPACIOUS BODY LAYOUT -->
       <div class="timeline-desc-body" style="font-size:1.05rem; margin-bottom: 1.5rem;">
-        ${this.formatParagraphs(displayDesc)}
+        ${this.formatParagraphs(activeItem.desc)}
       </div>
 
       <!-- ASSEMBLY SAVED MEMBERS & TESTIMONIES BUTTON -->
