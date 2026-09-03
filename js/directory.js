@@ -414,34 +414,56 @@ class DirectoryComponent {
     const body = document.getElementById("memberDetailBody");
     if (!modal || !body) return;
 
-    body.innerHTML = "";
+    const photoUrl = (m.photo && m.photo.length > 5) ? m.photo : "images/members/mem_pdf-mem-1.jpg";
+    const isDisrupter = m.category === "disrupter";
+    const testimonyUrl = (m.testimony || m.youtube || "").trim();
 
-    const container = document.createElement("div");
-    container.style.cssText = "padding:1rem; color:var(--text-primary);";
+    body.innerHTML = `
+      <div style="padding:0.5rem; color:var(--text-primary);">
+        
+        <!-- LARGE HERO PHOTO CONTAINER -->
+        <div style="position:relative; width:100%; max-width:280px; height:280px; margin:0 auto 1.25rem auto; border-radius:24px; overflow:hidden; border:3px solid ${isDisrupter ? '#ef4444' : '#0284c7'}; box-shadow:0 12px 30px rgba(0,0,0,0.18); background:#ffffff; display:flex; align-items:center; justify-content:center;">
+          <img src="${photoUrl}" alt="${m.name}" style="width:100%; height:100%; object-fit:cover; display:block;" />
+          ${isDisrupter ? '<span class="badge badge-danger" style="position:absolute; top:10px; left:10px; font-size:0.85rem; font-weight:800; padding:0.3rem 0.7rem; border-radius:12px; z-index:2;">⚠️ Disrupter</span>' : ''}
+        </div>
 
-    const header = document.createElement("div");
-    header.style.cssText = "display:flex; gap:1.2rem; align-items:center; margin-bottom:1.2rem;";
+        <!-- MEMBER INFO HEADER -->
+        <div style="text-align:center; margin-bottom:1.2rem;">
+          <h2 style="font-size:1.7rem; font-weight:900; margin:0 0 0.4rem 0; color:#1e3a8a;">${m.name}</h2>
+          <p style="font-size:1.02rem; color:var(--text-secondary); margin:0; font-weight:700;">📍 ${m.region} · 💼 ${m.job || '직업 정보 없음'}</p>
+        </div>
 
-    const img = document.createElement("img");
-    img.src = m.photo || "images/members/mem_pdf-mem-1.jpg";
-    img.style.cssText = "width:100px; height:100px; border-radius:14px; object-fit:cover; border:2px solid #0284c7;";
-    header.appendChild(img);
+        <!-- DETAILS CARD LIST -->
+        <div style="background:var(--bg-main); border:1px solid var(--border-color); border-radius:16px; padding:1rem 1.25rem; margin-bottom:1.2rem; display:flex; flex-direction:column; gap:0.75rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.92rem;">
+            <span style="color:var(--text-muted); font-weight:600;"><i class="fa-solid fa-calendar-days" style="color:var(--accent-gold); margin-right:6px;"></i> 참석/구원 일자</span>
+            <strong style="color:var(--text-primary); font-weight:800;">${m.assemblyMonth || '-'}</strong>
+          </div>
+          ${m.inviter ? `
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.92rem; border-top:1px solid var(--border-color); padding-top:0.6rem;">
+              <span style="color:var(--text-muted); font-weight:600;"><i class="fa-solid fa-user-plus" style="color:#0284c7; margin-right:6px;"></i> 초대자</span>
+              <span data-action="open-inviter-network" data-id="${m.inviter}" style="cursor:pointer; color:#0284c7; font-weight:800; text-decoration:underline;">${m.inviter}</span>
+            </div>
+          ` : ''}
+        </div>
 
-    const titleGroup = document.createElement("div");
-    const h2 = document.createElement("h2");
-    h2.style.cssText = "margin:0 0 4px 0; font-size:1.4rem; font-weight:800;";
-    h2.textContent = m.name;
-    titleGroup.appendChild(h2);
+        <!-- TESTIMONY BUTTON & ACTION -->
+        ${testimonyUrl ? `
+          <div style="text-align:center; margin-bottom:1rem;">
+            <button type="button" data-action="open-testimony-link" data-link="${testimonyUrl}" data-name="${m.name}" class="btn btn-primary" style="width:100%; padding:0.8rem; font-size:1rem; font-weight:800; border-radius:14px; box-shadow:0 4px 15px rgba(2,132,199,0.3); display:inline-flex; align-items:center; justify-content:center; gap:0.5rem;">
+              <i class="fa-solid fa-circle-play" style="font-size:1.1rem; color:#fbbf24;"></i> 🎬 ${m.name} 님 구원 간증 보기
+            </button>
+          </div>
+        ` : ''}
 
-    const subP = document.createElement("p");
-    subP.style.cssText = "margin:0; font-size:0.9rem; color:var(--text-muted);";
-    subP.textContent = `${m.region} · ${m.job || '-'}`;
-    titleGroup.appendChild(subP);
+        <div style="display:flex; justify-content:flex-end; gap:0.6rem; margin-top:1rem; padding-top:0.8rem; border-top:1px solid var(--border-color);">
+          <button type="button" class="btn btn-secondary btn-sm" data-action="open-edit-member" data-id="${m.id}" style="padding:0.4rem 0.9rem; font-weight:700;">
+            <i class="fa-solid fa-pen"></i> 수정하기
+          </button>
+        </div>
+      </div>
+    `;
 
-    header.appendChild(titleGroup);
-    container.appendChild(header);
-
-    body.appendChild(container);
     modal.classList.remove("hidden");
   }
 
@@ -451,36 +473,71 @@ class DirectoryComponent {
     if (!modal || !body) return;
 
     const members = window.db ? window.db.getMembers() : [];
-    const q = (inviterName || '').toLowerCase().trim();
+    const inviterNameClean = (inviterName || '').trim();
 
-    const invited = members.filter(m => m.inviter && m.inviter.toLowerCase().includes(q));
+    // Find Inviter Profile Object
+    const inviterObj = members.find(m => m.name.toLowerCase() === inviterNameClean.toLowerCase() || inviterNameClean.toLowerCase().includes(m.name.toLowerCase()));
+    const inviterPhoto = inviterObj && inviterObj.photo ? inviterObj.photo : "images/members/mem_pdf-mem-1.jpg";
 
-    body.innerHTML = "";
-    const wrapper = document.createElement("div");
-    wrapper.style.cssText = "padding:1rem;";
+    // Find All Members Invited by this Inviter
+    const invitedMembers = members.filter(m => m.inviter && m.inviter.toLowerCase().includes(inviterNameClean.toLowerCase()));
 
-    const h3 = document.createElement("h3");
-    h3.style.cssText = "font-size:1.3rem; font-weight:800; color:var(--text-primary); margin-bottom:1rem;";
-    h3.textContent = `🌳 ${inviterName} 님의 초청 식구 그룹 (${invited.length}명)`;
-    wrapper.appendChild(h3);
+    body.innerHTML = `
+      <div style="padding:0.5rem;">
+        
+        <!-- INVITER HEADER CARD WITH LARGE FACE -->
+        <div style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color:#ffffff; padding:1.2rem 1.4rem; border-radius:18px; margin-bottom:1.5rem; box-shadow:0 8px 25px rgba(2,132,199,0.3); display:flex; align-items:center; gap:1.2rem; flex-wrap:wrap;">
+          
+          <!-- Inviter Face Photo (100px x 100px) -->
+          <div style="position:relative; width:95px; height:95px; border-radius:18px; overflow:hidden; border:3px solid #ffffff; box-shadow:0 4px 12px rgba(0,0,0,0.2); flex-shrink:0; background:#ffffff;">
+            <img src="${inviterPhoto}" alt="${inviterNameClean}" style="width:100%; height:100%; object-fit:cover; display:block;" />
+          </div>
 
-    if (invited.length === 0) {
-      const p = document.createElement("p");
-      p.textContent = "직접 초청된 참석자 기록이 없습니다.";
-      wrapper.appendChild(p);
-    } else {
-      const grid = document.createElement("div");
-      grid.style.cssText = "display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:1rem;";
-      invited.forEach(m => {
-        const item = document.createElement("div");
-        item.style.cssText = "padding:0.8rem; background:var(--bg-card); border:1px solid var(--border-color); border-radius:12px;";
-        item.textContent = `${m.name} (${m.region})`;
-        grid.appendChild(item);
-      });
-      wrapper.appendChild(grid);
-    }
+          <div>
+            <span style="font-size:0.8rem; color:#e0f2fe; font-weight:800; letter-spacing:0.5px; text-transform:uppercase;">
+              <i class="fa-solid fa-sitemap"></i> 전도 초대자 계보
+            </span>
+            <h2 style="font-size:1.5rem; font-weight:900; margin:2px 0; color:#ffffff;">${inviterNameClean}</h2>
+            <p style="font-size:0.92rem; color:#f0f9ff; margin:0; font-weight:700;">
+              직접 초청한 참석자: <strong style="color:#fbbf24; font-size:1.1rem;">총 ${invitedMembers.length}명</strong>
+            </p>
+          </div>
+        </div>
 
-    body.appendChild(wrapper);
+        <!-- INVITED MEMBERS GRID WITH MINI FACE AVATARS -->
+        <h4 style="font-size:1.05rem; font-weight:800; color:var(--text-primary); margin-bottom:0.8rem; display:flex; align-items:center; gap:0.4rem;">
+          <i class="fa-solid fa-users" style="color:#0284c7;"></i> 초청된 식구 명단 (${invitedMembers.length}명)
+        </h4>
+
+        ${invitedMembers.length === 0 ? `
+          <div style="text-align:center; padding:2.5rem 1rem; color:var(--text-muted); background:var(--bg-main); border-radius:14px; border:1px solid var(--border-color);">
+            <i class="fa-solid fa-users-slash" style="font-size:2rem; margin-bottom:0.5rem; color:#0284c7;"></i>
+            <p style="font-size:0.95rem; font-weight:700; margin:0;">등록된 초청 식구가 없습니다.</p>
+          </div>
+        ` : `
+          <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:0.9rem;">
+            ${invitedMembers.map(m => {
+              const photo = m.photo || "images/members/mem_pdf-mem-1.jpg";
+              return `
+                <div data-action="open-member-detail" data-id="${m.id}" style="cursor:pointer; background:var(--bg-card); border:1px solid var(--border-color); border-radius:16px; padding:0.75rem; display:flex; align-items:center; gap:0.85rem; box-shadow:var(--shadow-sm); transition:transform 0.2s;" class="hover-text-primary">
+                  <!-- Mini Face Avatar (65px x 65px) -->
+                  <div style="width:65px; height:65px; border-radius:14px; overflow:hidden; border:2px solid #0284c7; flex-shrink:0; background:#ffffff; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+                    <img src="${photo}" alt="${m.name}" style="width:100%; height:100%; object-fit:cover; display:block;" />
+                  </div>
+                  <div style="flex:1; overflow:hidden;">
+                    <h4 style="font-size:1.05rem; font-weight:800; margin:0 0 2px 0; color:#1e3a8a; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${m.name}</h4>
+                    <p style="font-size:0.8rem; color:var(--text-secondary); margin:0 0 2px 0; font-weight:600;">📍 ${m.region}</p>
+                    <span style="font-size:0.75rem; color:var(--accent-gold); font-weight:700;">📅 ${m.assemblyMonth || '-'}</span>
+                  </div>
+                </div>
+              `;
+            }).join("")}
+          </div>
+        `}
+
+      </div>
+    `;
+
     modal.classList.remove("hidden");
   }
 
