@@ -1823,12 +1823,17 @@ class DataStore {
   }
 
   getHistory() {
+    if (this._historyCache && Array.isArray(this._historyCache) && this._historyCache.length > 0) {
+      return this._historyCache;
+    }
+
     let history = null;
     try { history = JSON.parse(localStorage.getItem("ethiopia_history")); } catch(e) {}
     if (!history || !Array.isArray(history) || history.length < 10) {
       try { localStorage.removeItem("ethiopia_history"); } catch(e) {}
       history = JSON.parse(JSON.stringify(DEFAULT_HISTORY));
       try { localStorage.setItem("ethiopia_history", JSON.stringify(history)); } catch(e) {}
+      this._historyCache = history;
       return history;
     }
     let updated = false;
@@ -1892,6 +1897,7 @@ class DataStore {
     }
 
     history.sort((a, b) => this.parseTimelineDate(a.date).localeCompare(this.parseTimelineDate(b.date)));
+    this._historyCache = history;
     if (updated) {
       this.saveHistory(history);
     }
@@ -1899,6 +1905,8 @@ class DataStore {
   }
 
   saveHistory(historyList) {
+    this._historyCache = historyList; // Always update in-memory cache!
+
     if (historyList && Array.isArray(historyList)) {
       historyList.forEach(item => {
         if (!item || !item.id) return;
