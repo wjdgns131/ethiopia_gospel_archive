@@ -388,6 +388,14 @@ class TimelineComponent {
     modal.classList.remove("hidden");
   }
 
+  openPhotoLightboxById(historyId, imgIdx = 0) {
+    const historyList = window.db ? window.db.getHistory() : [];
+    const item = historyList.find(h => h && h.id === historyId);
+    if (item && item.images && item.images.length > 0) {
+      this.openPhotoLightbox(item.images, imgIdx);
+    }
+  }
+
   updateLightboxState() {
     const imgEl = document.getElementById("lightboxImg");
     const counterEl = document.getElementById("lightboxCounter");

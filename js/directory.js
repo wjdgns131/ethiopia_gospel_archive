@@ -899,11 +899,22 @@ class DirectoryComponent {
       return;
     }
 
-    // Inviter Specific View: Find Inviter Profile & DIRECTLY INVITED MEMBERS ONLY
-    const inviterObj = allMembers.find(m => m.name.toLowerCase().includes(inviterNameClean.toLowerCase()) || inviterNameClean.toLowerCase().includes(m.name.toLowerCase()));
-    
-    // Filter ONLY members directly invited by this inviter
-    const invitedMembers = allMembers.filter(m => m.inviter && m.inviter.trim().toLowerCase().includes(inviterNameClean.toLowerCase()));
+    // Smart flexible matching for inviter profile & invited members
+    let q = inviterNameClean.toLowerCase();
+    let tokens = q.split(/\s+/).filter(Boolean);
+
+    const inviterObj = allMembers.find(m => {
+      const mName = (m.name || "").toLowerCase();
+      if (mName.includes(q) || q.includes(mName)) return true;
+      return tokens.some(tok => tok.length >= 2 && mName.includes(tok));
+    });
+
+    const invitedMembers = allMembers.filter(m => {
+      if (!m.inviter) return false;
+      const invStr = m.inviter.toLowerCase();
+      if (invStr.includes(q) || q.includes(invStr)) return true;
+      return tokens.some(tok => tok.length >= 2 && invStr.includes(tok));
+    });
 
     const inviterPhoto = inviterObj && inviterObj.photo ? inviterObj.photo : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=600&auto=format&fit=crop';
 
@@ -990,12 +1001,48 @@ class DirectoryComponent {
   }
 
   parseAssemblyDate(dateStr) {
-    if (!dateStr) return "9999.99.99";
-    const matches = dateStr.match(/\d+/g);
-    if (!matches || matches.length === 0) return "9999.99.99";
-    const year = matches[0];
-    const month = matches.length > 1 ? matches[1].padStart(2, '0') : '01';
-    const day = matches.length > 2 ? matches[2].padStart(2, '0') : '01';
+    if (!dateStr || typeof dateStr !== "string") return "9999.99.99";
+    const str = dateStr.trim();
+    if (!str) return "9999.99.99";
+
+    const monthMap = {
+      jan: "01", feb: "02", mar: "03", apr: "04", may: "05", jun: "06",
+      jul: "07", aug: "08", sep: "09", oct: "10", nov: "11", dec: "12",
+      january: "01", february: "02", march: "03", april: "04", june: "06",
+      july: "07", august: "08", september: "09", october: "10", november: "11", december: "12"
+    };
+
+    const yearMatch = str.match(/(20\d{2})/);
+    const year = yearMatch ? yearMatch[1] : "9999";
+
+    let month = "01";
+    const lower = str.toLowerCase();
+    for (let k in monthMap) {
+      if (lower.includes(k)) {
+        month = monthMap[k];
+        break;
+      }
+    }
+
+    if (month === "01") {
+      const nums = str.match(/\d+/g) || [];
+      if (nums.length >= 2) {
+        if (nums[0].length === 4) {
+          month = nums[1].padStart(2, '0');
+        } else if (nums[1].length === 4) {
+          month = nums[0].padStart(2, '0');
+        }
+      } else if (nums.length === 1 && nums[0].length <= 2) {
+        month = nums[0].padStart(2, '0');
+      }
+    }
+
+    let day = "01";
+    const numsAll = str.match(/\d+/g) || [];
+    if (numsAll.length >= 3 && numsAll[0].length === 4) {
+      day = numsAll[2].padStart(2, '0');
+    }
+
     return `${year}.${month}.${day}`;
   }
 
