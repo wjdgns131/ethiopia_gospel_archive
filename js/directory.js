@@ -18,128 +18,78 @@ class DirectoryComponent {
 
   // 1. Centralized Safe Event Delegation (DOM 클릭 이벤트 통일 수신기)
   // 1. Centralized Safe Event Delegation (DOM 클릭 이벤트 통일 수신기)
+  // 1. Centralized Safe Event Delegation (DOM 클릭 이벤트 통일 수신기)
   initGlobalEventDelegation() {
-    // Clipboard Paste Listener (Ctrl + V) for Member Photos
-    document.addEventListener("paste", (e) => {
+    // Robust Clipboard Paste Handler ([Ctrl + V]) for PPT, KakaoTalk, Windows Snipping Tool
+    window.addEventListener("paste", (e) => {
       const modal = document.getElementById("memberEditModal");
       if (!modal || modal.classList.contains("hidden")) return;
 
-      const items = (e.clipboardData || e.originalEvent.clipboardData)?.items;
-      if (!items) return;
+      const clipboardData = e.clipboardData || (e.originalEvent && e.originalEvent.clipboardData);
+      if (!clipboardData) return;
 
-      for (let item of items) {
-        if (item.type.indexOf("image") !== -1) {
-          e.preventDefault();
-          const blob = item.getAsFile();
-          this.readAndAutoCropMemberPhoto(blob);
-          break;
+      let imageFile = null;
+
+      // Priority 1: Check clipboard files (PPT, Snipping Tool, File Copy)
+      if (clipboardData.files && clipboardData.files.length > 0) {
+        for (let i = 0; i < clipboardData.files.length; i++) {
+          if (clipboardData.files[i].type.startsWith("image/")) {
+            imageFile = clipboardData.files[i];
+            break;
+          }
+        }
+      }
+
+      // Priority 2: Check clipboard items (Browser Image Copy, Web Snippets)
+      if (!imageFile && clipboardData.items && clipboardData.items.length > 0) {
+        for (let i = 0; i < clipboardData.items.length; i++) {
+          const item = clipboardData.items[i];
+          if (item.type.startsWith("image/")) {
+            imageFile = item.getAsFile();
+            break;
+          }
+        }
+      }
+
+      if (imageFile) {
+        e.preventDefault();
+        this.readAndAutoCropMemberPhoto(imageFile);
+      }
+    });
+
+    // File Input & Drag and Drop Handlers
+    document.addEventListener("change", (e) => {
+      const target = e.target;
+      if (target && (target.id === "fieldMemberFileInput" || target.id === "fieldFileInput")) {
+        if (target.files && target.files.length > 0) {
+          this.readAndAutoCropMemberPhoto(target.files[0]);
+          target.value = "";
         }
       }
     });
 
-    // Modal Drop Zone & File Input Listeners
-    const fileInput = document.getElementById("fieldMemberFileInput") || document.getElementById("fieldFileInput");
-    const selectBtn = document.getElementById("selectMemberPhotoBtn") || document.getElementById("selectPhotoBtn");
-    const dropZone = document.getElementById("memberDropZone");
-
-    if (selectBtn && fileInput) {
-      selectBtn.addEventListener("click", (e) => {
+    document.addEventListener("click", (e) => {
+      const btn = e.target.closest("#selectMemberPhotoBtn, #selectPhotoBtn, .photo-select-btn");
+      if (btn) {
         e.preventDefault();
+        let fileInput = document.getElementById("fieldMemberFileInput") || document.getElementById("fieldFileInput");
+        if (!fileInput) {
+          fileInput = document.createElement("input");
+          fileInput.type = "file";
+          fileInput.id = "fieldMemberFileInput";
+          fileInput.accept = "image/*";
+          fileInput.style.display = "none";
+          document.body.appendChild(fileInput);
+          fileInput.addEventListener("change", (evt) => {
+            if (evt.target.files && evt.target.files.length > 0) {
+              this.readAndAutoCropMemberPhoto(evt.target.files[0]);
+            }
+          });
+        }
         fileInput.value = "";
         fileInput.click();
-      });
-    }
-
-    if (fileInput) {
-      fileInput.addEventListener("change", (e) => {
-        if (e.target.files && e.target.files.length > 0) {
-          this.readAndAutoCropMemberPhoto(e.target.files[0]);
-          fileInput.value = "";
-        }
-      });
-    }
-
-    if (dropZone) {
-      dropZone.addEventListener("dragover", (e) => { e.preventDefault(); dropZone.classList.add("dragover"); });
-      dropZone.addEventListener("dragleave", () => dropZone.classList.remove("dragover"));
-      dropZone.addEventListener("drop", (e) => {
-        e.preventDefault();
-        dropZone.classList.remove("dragover");
-        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-          this.readAndAutoCropMemberPhoto(e.dataTransfer.files[0]);
-        }
-      });
-    }
-    document.body.addEventListener("click", (e) => {
-      const target = e.target.closest("[data-action]");
-      if (!target) return;
-
-      const action = target.getAttribute("data-action");
-      const id = target.getAttribute("data-id");
-
-      if (action === "open-add-member") {
-        e.preventDefault();
-        this.openEditModal(null);
-      } else if (action === "open-edit-member") {
-        e.preventDefault();
-        e.stopPropagation();
-        this.openEditModal(id);
-      } else if (action === "open-member-detail") {
-        e.preventDefault();
-        this.openMemberDetailModal(id);
-      } else if (action === "open-inviter-network") {
-        e.preventDefault();
-        e.stopPropagation();
-        this.openNetworkModal(id);
-      } else if (action === "open-testimony-link") {
-        e.preventDefault();
-        e.stopPropagation();
-        const link = target.getAttribute("data-link");
-        const name = target.getAttribute("data-name");
-        this.openTestimonyLink(link, name);
       }
     });
-
-    // Category Tabs Listener
-    const tabs = document.querySelectorAll("#categoryTabs .cat-tab");
-    tabs.forEach(tab => {
-      tab.addEventListener("click", () => {
-        tabs.forEach(t => t.classList.remove("active"));
-        tab.classList.add("active");
-        this.activeCategory = tab.getAttribute("data-category") || "all";
-        this.render();
-      });
-    });
-
-    // Region Dropdown Select Listener
-    const regionDropdown = document.getElementById("regionDropdown");
-    if (regionDropdown) {
-      regionDropdown.addEventListener("change", (e) => {
-        const val = e.target.value;
-        this.activeRegion = (val === "all" || val.includes("전체")) ? null : val;
-        if (window.mapComponent) {
-          window.mapComponent.selectRegion(this.activeRegion);
-        } else {
-          this.render();
-        }
-      });
-    }
-
-    // Search Input Listener
-    const searchInput = document.getElementById("searchInput") || document.getElementById("memberSearchInput");
-    if (searchInput) {
-      searchInput.addEventListener("input", (e) => {
-        this.searchQuery = e.target.value.trim().toLowerCase();
-        this.render();
-      });
-    }
-
-    // Reset Filters Button
-    const resetBtn = document.getElementById("resetFilterBtn");
-    if (resetBtn) {
-      resetBtn.addEventListener("click", () => this.resetFilters());
-    }
-  }
 
   resetFilters() {
     this.activeCategory = "all";
@@ -396,11 +346,17 @@ class DirectoryComponent {
     const reader = new FileReader();
     reader.onload = (e) => {
       this.tempMemberPhoto = e.target.result;
+      
+      const photoInput = document.getElementById("fieldPhoto");
+      if (photoInput) photoInput.value = this.tempMemberPhoto;
+
       this.renderMemberPhotoPreview();
-      // Automatically open 1:1 Cropper Modal instantly so user can crop the photo!
+      
+      if (window.showToast) window.showToast("📷 사진이 성공적으로 올라갔습니다! 1:1 자르기 창을 엽니다.");
+      
       setTimeout(() => {
         this.openCropperModal();
-      }, 100);
+      }, 150);
     };
     reader.readAsDataURL(file);
   }
