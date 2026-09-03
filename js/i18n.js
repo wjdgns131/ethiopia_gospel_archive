@@ -201,7 +201,7 @@
     { ko: /직업 정보 없음/g, en: "No Occupation Listed" },
 
     // 3. Mission & Gospel Key Phrases
-    { ko: /성경은 사실이다/g, en: "'The Bible is Fact'" },
+    { ko: /성경은 사실이다/g, en: "The Bible is True" },
     { ko: /체코에서 시작된 에티오피아 복음 전파/g, en: "Gospel Spreading in Ethiopia Starting from Czech" },
     { ko: /첫 오프라인 집회/g, en: "First Offline Assembly" },
     { ko: /오프라인 집회/g, en: "Offline Assembly" },
