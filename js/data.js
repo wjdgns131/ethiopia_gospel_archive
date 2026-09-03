@@ -1785,20 +1785,12 @@ const DEFAULT_FELLOWSHIP = [];
 
 const DEFAULT_EVENTS = [
   {
-    id: "evt-20260206",
-    date: "2026-02-06",
-    title: "구디나 툼사 수양관 전도집회",
-    category: "assembly",
-    location: "구디나 툼사, 아디스아바바",
-    desc: "2026.2.06~08 전도집회"
-  },
-  {
-    id: "evt-1",
-    date: "2026-09-15",
-    title: "아디스아바바 월례 전도집회",
-    category: "assembly",
-    location: "아디스아바바 집회소",
-    desc: "9월 정기 전도집회 및 거듭남 말씀 강연"
+    "id": "evt-20260206",
+    "date": "2026-02-06",
+    "title": "구디나 툼사 수양관 전도집회",
+    "category": "assembly",
+    "location": "구디나 툼사, 아디스아바바",
+    "desc": "2026.2.06~08 전도집회"
   }
 ];
 
@@ -1810,19 +1802,22 @@ class DataStore {
 
   init() {
     try {
-      const CURRENT_DATA_VERSION = "8.0_master_auto_save_shield";
-      localStorage.setItem("ethiopia_data_ver", CURRENT_DATA_VERSION);
+      const CURRENT_DATA_VERSION = "9.0_restored_user_backup_20260903";
+      const savedVersion = localStorage.getItem("ethiopia_data_ver");
 
-      let userCustomHistory = null;
-      try { userCustomHistory = JSON.parse(localStorage.getItem("ethiopia_user_custom_edits")); } catch(e) {}
+      if (savedVersion !== CURRENT_DATA_VERSION) {
+        console.log("🔄 Force restoring user backup dataset version: " + CURRENT_DATA_VERSION);
+        localStorage.setItem("ethiopia_data_ver", CURRENT_DATA_VERSION);
+        localStorage.setItem("ethiopia_history", JSON.stringify(DEFAULT_HISTORY));
+        localStorage.setItem("ethiopia_members", JSON.stringify(DEFAULT_MEMBERS));
+        localStorage.setItem("ethiopia_assemblies", JSON.stringify(DEFAULT_ASSEMBLIES));
+        localStorage.setItem("ethiopia_events", JSON.stringify(DEFAULT_EVENTS));
+        localStorage.setItem("ethiopia_user_custom_edits", JSON.stringify(DEFAULT_HISTORY));
+      }
 
       let historyData = null;
       try { historyData = JSON.parse(localStorage.getItem("ethiopia_history")); } catch(e) {}
-
-      if (userCustomHistory && Array.isArray(userCustomHistory) && userCustomHistory.length > 0) {
-        historyData = userCustomHistory;
-        try { localStorage.setItem("ethiopia_history", JSON.stringify(historyData)); } catch(e) {}
-      } else if (!historyData || !Array.isArray(historyData) || historyData.length === 0) {
+      if (!historyData || !Array.isArray(historyData) || historyData.length === 0) {
         historyData = JSON.parse(JSON.stringify(DEFAULT_HISTORY));
         try { localStorage.setItem("ethiopia_history", JSON.stringify(historyData)); } catch(e) {}
       }
