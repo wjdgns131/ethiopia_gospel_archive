@@ -17,7 +17,59 @@ class DirectoryComponent {
   }
 
   // 1. Centralized Safe Event Delegation (DOM 클릭 이벤트 통일 수신기)
+  // 1. Centralized Safe Event Delegation (DOM 클릭 이벤트 통일 수신기)
   initGlobalEventDelegation() {
+    // Clipboard Paste Listener (Ctrl + V) for Member Photos
+    document.addEventListener("paste", (e) => {
+      const modal = document.getElementById("memberEditModal");
+      if (!modal || modal.classList.contains("hidden")) return;
+
+      const items = (e.clipboardData || e.originalEvent.clipboardData)?.items;
+      if (!items) return;
+
+      for (let item of items) {
+        if (item.type.indexOf("image") !== -1) {
+          e.preventDefault();
+          const blob = item.getAsFile();
+          this.readAndAutoCropMemberPhoto(blob);
+          break;
+        }
+      }
+    });
+
+    // Modal Drop Zone & File Input Listeners
+    const fileInput = document.getElementById("fieldMemberFileInput") || document.getElementById("fieldFileInput");
+    const selectBtn = document.getElementById("selectMemberPhotoBtn") || document.getElementById("selectPhotoBtn");
+    const dropZone = document.getElementById("memberDropZone");
+
+    if (selectBtn && fileInput) {
+      selectBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        fileInput.value = "";
+        fileInput.click();
+      });
+    }
+
+    if (fileInput) {
+      fileInput.addEventListener("change", (e) => {
+        if (e.target.files && e.target.files.length > 0) {
+          this.readAndAutoCropMemberPhoto(e.target.files[0]);
+          fileInput.value = "";
+        }
+      });
+    }
+
+    if (dropZone) {
+      dropZone.addEventListener("dragover", (e) => { e.preventDefault(); dropZone.classList.add("dragover"); });
+      dropZone.addEventListener("dragleave", () => dropZone.classList.remove("dragover"));
+      dropZone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dropZone.classList.remove("dragover");
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+          this.readAndAutoCropMemberPhoto(e.dataTransfer.files[0]);
+        }
+      });
+    }
     document.body.addEventListener("click", (e) => {
       const target = e.target.closest("[data-action]");
       if (!target) return;
@@ -339,6 +391,20 @@ class DirectoryComponent {
   }
 
   // Interactive 1:1 Profile Photo Cropper Engine
+  readAndAutoCropMemberPhoto(file) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      this.tempMemberPhoto = e.target.result;
+      this.renderMemberPhotoPreview();
+      // Automatically open 1:1 Cropper Modal instantly so user can crop the photo!
+      setTimeout(() => {
+        this.openCropperModal();
+      }, 100);
+    };
+    reader.readAsDataURL(file);
+  }
+
   openCropperModal() {
     if (!this.tempMemberPhoto) {
       alert("먼저 사진을 올려주시거나 [Ctrl + V]로 이미지 캡처를 붙여넣어 주세요.");
