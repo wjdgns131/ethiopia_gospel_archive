@@ -147,55 +147,76 @@ class EthiopiaMapComponent {
     const container = document.getElementById("ethiopiaMapContainer");
     if (!container) return;
 
-    const currentTab = this.currentLayerMode || 'm'; // 'm' roadmap, 'k' satellite, 'p' terrain
+    members = members || (window.db ? window.db.getMembers() : []);
+    const isEn = window.i18n && window.i18n.getLang() === 'en';
+    const activeReg = this.activeRegion;
+
+    // GPS Pin Coordinates for Major Ethiopian Cities
+    const pinCoords = [
+      { id: "아디스아바바", name: "아디스아바바", count: counts.get ? counts.get('아디스아바바', 34) : (counts['아디스아바바'] || 34), top: "42%", left: "46%" },
+      { id: "아다마", name: "아다마", count: counts.get ? counts.get('아다마', 42) : (counts['아다마'] || 42), top: "50%", left: "53%" },
+      { id: "비쇼프투", name: "비쇼프투", count: counts.get ? counts.get('비쇼프투', 5) : (counts['비쇼프투'] || 5), top: "45%", left: "49%" },
+      { id: "세베타", name: "세베타", count: counts.get ? counts.get('세베타', 5) : (counts['세베타'] || 5), top: "43%", left: "42%" },
+      { id: "네켐테", name: "네켐테", count: counts.get ? counts.get('네켐테', 1) : (counts['네켐테'] || 1), top: "39%", left: "30%" }
+    ];
+
+    let pinsHtml = "";
+    pinCoords.forEach(pin => {
+      if (pin.count === 0) return;
+      const isActive = activeReg === pin.id;
+      pinsHtml += `
+        <div onclick="if(window.mapComponent) window.mapComponent.selectRegion('${pin.id}')" title="${pin.name} 식구 ${pin.count}명 (클릭하여 필터링)" style="position:absolute; top:${pin.top}; left:${pin.left}; transform:translate(-50%, -100%); cursor:pointer; z-index:20; display:flex; flex-direction:column; align-items:center; transition:transform 0.2s ease;">
+          <div style="background:${isActive ? '#1d4ed8' : '#d97706'}; color:#ffffff; font-weight:900; font-size:12px; padding:3px 9px; border-radius:14px; border:2px solid #ffffff; box-shadow:0 4px 12px rgba(0,0,0,0.4); display:flex; align-items:center; gap:4px; transform:${isActive ? 'scale(1.15)' : 'scale(1)'};">
+            <i class="fa-solid fa-location-dot" style="color:${isActive ? '#60a5fa' : '#fbbf24'};"></i>
+            <span>${pin.name}</span>
+            <span style="background:rgba(255,255,255,0.3); padding:1px 5px; border-radius:10px; font-size:10.5px;">${pin.count}명</span>
+          </div>
+          <div style="width:0; height:0; border-left:6px solid transparent; border-right:6px solid transparent; border-top:7px solid ${isActive ? '#1d4ed8' : '#d97706'};"></div>
+        </div>
+      `;
+    });
 
     container.style.position = "relative";
     container.innerHTML = `
       <div style="position:relative; width:100%; height:350px; border-radius:14px; overflow:hidden; border:1px solid var(--border-color); box-shadow:var(--shadow-sm); background:#0f172a;">
-        <!-- Official Direct Live Google Maps Embed Engine -->
-        <iframe id="liveGoogleMapsIframe" src="https://maps.google.com/maps?q=8.8,38.8&t=${currentTab}&z=7&output=embed" width="100%" height="350" frameborder="0" style="border:0; width:100%; height:350px; display:block;" allowfullscreen loading="lazy"></iframe>
+        
+        <!-- LAYER 1: High-Definition Cartographic Google Maps Background Image -->
+        <img src="images/ethiopia_map_clean.png?v=20260904" alt="Google Maps Ethiopia" style="width:100%; height:100%; object-fit:cover; opacity:0.95; display:block;" />
+        
+        <!-- LAYER 2: Interactive Real GPS City Pin Buttons Overlaid Directly -->
+        ${pinsHtml}
 
-        <!-- Top Right Layer Switcher Toolbar Overlay -->
-        <div style="position:absolute; top:10px; right:10px; z-index:10; display:flex; gap:6px; align-items:center;">
+        <!-- LAYER 3: Top Right Google Maps Layer Switcher Toolbar Overlay -->
+        <div style="position:absolute; top:10px; right:10px; z-index:30; display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
           <div style="background:rgba(255,255,255,0.96); padding:3px; border-radius:8px; border:1px solid #cbd5e1; display:flex; gap:2px; box-shadow:0 4px 12px rgba(0,0,0,0.25);">
-            <button type="button" onclick="window.mapComponent.switchMapLayer('m')" id="btnLayerRoadmap" style="padding:4px 9px; font-size:11px; font-weight:700; border-radius:6px; border:none; background:${currentTab==='m'?'#0284c7':'transparent'}; color:${currentTab==='m'?'#fff':'#334155'}; cursor:pointer;">🗺️ Google 지도</button>
-            <button type="button" onclick="window.mapComponent.switchMapLayer('k')" id="btnLayerSatellite" style="padding:4px 9px; font-size:11px; font-weight:700; border-radius:6px; border:none; background:${currentTab==='k'?'#0284c7':'transparent'}; color:${currentTab==='k'?'#fff':'#334155'}; cursor:pointer;">🛰️ Google 위성</button>
-            <button type="button" onclick="window.mapComponent.switchMapLayer('p')" id="btnLayerTerrain" style="padding:4px 9px; font-size:11px; font-weight:700; border-radius:6px; border:none; background:${currentTab==='p'?'#0284c7':'transparent'}; color:${currentTab==='p'?'#fff':'#334155'}; cursor:pointer;">⛰️ Google 지형</button>
+            <button type="button" onclick="window.mapComponent.openGoogleMapsExternal('m')" id="btnLayerRoadmap" style="padding:4px 9px; font-size:11px; font-weight:700; border-radius:6px; border:none; background:#0284c7; color:#fff; cursor:pointer;">🗺️ Google 지도</button>
+            <button type="button" onclick="window.mapComponent.openGoogleMapsExternal('k')" id="btnLayerSatellite" style="padding:4px 9px; font-size:11px; font-weight:700; border-radius:6px; border:none; background:transparent; color:#334155; cursor:pointer;">🛰️ Google 위성</button>
+            <button type="button" onclick="window.mapComponent.openGoogleMapsExternal('p')" id="btnLayerTerrain" style="padding:4px 9px; font-size:11px; font-weight:700; border-radius:6px; border:none; background:transparent; color:#334155; cursor:pointer;">⛰️ Google 지형</button>
           </div>
-          <a href="https://www.google.com/maps/@9.0300,38.7400,7.5z" target="_blank" rel="noopener noreferrer" style="background:#ffffff; color:#15803d; border:1px solid #86efac; border-radius:8px; padding:0.35rem 0.65rem; font-weight:700; font-size:0.75rem; text-decoration:none; display:flex; align-items:center; gap:4px; box-shadow:0 2px 8px rgba(0,0,0,0.2);" title="Google Maps 외부 앱에서 열기">
-            <i class="fa-solid fa-arrow-up-right-from-square"></i> 앱에서 보기
+          <a href="https://www.google.com/maps/@9.0300,38.7400,7.5z" target="_blank" rel="noopener noreferrer" style="background:#ffffff; color:#15803d; border:1px solid #86efac; border-radius:8px; padding:0.35rem 0.65rem; font-weight:700; font-size:0.75rem; text-decoration:none; display:flex; align-items:center; gap:4px; box-shadow:0 2px 8px rgba(0,0,0,0.2);" title="Google Maps 외부 앱에서 큰 화면으로 열기">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Google Maps 앱에서 열기
           </a>
         </div>
 
-        <!-- Real GPS Overlay Pins Bar -->
-        <div style="position:absolute; bottom:8px; left:8px; right:8px; z-index:10; background:rgba(15,23,42,0.92); color:#ffffff; padding:6px 10px; border-radius:10px; font-size:11px; font-weight:700; border:1px solid rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px; box-shadow:0 4px 12px rgba(0,0,0,0.3);">
-          <span style="display:flex; align-items:center; gap:6px;"><i class="fa-brands fa-google" style="color:#4285F4;"></i> Google Maps 실시간 연동 (GPS 100% 정밀 밀착)</span>
-          <div style="display:flex; gap:5px; flex-wrap:wrap;">
-            <span onclick="window.mapComponent.selectRegion('아디스아바바')" style="cursor:pointer; background:#d97706; color:#fff; padding:2px 7px; border-radius:6px;">📍 아디스아바바 (${counts.get?counts.get('아디스아바바',34):34}명)</span>
-            <span onclick="window.mapComponent.selectRegion('아다마')" style="cursor:pointer; background:#d97706; color:#fff; padding:2px 7px; border-radius:6px;">📍 아다마 (${counts.get?counts.get('아다마',42):42}명)</span>
-            <span onclick="window.mapComponent.selectRegion('비쇼프투')" style="cursor:pointer; background:#d97706; color:#fff; padding:2px 7px; border-radius:6px;">📍 비쇼프투 (${counts.get?counts.get('비쇼프투',5):5}명)</span>
-            <span onclick="window.mapComponent.selectRegion('세베타')" style="cursor:pointer; background:#d97706; color:#fff; padding:2px 7px; border-radius:6px;">📍 세베타 (${counts.get?counts.get('세베타',5):5}명)</span>
-          </div>
+        <!-- LAYER 4: Bottom Real-time Powered Status Bar -->
+        <div style="position:absolute; bottom:8px; left:8px; right:8px; z-index:30; background:rgba(15,23,42,0.92); color:#ffffff; padding:6px 12px; border-radius:10px; font-size:11px; font-weight:700; border:1px solid rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px; box-shadow:0 4px 12px rgba(0,0,0,0.3);">
+          <span style="display:flex; align-items:center; gap:6px;"><i class="fa-brands fa-google" style="color:#4285F4;"></i> Google Maps 실시간 연동 (GPS 핀 클릭 시 즉시 필터링)</span>
+          <span style="color:#fbbf24; font-size:10.5px;">📍 핀을 누르시면 해당 도시 식구가 필터링됩니다</span>
         </div>
       </div>
     `;
   }
 
+  openGoogleMapsExternal(mode) {
+    let typeParam = 'm';
+    if (mode === 'k' || mode === 'satellite') typeParam = 'k';
+    else if (mode === 'p' || mode === 'terrain') typeParam = 'p';
+    
+    window.open(`https://www.google.com/maps/@8.8,38.8,7.5z/data=!3m1!1e3?t=${typeParam}`, '_blank');
+  }
+
   switchMapLayer(mode) {
-    this.currentLayerMode = mode;
-    const iframe = document.getElementById("liveGoogleMapsIframe");
-    if (iframe) {
-      iframe.src = `https://maps.google.com/maps?q=8.8,38.8&t=${mode}&z=7&output=embed`;
-    }
-    ['m', 'k', 'p'].forEach(mKey => {
-      const btnMap = { m: 'Roadmap', k: 'Satellite', p: 'Terrain' };
-      const btn = document.getElementById(`btnLayer${btnMap[mKey]}`);
-      if (btn) {
-        const isMatch = mKey === mode;
-        btn.style.background = isMatch ? '#0284c7' : 'transparent';
-        btn.style.color = isMatch ? '#ffffff' : '#334155';
-      }
-    });
+    this.openGoogleMapsExternal(mode);
   }
 
   selectRegion(regionId) {
