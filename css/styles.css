@@ -485,7 +485,7 @@ input, select, textarea {
 
 /* Weather & Currency Ticker */
 .news-ticker-bar {
-  background: #ffffff !important;
+  background: #0f172a !important;
   border-radius: var(--radius-md);
   padding: 0.45rem 0.75rem;
   display: flex;
@@ -883,11 +883,11 @@ input, select, textarea {
 }
 
 .map-wrapper {
-  background: #ffffff !important;
+  background: #0f172a !important;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
-  padding: 1rem;
-  position: relative;
+  padding: 0;
+  position: relative; overflow: hidden;
   min-height: 280px;
   display: flex;
   align-items: center;

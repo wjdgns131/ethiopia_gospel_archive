@@ -103,10 +103,8 @@ class EthiopiaMapComponent {
       counts[regId] = (counts[regId] || 0) + 1;
     });
 
-    // Render Google Maps Engine
-    if (typeof L !== 'undefined') {
-      this.renderGoogleMap(counts, members);
-    }
+    // ALWAYS Render Map Engine (Unconditionally!)
+    this.renderGoogleMap(counts, members);
 
     // Render Sidebar Region Pills (ONLY for regions with count > 0)
     const isEn = window.i18n && window.i18n.getLang() === 'en';
@@ -120,7 +118,7 @@ class EthiopiaMapComponent {
 
     ETHIOPIA_REGIONS.forEach(reg => {
       const cnt = counts[reg.id] || 0;
-      if (cnt === 0) return; // Hide regions with 0 members!
+      if (cnt === 0) return;
 
       const isActive = this.activeRegion === reg.id;
       const regNameDisp = isEn ? window.i18n.translateContent(reg.name) : reg.name;
