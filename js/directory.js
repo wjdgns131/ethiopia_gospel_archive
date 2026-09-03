@@ -19,8 +19,9 @@ class DirectoryComponent {
   // 1. Centralized Safe Event Delegation (DOM 클릭 이벤트 통일 수신기)
   // 1. Centralized Safe Event Delegation (DOM 클릭 이벤트 통일 수신기)
   // 1. Centralized Safe Event Delegation (DOM 클릭 이벤트 통일 수신기)
+  // 1. Centralized Safe Event Delegation (DOM 클릭 이벤트 통일 수신기)
   initGlobalEventDelegation() {
-    // Robust Clipboard Paste Handler ([Ctrl + V]) for PPT, KakaoTalk, Windows Snipping Tool
+    // 📋 ULTIMATE POWERPOINT (PPT) & CLIPBOARD PASTE ENGINE ([Ctrl + V])
     window.addEventListener("paste", (e) => {
       const modal = document.getElementById("memberEditModal");
       if (!modal || modal.classList.contains("hidden")) return;
@@ -30,7 +31,21 @@ class DirectoryComponent {
 
       let imageFile = null;
 
-      // Priority 1: Check clipboard files (PPT, Snipping Tool, File Copy)
+      // 1. Check PowerPoint text/html Base64 Clipboard Format
+      const htmlData = clipboardData.getData("text/html");
+      if (htmlData) {
+        const imgMatch = htmlData.match(/<img[^>]+src=["'](data:image\/[^"']+)["']/i);
+        if (imgMatch && imgMatch[1]) {
+          e.preventDefault();
+          this.tempMemberPhoto = imgMatch[1];
+          this.renderMemberPhotoPreview();
+          if (window.showToast) window.showToast("📋 PPT 캡처 사진이 즉시 붙여넣어졌습니다! 1:1 구도를 맞추세요.");
+          setTimeout(() => this.openCropperModal(), 100);
+          return;
+        }
+      }
+
+      // 2. Check Clipboard Files (Windows Snipping Tool & Copied Image Files)
       if (clipboardData.files && clipboardData.files.length > 0) {
         for (let i = 0; i < clipboardData.files.length; i++) {
           if (clipboardData.files[i].type.startsWith("image/")) {
@@ -40,7 +55,7 @@ class DirectoryComponent {
         }
       }
 
-      // Priority 2: Check clipboard items (Browser Image Copy, Web Snippets)
+      // 3. Check Clipboard Items (Chrome Browser Copy)
       if (!imageFile && clipboardData.items && clipboardData.items.length > 0) {
         for (let i = 0; i < clipboardData.items.length; i++) {
           const item = clipboardData.items[i];
@@ -361,6 +376,7 @@ class DirectoryComponent {
     reader.readAsDataURL(file);
   }
 
+  // Interactive 1:1 Profile Photo Cropper Engine (PPT & Photo Optimal Fit)
   openCropperModal() {
     if (!this.tempMemberPhoto) {
       alert("먼저 사진을 올려주시거나 [Ctrl + V]로 이미지 캡처를 붙여넣어 주세요.");
@@ -384,32 +400,33 @@ class DirectoryComponent {
           </div>
 
           <p style="font-size:0.85rem; color:#64748b; margin-bottom:1rem; line-height:1.4;">
-            마우스 드래그로 얼굴 위치를 맞추시거나, 확대 슬라이더와 방향 버튼을 이용해 가장 예쁜 구도를 맞춰주세요.
+            마우스 드래그로 얼굴 위치를 맞추시거나, 확대/축소 슬라이더로 원하는 구도를 편하게 맞춰주세요.
           </p>
 
-          <!-- 1:1 SQUARE CROP VIEWPORT -->
-          <div id="cropperViewport" style="position:relative; width:240px; height:240px; margin:0 auto 1.25rem auto; border-radius:20px; overflow:hidden; border:3px solid #0284c7; box-shadow:0 8px 20px rgba(2,132,199,0.25); background:#f8fafc; cursor:grab; user-select:none;">
-            <img id="cropperTargetImg" src="" alt="Crop Target" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%) scale(1); max-width:none; transition:none;" />
-            <div style="position:absolute; inset:0; border:2px dashed rgba(2,132,199,0.6); border-radius:18px; pointer-events:none;"></div>
+          <!-- 1:1 SQUARE CROP VIEWPORT (260px x 260px) -->
+          <div id="cropperViewport" style="position:relative; width:260px; height:260px; margin:0 auto 1.25rem auto; border-radius:20px; overflow:hidden; border:3px solid #0284c7; box-shadow:0 8px 20px rgba(2,132,199,0.25); background:#0f172a; cursor:grab; user-select:none;">
+            <img id="cropperTargetImg" src="" alt="Crop Target" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%) scale(0.6); max-width:none; transition:none;" />
+            <div style="position:absolute; inset:0; border:2px dashed rgba(255,255,255,0.7); border-radius:18px; pointer-events:none;"></div>
           </div>
 
           <!-- CONTROLS TOOLBAR -->
           <div style="background:#f1f5f9; padding:0.85rem 1rem; border-radius:14px; margin-bottom:1.25rem; display:flex; flex-direction:column; gap:0.75rem;">
             
-            <!-- ZOOM SLIDER -->
+            <!-- ZOOM SLIDER & BUTTONS -->
             <div style="display:flex; align-items:center; gap:0.6rem;">
-              <span style="font-size:0.82rem; font-weight:700; color:#334155; white-space:nowrap;"><i class="fa-solid fa-magnifying-glass-plus"></i> 크기 확대</span>
-              <input type="range" id="cropZoomSlider" min="1.0" max="3.5" step="0.05" value="1.0" style="flex:1; cursor:pointer;" />
+              <button type="button" id="cropBtnZoomOut" class="btn btn-secondary btn-sm" style="padding:0.25rem 0.55rem; font-weight:800;"><i class="fa-solid fa-minus"></i> 축소</button>
+              <input type="range" id="cropZoomSlider" min="0.2" max="3.0" step="0.05" value="0.6" style="flex:1; cursor:pointer;" />
+              <button type="button" id="cropBtnZoomIn" class="btn btn-secondary btn-sm" style="padding:0.25rem 0.55rem; font-weight:800;"><i class="fa-solid fa-plus"></i> 확대</button>
             </div>
 
             <!-- 4-WAY DIRECTION BUTTONS -->
             <div style="display:flex; justify-content:center; gap:0.5rem; align-items:center;">
-              <span style="font-size:0.8rem; font-weight:700; color:#475569; margin-right:4px;">위치 조정:</span>
+              <span style="font-size:0.8rem; font-weight:700; color:#475569; margin-right:4px;">위치 이동:</span>
               <button type="button" id="cropBtnLeft" class="btn btn-secondary btn-sm" style="padding:0.25rem 0.6rem; font-size:0.8rem;"><i class="fa-solid fa-arrow-left"></i></button>
               <button type="button" id="cropBtnUp" class="btn btn-secondary btn-sm" style="padding:0.25rem 0.6rem; font-size:0.8rem;"><i class="fa-solid fa-arrow-up"></i></button>
               <button type="button" id="cropBtnDown" class="btn btn-secondary btn-sm" style="padding:0.25rem 0.6rem; font-size:0.8rem;"><i class="fa-solid fa-arrow-down"></i></button>
               <button type="button" id="cropBtnRight" class="btn btn-secondary btn-sm" style="padding:0.25rem 0.6rem; font-size:0.8rem;"><i class="fa-solid fa-arrow-right"></i></button>
-              <button type="button" id="cropBtnReset" class="btn btn-outline btn-sm" style="padding:0.25rem 0.6rem; font-size:0.78rem; font-weight:700; color:#0284c7;">중앙</button>
+              <button type="button" id="cropBtnReset" class="btn btn-outline btn-sm" style="padding:0.25rem 0.6rem; font-size:0.78rem; font-weight:700; color:#0284c7;">초기화</button>
             </div>
           </div>
 
@@ -424,14 +441,15 @@ class DirectoryComponent {
       `;
       document.body.appendChild(modal);
 
-      // Wire interactive events
       this.initCropperInteractions();
     }
 
     const targetImg = document.getElementById("cropperTargetImg");
     if (targetImg) {
       targetImg.src = this.tempMemberPhoto;
-      this.cropState = { scale: 1.0, offsetX: 0, offsetY: 0, isDragging: false, startX: 0, startY: 0 };
+      this.cropState = { scale: 0.6, offsetX: 0, offsetY: 0, isDragging: false, startX: 0, startY: 0 };
+      const slider = document.getElementById("cropZoomSlider");
+      if (slider) slider.value = 0.6;
       this.applyCropTransforms();
     }
 
@@ -443,12 +461,18 @@ class DirectoryComponent {
     const slider = document.getElementById("cropZoomSlider");
     const applyBtn = document.getElementById("applyCropBtn");
 
+    const updateScale = (val) => {
+      this.cropState.scale = Math.max(0.2, Math.min(3.0, val));
+      if (slider) slider.value = this.cropState.scale;
+      this.applyCropTransforms();
+    };
+
     if (slider) {
-      slider.addEventListener("input", (e) => {
-        this.cropState.scale = parseFloat(e.target.value);
-        this.applyCropTransforms();
-      });
+      slider.addEventListener("input", (e) => updateScale(parseFloat(e.target.value)));
     }
+
+    document.getElementById("cropBtnZoomIn")?.addEventListener("click", () => updateScale(this.cropState.scale + 0.15));
+    document.getElementById("cropBtnZoomOut")?.addEventListener("click", () => updateScale(this.cropState.scale - 0.15));
 
     const updatePos = (dx, dy) => {
       this.cropState.offsetX += dx;
@@ -456,19 +480,16 @@ class DirectoryComponent {
       this.applyCropTransforms();
     };
 
-    document.getElementById("cropBtnLeft")?.addEventListener("click", () => updatePos(-10, 0));
-    document.getElementById("cropBtnRight")?.addEventListener("click", () => updatePos(10, 0));
-    document.getElementById("cropBtnUp")?.addEventListener("click", () => updatePos(0, -10));
-    document.getElementById("cropBtnDown")?.addEventListener("click", () => updatePos(0, 10));
+    document.getElementById("cropBtnLeft")?.addEventListener("click", () => updatePos(-15, 0));
+    document.getElementById("cropBtnRight")?.addEventListener("click", () => updatePos(15, 0));
+    document.getElementById("cropBtnUp")?.addEventListener("click", () => updatePos(0, -15));
+    document.getElementById("cropBtnDown")?.addEventListener("click", () => updatePos(0, 15));
     document.getElementById("cropBtnReset")?.addEventListener("click", () => {
       this.cropState.offsetX = 0;
       this.cropState.offsetY = 0;
-      this.cropState.scale = 1.0;
-      if (slider) slider.value = 1.0;
-      this.applyCropTransforms();
+      updateScale(0.6);
     });
 
-    // Mouse & Touch Dragging Handlers
     if (viewport) {
       viewport.addEventListener("mousedown", (e) => {
         this.cropState.isDragging = true;
@@ -487,6 +508,13 @@ class DirectoryComponent {
       window.addEventListener("mouseup", () => {
         if (this.cropState) this.cropState.isDragging = false;
         if (viewport) viewport.style.cursor = "grab";
+      });
+
+      // Mouse Wheel Zoom
+      viewport.addEventListener("wheel", (e) => {
+        e.preventDefault();
+        const delta = e.deltaY > 0 ? -0.08 : 0.08;
+        updateScale(this.cropState.scale + delta);
       });
     }
 
@@ -508,15 +536,13 @@ class DirectoryComponent {
 
     try {
       const canvas = document.createElement("canvas");
-      canvas.width = 300;
-      canvas.height = 300;
+      canvas.width = 400;
+      canvas.height = 400;
       const ctx = canvas.getContext("2d");
 
-      // Draw background white
       ctx.fillStyle = "#ffffff";
-      ctx.fillRect(0, 0, 300, 300);
+      ctx.fillRect(0, 0, 400, 400);
 
-      // Create a temp image element to ensure dimensions
       const tempImg = new Image();
       tempImg.crossOrigin = "anonymous";
       tempImg.onload = () => {
@@ -524,37 +550,26 @@ class DirectoryComponent {
         const offsetX = this.cropState.offsetX;
         const offsetY = this.cropState.offsetY;
 
-        // Viewport 240x240 mapped to canvas 300x300 (ratio 1.25)
-        const ratio = 1.25;
+        // Viewport 260x260 mapped to canvas 400x400 (ratio = 400 / 260 = 1.538)
+        const ratio = 400 / 260;
 
-        let renderW = tempImg.naturalWidth * scale * ratio;
-        let renderH = tempImg.naturalHeight * scale * ratio;
+        let drawW = tempImg.naturalWidth * scale * ratio;
+        let drawH = tempImg.naturalHeight * scale * ratio;
 
-        // Keep aspect ratio
-        if (tempImg.naturalWidth > 0 && tempImg.naturalHeight > 0) {
-          const imgAspect = tempImg.naturalWidth / tempImg.naturalHeight;
-          if (imgAspect > 1) {
-            renderH = (300 / scale) * scale;
-            renderW = renderH * imgAspect;
-          } else {
-            renderW = (300 / scale) * scale;
-            renderH = renderW / imgAspect;
-          }
-        }
+        const drawX = (200 - drawW / 2) + (offsetX * ratio);
+        const drawY = (200 - drawH / 2) + (offsetY * ratio);
 
-        renderW *= scale;
-        renderH *= scale;
-
-        const drawX = (150 - renderW / 2) + (offsetX * ratio);
-        const drawY = (150 - renderH / 2) + (offsetY * ratio);
-
-        ctx.drawImage(tempImg, drawX, drawY, renderW, renderH);
+        ctx.drawImage(tempImg, drawX, drawY, drawW, drawH);
 
         this.tempMemberPhoto = canvas.toDataURL("image/jpeg", 0.9);
+
+        const photoInput = document.getElementById("fieldPhoto");
+        if (photoInput) photoInput.value = this.tempMemberPhoto;
+
         this.renderMemberPhotoPreview();
-        
+
         document.getElementById("cropperModal")?.classList.add("hidden");
-        if (window.showToast) window.showToast("✂️ 프로필 사진 구도가 성공적으로 조정되었습니다!");
+        if (window.showToast) window.showToast("✂️ 선택하신 구도로 프로필 사진이 자르기 적용되었습니다!");
       };
       tempImg.src = img.src;
     } catch(e) {
