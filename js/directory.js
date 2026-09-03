@@ -693,13 +693,13 @@ class DirectoryComponent {
     const isDisrupter = member.category === "disrupter";
 
     const isEn = window.i18n && window.i18n.getLang() === 'en';
-    const nameDisp = isEn ? window.i18n.translateContent(member.name) : member.name;
-    const regionDisp = isEn ? window.i18n.translateContent(member.region) : member.region;
-    const jobDisp = isEn ? window.i18n.translateContent(member.job || '직업 정보 없음') : (member.job || '직업 정보 없음');
+    const nameDisp = isEn ? (member.nameEn || window.i18n.translateContent(member.name)) : member.name;
+    const regionDisp = isEn ? (member.regionEn || window.i18n.translateContent(member.region)) : member.region;
+    const jobDisp = isEn ? (member.jobEn || window.i18n.translateContent(member.job || 'No Occupation Listed')) : (member.job || '직업 정보 없음');
     const assemblyMonthDisp = isEn ? window.i18n.translateContent(member.assemblyMonth || '-') : (member.assemblyMonth || '-');
-    const inviterDisp = isEn ? window.i18n.translateContent(member.inviter || '') : (member.inviter || '');
-    const inviterRelDisp = isEn ? window.i18n.translateContent(member.inviterRelation || '초대') : (member.inviterRelation || '초대');
-    const testimonyDisp = isEn ? window.i18n.translateContent(member.testimony || '등록된 간증 문구가 없습니다.') : (member.testimony || '등록된 간증 문구가 없습니다.');
+    const inviterDisp = isEn ? (member.inviterEn || window.i18n.translateContent(member.inviter || '')) : (member.inviter || '');
+    const inviterRelDisp = isEn ? (member.inviterRelationEn || window.i18n.translateContent(member.inviterRelation || 'invitation')) : (member.inviterRelation || '초대');
+    const testimonyDisp = isEn ? (member.testimonyEn || window.i18n.translateContent(member.testimony || 'No testimony text recorded.')) : (member.testimony || '등록된 간증 문구가 없습니다.');
 
     body.innerHTML = `
       <div class="member-detail-header" style="display:flex; gap:1.5rem; align-items:flex-start; margin-bottom:1.5rem; flex-wrap:wrap;">
@@ -1086,11 +1086,12 @@ class DirectoryComponent {
     const currentCalculatedAge = this.getCalculatedAge(m);
     const testimonyUrl = (m.testimony || m.youtube || "").trim();
 
-    const nameDisp = window.i18n ? window.i18n.translateContent(m.name) : m.name;
-    const regionDisp = window.i18n ? window.i18n.translateContent(m.region) : m.region;
-    const jobDisp = window.i18n ? window.i18n.translateContent(m.job || '-') : (m.job || '-');
-    const assemblyMonthDisp = window.i18n ? window.i18n.translateContent(m.assemblyMonth || '-') : (m.assemblyMonth || '-');
-    const viewTestimonyLabel = window.i18n ? window.i18n.t("viewTestimonyBtn") : "간증 보기";
+    const isEn = window.i18n && window.i18n.getLang() === 'en';
+    const nameDisp = isEn ? (m.nameEn || window.i18n.translateContent(m.name)) : m.name;
+    const regionDisp = isEn ? (m.regionEn || window.i18n.translateContent(m.region)) : m.region;
+    const jobDisp = isEn ? (m.jobEn || window.i18n.translateContent(m.job || '-')) : (m.job || '-');
+    const assemblyMonthDisp = isEn ? window.i18n.translateContent(m.assemblyMonth || '-') : (m.assemblyMonth || '-');
+    const viewTestimonyLabel = isEn ? "Testimony" : "간증 보기";
 
     return `
       <div class="member-card ${isDisrupter ? 'disrupter-card' : ''}" onclick="window.directoryComponent.openMemberDetailModal('${m.id}')" style="cursor:pointer; background:var(--bg-card); border:1px solid var(--border-color); border-radius:20px; overflow:hidden; box-shadow:var(--shadow-sm); transition:transform 0.25s, box-shadow 0.25s; display:flex; flex-direction:column; padding:0.4rem 0.4rem 1rem 0.4rem;">
