@@ -1975,7 +1975,7 @@ if (typeof window !== 'undefined') {
   window.DEFAULT_HISTORY = DEFAULT_HISTORY;
   window.DEFAULT_ASSEMBLIES = [];
   window.DEFAULT_EVENTS = typeof DEFAULT_EVENTS !== 'undefined' ? DEFAULT_EVENTS : [];
-  window.DATA_VERSION = "20260904_V3500_MASTER_CACHE_AND_SVG_FIX";
+  window.DATA_VERSION = "20260904_V3600_INLINE_FAILSAFE_EMERGENCY_RENDER";
 
   // Force-clear all stale localStorage keys
   try {
@@ -1991,7 +1991,7 @@ if (typeof window !== 'undefined') {
   window.db = {
     getMembers() {
       try {
-        const stored = localStorage.getItem("ethiopia_members_v3500");
+        const stored = localStorage.getItem("ethiopia_members_v3600");
         if (stored) {
           const parsed = JSON.parse(stored);
           if (Array.isArray(parsed) && parsed.length > 0) {
@@ -2006,13 +2006,13 @@ if (typeof window !== 'undefined') {
     saveMembers(mems) {
       try {
         if (Array.isArray(mems) && mems.length > 0) {
-          localStorage.setItem("ethiopia_members_v3500", JSON.stringify(mems));
+          localStorage.setItem("ethiopia_members_v3600", JSON.stringify(mems));
         }
       } catch(e) {}
     },
     getHistory() {
       try {
-        const stored = localStorage.getItem("ethiopia_history_v3500");
+        const stored = localStorage.getItem("ethiopia_history_v3600");
         if (stored) {
           const parsed = JSON.parse(stored);
           if (Array.isArray(parsed) && parsed.length > 0) {
@@ -2027,13 +2027,13 @@ if (typeof window !== 'undefined') {
     saveHistory(hists) {
       try {
         if (Array.isArray(hists) && hists.length > 0) {
-          localStorage.setItem("ethiopia_history_v3500", JSON.stringify(hists));
+          localStorage.setItem("ethiopia_history_v3600", JSON.stringify(hists));
         }
       } catch(e) {}
     },
     getFellowship() {
       try {
-        const stored = localStorage.getItem("ethiopia_assemblies_v3500");
+        const stored = localStorage.getItem("ethiopia_assemblies_v3600");
         if (stored) {
           const parsed = JSON.parse(stored);
           if (Array.isArray(parsed)) return parsed;
@@ -2043,12 +2043,12 @@ if (typeof window !== 'undefined') {
     },
     saveFellowship(items) {
       try {
-        localStorage.setItem("ethiopia_assemblies_v3500", JSON.stringify(items));
+        localStorage.setItem("ethiopia_assemblies_v3600", JSON.stringify(items));
       } catch(e) {}
     },
     getEvents() {
       try {
-        const stored = localStorage.getItem("ethiopia_events_v3500");
+        const stored = localStorage.getItem("ethiopia_events_v3600");
         if (stored) {
           const parsed = JSON.parse(stored);
           if (Array.isArray(parsed)) return parsed;
@@ -2058,7 +2058,7 @@ if (typeof window !== 'undefined') {
     },
     saveEvents(evts) {
       try {
-        localStorage.setItem("ethiopia_events_v3500", JSON.stringify(evts));
+        localStorage.setItem("ethiopia_events_v3600", JSON.stringify(evts));
       } catch(e) {}
     },
     addEvent(e) {
