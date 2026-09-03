@@ -1905,16 +1905,16 @@ class DataStore {
   }
 
   saveHistory(historyList) {
-    this._historyCache = historyList; // Always update in-memory cache!
+    this._historyCache = [...historyList]; // Always update in-memory cache!
 
     if (historyList && Array.isArray(historyList)) {
       historyList.forEach(item => {
         if (!item || !item.id) return;
-        const idx = DEFAULT_HISTORY.findIndex(h => h && h.id === item.id);
+        const idx = DEFAULT_HISTORY.findIndex(h => h && String(h.id) === String(item.id));
         if (idx !== -1) {
-          DEFAULT_HISTORY[idx] = item;
+          DEFAULT_HISTORY[idx] = { ...item };
         } else {
-          DEFAULT_HISTORY.push(item);
+          DEFAULT_HISTORY.push({ ...item });
         }
       });
     }

@@ -361,7 +361,7 @@ class TimelineComponent {
       if (id) {
         historyData.id = id;
         const currentList = window.db ? window.db.getHistory() : [];
-        const updatedList = currentList.map(h => h && h.id === id ? { ...h, ...historyData } : h);
+        const updatedList = currentList.map(h => h && String(h.id) === String(id) ? { ...h, ...historyData } : h);
         window.db.saveHistory(updatedList);
         this.activeId = id;
       } else {
