@@ -1058,7 +1058,13 @@ class DirectoryComponent {
   }
 
   filterMembers() {
-    const allMembers = window.db ? window.db.getMembers() : [];
+    let allMembers = [];
+    try {
+      allMembers = window.db ? window.db.getMembers() : [];
+    } catch(e) {}
+    if (!allMembers || allMembers.length === 0) {
+      allMembers = window.DEFAULT_MEMBERS || [];
+    }
     
     const filtered = allMembers.filter(m => {
       // Category Filter

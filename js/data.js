@@ -1967,10 +1967,10 @@ const DEFAULT_ASSEMBLIES = [];
 if (typeof window !== 'undefined') {
   window.DEFAULT_MEMBERS = DEFAULT_MEMBERS;
   window.DEFAULT_HISTORY = DEFAULT_HISTORY;
-  window.DEFAULT_ASSEMBLIES = DEFAULT_ASSEMBLIES;
-  window.DATA_VERSION = "20260904_V2800_CLEARED_FELLOWSHIP";
+  window.DEFAULT_ASSEMBLIES = [];
+  window.DATA_VERSION = "20260904_V2900_PERMANENT_PROTECTION";
 
-  // Auto-flush stale localStorage if code/data version changes
+  // Force-clear all stale localStorage keys
   try {
     const currentVer = localStorage.getItem("ethiopia_archive_data_ver");
     if (currentVer !== window.DATA_VERSION) {
@@ -1984,7 +1984,7 @@ if (typeof window !== 'undefined') {
   window.db = {
     getMembers() {
       try {
-        const stored = localStorage.getItem("ethiopia_members_v2800");
+        const stored = localStorage.getItem("ethiopia_members_v2900");
         if (stored) {
           const parsed = JSON.parse(stored);
           if (Array.isArray(parsed) && parsed.length > 0) return parsed;
@@ -1994,12 +1994,12 @@ if (typeof window !== 'undefined') {
     },
     saveMembers(mems) {
       try {
-        localStorage.setItem("ethiopia_members_v2800", JSON.stringify(mems));
+        localStorage.setItem("ethiopia_members_v2900", JSON.stringify(mems));
       } catch(e) {}
     },
     getHistory() {
       try {
-        const stored = localStorage.getItem("ethiopia_history_v2800");
+        const stored = localStorage.getItem("ethiopia_history_v2900");
         if (stored) {
           const parsed = JSON.parse(stored);
           if (Array.isArray(parsed) && parsed.length > 0) return parsed;
@@ -2009,22 +2009,22 @@ if (typeof window !== 'undefined') {
     },
     saveHistory(hists) {
       try {
-        localStorage.setItem("ethiopia_history_v2800", JSON.stringify(hists));
+        localStorage.setItem("ethiopia_history_v2900", JSON.stringify(hists));
       } catch(e) {}
     },
     getFellowship() {
       try {
-        const stored = localStorage.getItem("ethiopia_assemblies_v2800");
+        const stored = localStorage.getItem("ethiopia_assemblies_v2900");
         if (stored) {
           const parsed = JSON.parse(stored);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          if (Array.isArray(parsed)) return parsed;
         }
       } catch(e) {}
-      return window.DEFAULT_ASSEMBLIES || [];
+      return [];
     },
     saveFellowship(items) {
       try {
-        localStorage.setItem("ethiopia_assemblies_v2800", JSON.stringify(items));
+        localStorage.setItem("ethiopia_assemblies_v2900", JSON.stringify(items));
       } catch(e) {}
     },
     addMember(m) {
@@ -2080,7 +2080,7 @@ if (typeof window !== 'undefined') {
         localStorage.clear();
         localStorage.setItem("ethiopia_archive_data_ver", window.DATA_VERSION);
       } catch(e) {}
-      if (window.showToast) window.showToast("⚡ 최신 코드 데이터 및 수정된 역사가 성공적으로 동기화되었습니다!");
+      if (window.showToast) window.showToast("⚡ 코드 데이터셋 및 사진으로 동기화되었습니다!");
       setTimeout(() => location.reload(), 400);
     }
   };
