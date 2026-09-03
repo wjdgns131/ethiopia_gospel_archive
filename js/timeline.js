@@ -562,15 +562,28 @@ class TimelineComponent {
       ${this.renderAssemblyTestimonyButton(activeItem)}
 
       ${activeItem.images && activeItem.images.length > 0 ? `
-        <div class="timeline-gallery-grid images-${Math.min(activeItem.images.length, 4)}" style="margin-top:1.8rem;">
-          ${activeItem.images.map((img, imgIdx) => `
-            <div class="gallery-image-box" onclick="window.timelineComponent.openPhotoLightboxById('${activeItem.id}', ${imgIdx})" style="background:transparent !important; height:320px !important; border-radius:16px !important; overflow:hidden !important; border:1px solid var(--border-color) !important; box-shadow:0 4px 12px rgba(0,0,0,0.06) !important;">
-              <img src="${img}" alt="${activeItem.title}" loading="lazy" style="width:100% !important; height:100% !important; object-fit:cover !important; border-radius:16px !important; display:block !important;" />
-              <div class="image-hover-overlay">
-                <i class="fa-solid fa-magnifying-glass-plus"></i>
+        <div style="margin-top:2rem;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.75rem; padding:0 0.2rem; flex-wrap:wrap; gap:0.5rem;">
+            <span style="font-size:0.92rem; font-weight:800; color:var(--text-primary); display:flex; align-items:center; gap:0.4rem;">
+              <i class="fa-solid fa-images" style="color:#0284c7;"></i> 현장 활동 사진 <span style="background:rgba(2,132,199,0.1); color:#0284c7; padding:0.15rem 0.6rem; border-radius:12px; font-size:0.78rem; font-weight:800;">${activeItem.images.length}장</span>
+            </span>
+            ${activeItem.images.length > 1 ? `
+              <span style="font-size:0.8rem; color:var(--text-muted); font-weight:600; display:flex; align-items:center; gap:0.3rem;">
+                <i class="fa-solid fa-left-right" style="color:#0284c7;"></i> 좌우로 드래그(슬라이드)하여 사진을 확인하실 수 있습니다
+              </span>
+            ` : ''}
+          </div>
+
+          <div class="timeline-gallery-grid ${activeItem.images.length === 1 ? 'single-image' : ''}" onmousedown="window.timelineComponent.handleGalleryDragStart(event, this)">
+            ${activeItem.images.map((img, imgIdx) => `
+              <div class="gallery-image-box" onclick="window.timelineComponent.openPhotoLightboxById('${activeItem.id}', ${imgIdx})">
+                <img src="${img}" alt="${activeItem.title}" loading="lazy" />
+                <div class="image-hover-overlay">
+                  <i class="fa-solid fa-magnifying-glass-plus"></i>
+                </div>
               </div>
-            </div>
-          `).join('')}
+            `).join('')}
+          </div>
         </div>
       ` : ''}
 
@@ -910,7 +923,28 @@ class TimelineComponent {
       `}
     `;
 
-    modal.classList.remove("hidden");
+  handleGalleryDragStart(e, container) {
+    if (!container) return;
+    let isDown = true;
+    let startX = e.pageX - container.offsetLeft;
+    let scrollLeft = container.scrollLeft;
+
+    const onMouseMove = (moveEv) => {
+      if (!isDown) return;
+      moveEv.preventDefault();
+      const x = moveEv.pageX - container.offsetLeft;
+      const walk = (x - startX) * 1.6;
+      container.scrollLeft = scrollLeft - walk;
+    };
+
+    const onMouseUp = () => {
+      isDown = false;
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
   }
 }
 
