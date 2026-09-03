@@ -1205,7 +1205,13 @@ class DirectoryComponent {
     if (!this.container) this.container = document.getElementById("memberGrid") || document.getElementById("memberGridContainer");
     if (!this.container) return;
 
-    const filtered = this.filterMembers();
+    let filtered = [];
+    try {
+      filtered = this.filterMembers();
+    } catch(e) {
+      console.error("filterMembers error:", e);
+      filtered = (typeof DEFAULT_MEMBERS !== 'undefined' && Array.isArray(DEFAULT_MEMBERS)) ? DEFAULT_MEMBERS : (window.DEFAULT_MEMBERS || []);
+    }
 
     // Sync Region Dropdown Select
     const regionDropdown = document.getElementById("regionDropdown");
@@ -1236,24 +1242,21 @@ class DirectoryComponent {
 
     // Re-render Map with full members count
     if (window.mapComponent) {
-      window.mapComponent.render(window.db ? window.db.getMembers() : []);
+      try {
+        window.mapComponent.render(window.db ? window.db.getMembers() : []);
+      } catch(e) {}
     }
 
-    if (filtered.length === 0) {
-      // Auto-healing fallback: If filters are default but filtered count is 0, force-render all 94 DEFAULT_MEMBERS!
+    if (!filtered || !Array.isArray(filtered) || filtered.length === 0) {
+      // Auto-healing fallback: If filters match 0 results or fail, force-render all 94 DEFAULT_MEMBERS!
       const isDefaultFilters = (!this.activeRegion || this.activeRegion === "all" || this.activeRegion === "전체") && (this.activeCategory === "all") && !this.searchQuery;
       if (isDefaultFilters) {
-        try {
-          localStorage.clear();
-        } catch(e) {}
-        const restored = (typeof DEFAULT_MEMBERS !== 'undefined' && Array.isArray(DEFAULT_MEMBERS) && DEFAULT_MEMBERS.length > 0) ? DEFAULT_MEMBERS : (window.DEFAULT_MEMBERS || []);
-        if (restored && restored.length > 0) {
-          this.container.className = "mockup-member-grid";
-          this.container.innerHTML = restored.map(m => this.createCardHtml(m)).join("");
-          return;
-        }
+        try { localStorage.clear(); } catch(e) {}
+        filtered = (typeof DEFAULT_MEMBERS !== 'undefined' && Array.isArray(DEFAULT_MEMBERS) && DEFAULT_MEMBERS.length > 0) ? DEFAULT_MEMBERS : (window.DEFAULT_MEMBERS || []);
       }
+    }
 
+    if (!filtered || filtered.length === 0) {
       this.container.className = "member-grid-empty";
       this.container.innerHTML = `
         <div class="empty-state" style="padding:4rem 1rem; text-align:center; background:var(--bg-card); border:1px solid var(--border-color); border-radius:16px; margin:1rem 0; box-shadow:var(--shadow-sm);">
