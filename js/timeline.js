@@ -813,6 +813,15 @@ class TimelineComponent {
               </button>
             `;
           }).join('')}
+
+          <div style="margin-left:auto; display:flex; align-items:center; gap:0.6rem;">
+            <button type="button" onclick="event.stopPropagation(); window.db.exportDatabaseToJson()" style="padding:0.45rem 0.95rem; font-size:0.84rem; font-weight:800; border-radius:20px; border:1.5px solid #10b981; background:#ecfdf5; color:#047857; cursor:pointer; display:flex; align-items:center; gap:0.4rem; box-shadow:0 2px 6px rgba(16,185,129,0.15);" title="현재 작성된 모든 데이터와 사진을 내 컴퓨터에 안전하게 파일로 저장합니다.">
+              <i class="fa-solid fa-download"></i> 💾 백업 다운로드 (.json)
+            </button>
+            <button type="button" onclick="event.stopPropagation(); window.db.triggerImportDatabase()" style="padding:0.45rem 0.95rem; font-size:0.84rem; font-weight:800; border-radius:20px; border:1.5px solid #0284c7; background:#f0f9ff; color:#0369a1; cursor:pointer; display:flex; align-items:center; gap:0.4rem; box-shadow:0 2px 6px rgba(2,132,199,0.15);" title="이전에 저장해둔 백업 파일을 선택하여 데이터를 즉시 복원합니다.">
+              <i class="fa-solid fa-upload"></i> 📂 백업 파일 복원
+            </button>
+          </div>
         </div>
         
         <!-- Track Container with Edge Gradient Fade -->

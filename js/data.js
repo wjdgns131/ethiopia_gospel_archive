@@ -1810,19 +1810,24 @@ class DataStore {
 
   init() {
     try {
-      const CURRENT_DATA_VERSION = "7.0_force_all_cards_sync";
-      const savedVersion = localStorage.getItem("ethiopia_data_ver");
-      if (savedVersion !== CURRENT_DATA_VERSION) {
-        console.log("🔄 Upgrading data version to " + CURRENT_DATA_VERSION + ", syncing fresh history photos across all cards...");
-        localStorage.setItem("ethiopia_data_ver", CURRENT_DATA_VERSION);
-        localStorage.setItem("ethiopia_history", JSON.stringify(DEFAULT_HISTORY));
-      }
+      const CURRENT_DATA_VERSION = "8.0_master_auto_save_shield";
+      localStorage.setItem("ethiopia_data_ver", CURRENT_DATA_VERSION);
+
+      let userCustomHistory = null;
+      try { userCustomHistory = JSON.parse(localStorage.getItem("ethiopia_user_custom_edits")); } catch(e) {}
 
       let historyData = null;
       try { historyData = JSON.parse(localStorage.getItem("ethiopia_history")); } catch(e) {}
-      if (!historyData || !Array.isArray(historyData) || historyData.length === 0) {
-        try { localStorage.setItem("ethiopia_history", JSON.stringify(DEFAULT_HISTORY)); } catch(e) {}
+
+      if (userCustomHistory && Array.isArray(userCustomHistory) && userCustomHistory.length > 0) {
+        historyData = userCustomHistory;
+        try { localStorage.setItem("ethiopia_history", JSON.stringify(historyData)); } catch(e) {}
+      } else if (!historyData || !Array.isArray(historyData) || historyData.length === 0) {
+        historyData = JSON.parse(JSON.stringify(DEFAULT_HISTORY));
+        try { localStorage.setItem("ethiopia_history", JSON.stringify(historyData)); } catch(e) {}
       }
+
+      this._historyCache = historyData;
 
       let membersData = null;
       try { membersData = JSON.parse(localStorage.getItem("ethiopia_members")); } catch(e) {}
@@ -1970,8 +1975,10 @@ class DataStore {
 
     try {
       localStorage.setItem("ethiopia_history", JSON.stringify(historyList));
+      localStorage.setItem("ethiopia_user_custom_edits", JSON.stringify(historyList));
     } catch(e) {
       console.warn("localStorage quota exceeded for history:", e);
+      if (window.showToast) window.showToast("⚠️ 브라우저 저장용량이 가득 찼습니다. [데이터 백업 다운로드] 버튼으로 내 컴퓨터에 안전하게 보관하세요!");
     }
     this.syncHistoryToFile(historyList);
   }
@@ -2278,6 +2285,49 @@ class DataStore {
     downloadAnchor.click();
     downloadAnchor.remove();
     alert("✨ 모든 식구 정보 및 복음 역사가 성공적으로 내 컴퓨터에 백업 파일(.json)로 저장 되었습니다!");
+  }
+
+  importDatabaseFromJson(file) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = JSON.parse(e.target.result);
+        if (data && (data.history || data.members || data.assemblies)) {
+          if (data.history && Array.isArray(data.history)) {
+            this.saveHistory(data.history);
+          }
+          if (data.members && Array.isArray(data.members)) {
+            this.saveMembers(data.members);
+          }
+          if (data.assemblies && Array.isArray(data.assemblies)) {
+            this.saveAssemblies(data.assemblies);
+          }
+          if (data.events && Array.isArray(data.events)) {
+            this.saveEvents(data.events);
+          }
+          alert("✨ [백업 복원 완료] 선택하신 백업 파일의 모든 역사 기록과 식구 정보가 성공적으로 복원되었습니다!");
+          window.location.reload();
+        } else {
+          alert("⚠️ 올바른 백업 파일(.json) 형식이 아닙니다.");
+        }
+      } catch(err) {
+        console.error("Backup import error:", err);
+        alert("⚠️ 백업 파일 읽기 오류가 발생했습니다: " + err.message);
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  triggerImportDatabase() {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".json";
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (file) this.importDatabaseFromJson(file);
+    };
+    input.click();
   }
 }
 
