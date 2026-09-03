@@ -237,28 +237,31 @@ class TimelineComponent {
       modal.className = "modal-backdrop";
       modal.style.zIndex = "99999";
       modal.innerHTML = `
-        <div class="lightbox-content-wrapper" style="position:relative; max-width:98vw; max-height:96vh; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-          <button type="button" style="position:absolute; top:-50px; right:0; background:#ef4444; color:#fff; border:none; border-radius:50%; width:40px; height:40px; font-size:22px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 14px rgba(0,0,0,0.8); z-index:100;" onclick="document.getElementById('photoLightboxModal').classList.add('hidden')">
-            <i class="fa-solid fa-xmark"></i>
-          </button>
+        <div class="lightbox-content-wrapper" style="position:fixed; inset:0; width:100vw; height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:10px; box-sizing:border-box; z-index:99999; background:rgba(10,15,28,0.96); backdrop-filter:blur(16px);">
+          
+          <div style="position:absolute; top:18px; left:20px; right:20px; display:flex; align-items:center; justify-content:space-between; z-index:100100; pointer-events:none;">
+            <div id="lightboxCounter" style="pointer-events:auto; background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color:#fff; font-size:1rem; font-weight:800; padding:0.4rem 1.2rem; border-radius:25px; border:1px solid #38bdf8; box-shadow:0 6px 18px rgba(0,0,0,0.6);">
+              📷 1 / 1
+            </div>
 
-          <div id="lightboxCounter" style="position:absolute; top:-46px; left:0; background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color:#fff; font-size:0.95rem; font-weight:800; padding:0.35rem 1.1rem; border-radius:20px; border:1px solid #38bdf8; box-shadow:0 4px 12px rgba(0,0,0,0.5); z-index:100;">
-            📷 1 / 1
+            <button type="button" style="pointer-events:auto; background:#ef4444; color:#fff; border:none; border-radius:50%; width:46px; height:46px; font-size:24px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 20px rgba(239,68,68,0.6); transition:transform 0.2s;" onclick="document.getElementById('photoLightboxModal').classList.add('hidden')" title="닫기 (Esc)">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
           </div>
 
-          <div style="position:relative; cursor:pointer; border-radius:18px; overflow:hidden; box-shadow:0 30px 80px rgba(0,0,0,0.95); background:#0f172a; display:flex; align-items:center; justify-content:center; max-width:96vw; max-height:88vh;" onclick="window.timelineComponent.nextLightboxPhoto()">
-            <img id="lightboxImg" src="" alt="Enlarged Photo" style="max-width:96vw; max-height:88vh; object-fit:contain; border-radius:16px; display:block;" />
+          <div style="position:relative; width:100%; height:100%; display:flex; align-items:center; justify-content:center; max-width:98vw; max-height:92vh;" onclick="window.timelineComponent.nextLightboxPhoto()">
+            <img id="lightboxImg" src="" alt="Enlarged Photo" style="max-width:98vw; max-height:92vh; width:auto; height:auto; object-fit:contain; border-radius:14px; box-shadow:0 25px 90px rgba(0,0,0,0.95); display:block;" />
 
-            <button type="button" id="lightboxPrevBtn" onclick="event.stopPropagation(); window.timelineComponent.prevLightboxPhoto()" style="position:absolute; top:50%; left:16px; transform:translateY(-50%); background:rgba(15,23,42,0.75); color:#ffffff; border:2px solid rgba(255,255,255,0.8); border-radius:50%; width:58px; height:58px; font-size:26px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 25px rgba(0,0,0,0.7); backdrop-filter:blur(8px); transition:all 0.2s;" title="이전 사진">
+            <button type="button" id="lightboxPrevBtn" onclick="event.stopPropagation(); window.timelineComponent.prevLightboxPhoto()" style="position:absolute; top:50%; left:16px; transform:translateY(-50%); background:rgba(15,23,42,0.82); color:#ffffff; border:2px solid rgba(255,255,255,0.9); border-radius:50%; width:60px; height:60px; font-size:26px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 30px rgba(0,0,0,0.8); backdrop-filter:blur(10px); transition:all 0.2s; z-index:100101;" title="이전 사진">
               <i class="fa-solid fa-chevron-left"></i>
             </button>
 
-            <button type="button" id="lightboxNextBtn" onclick="event.stopPropagation(); window.timelineComponent.nextLightboxPhoto()" style="position:absolute; top:50%; right:16px; transform:translateY(-50%); background:rgba(15,23,42,0.75); color:#ffffff; border:2px solid rgba(255,255,255,0.8); border-radius:50%; width:58px; height:58px; font-size:26px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 25px rgba(0,0,0,0.7); backdrop-filter:blur(8px); transition:all 0.2s;" title="다음 사진">
+            <button type="button" id="lightboxNextBtn" onclick="event.stopPropagation(); window.timelineComponent.nextLightboxPhoto()" style="position:absolute; top:50%; right:16px; transform:translateY(-50%); background:rgba(15,23,42,0.82); color:#ffffff; border:2px solid rgba(255,255,255,0.9); border-radius:50%; width:60px; height:60px; font-size:26px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 30px rgba(0,0,0,0.8); backdrop-filter:blur(10px); transition:all 0.2s; z-index:100101;" title="다음 사진">
               <i class="fa-solid fa-chevron-right"></i>
             </button>
           </div>
 
-          <p style="margin-top:0.8rem; font-size:0.88rem; color:#e2e8f0; font-weight:700; text-shadow:0 2px 4px rgba(0,0,0,0.9);"><i class="fa-solid fa-circle-info" style="color:#38bdf8;"></i> 양 옆 화살표 버튼, 사진 클릭, 또는 키보드 화살표(← →)를 통해 다음 사진으로 넘어갑니다.</p>
+          <p style="position:absolute; bottom:14px; margin:0; font-size:0.88rem; color:#f1f5f9; font-weight:700; text-shadow:0 2px 8px rgba(0,0,0,0.9); z-index:100100;"><i class="fa-solid fa-circle-info" style="color:#38bdf8; margin-right:5px;"></i> 화살표 버튼, 사진 클릭, 또는 키보드 방향키(← →)로 감상하세요.</p>
         </div>
       `;
       document.body.appendChild(modal);
@@ -562,22 +565,30 @@ class TimelineComponent {
       ${this.renderAssemblyTestimonyButton(activeItem)}
 
       ${activeItem.images && activeItem.images.length > 0 ? `
-        <div style="margin-top:2rem;">
+        <div style="margin-top:2rem; position:relative;">
           <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.75rem; padding:0 0.2rem; flex-wrap:wrap; gap:0.5rem;">
-            <span style="font-size:0.92rem; font-weight:800; color:var(--text-primary); display:flex; align-items:center; gap:0.4rem;">
-              <i class="fa-solid fa-images" style="color:#0284c7;"></i> 현장 활동 사진 <span style="background:rgba(2,132,199,0.1); color:#0284c7; padding:0.15rem 0.6rem; border-radius:12px; font-size:0.78rem; font-weight:800;">${activeItem.images.length}장</span>
+            <span style="font-size:0.95rem; font-weight:800; color:var(--text-primary); display:flex; align-items:center; gap:0.4rem;">
+              <i class="fa-solid fa-images" style="color:#0284c7;"></i> 현장 활동 사진 <span style="background:rgba(2,132,199,0.1); color:#0284c7; padding:0.15rem 0.65rem; border-radius:12px; font-size:0.82rem; font-weight:800;">${activeItem.images.length}장</span>
             </span>
-            ${activeItem.images.length > 1 ? `
-              <span style="font-size:0.8rem; color:var(--text-muted); font-weight:600; display:flex; align-items:center; gap:0.3rem;">
-                <i class="fa-solid fa-left-right" style="color:#0284c7;"></i> 좌우로 드래그(슬라이드)하여 사진을 확인하실 수 있습니다
-              </span>
+            ${activeItem.images.length > 2 ? `
+              <div style="display:flex; align-items:center; gap:0.6rem;">
+                <span style="font-size:0.8rem; color:var(--text-muted); font-weight:600; display:flex; align-items:center; gap:0.3rem;">
+                  <i class="fa-solid fa-left-right" style="color:#0284c7;"></i> 마우스 드래그 / 화살표 클릭으로 2줄 슬라이드 감상
+                </span>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); window.timelineComponent.scrollGalleryLeft('${activeItem.id}')" title="이전 사진 보기" style="border-radius:50%; width:34px; height:34px; padding:0; display:inline-flex; align-items:center; justify-content:center; border:1px solid var(--border-color); background:var(--bg-card);">
+                  <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); window.timelineComponent.scrollGalleryRight('${activeItem.id}')" title="다음 사진 보기" style="border-radius:50%; width:34px; height:34px; padding:0; display:inline-flex; align-items:center; justify-content:center; border:1px solid var(--border-color); background:var(--bg-card);">
+                  <i class="fa-solid fa-chevron-right"></i>
+                </button>
+              </div>
             ` : ''}
           </div>
 
-          <div class="timeline-gallery-grid ${activeItem.images.length === 1 ? 'single-image' : ''}" onmousedown="window.timelineComponent.handleGalleryDragStart(event, this)">
+          <div class="timeline-gallery-grid ${activeItem.images.length <= 2 ? 'single-col' : ''}" id="hzGalleryScroll_${activeItem.id}" onmousedown="window.timelineComponent.handleGalleryDragStart(event, this)" style="display:grid !important; grid-template-rows:${activeItem.images.length === 1 ? '400px' : 'repeat(2, 320px)'} !important; grid-auto-columns:${activeItem.images.length <= 2 ? '100%' : 'min(500px, 82vw)'} !important; grid-auto-flow:column !important; overflow-x:auto !important; overflow-y:hidden !important; gap:1.2rem !important; margin-top:0.5rem !important; padding:0.4rem 0.2rem 0.8rem 0.2rem !important; scroll-snap-type:x mandatory !important; scroll-behavior:smooth !important; -webkit-overflow-scrolling:touch !important; cursor:grab;">
             ${activeItem.images.map((img, imgIdx) => `
-              <div class="gallery-image-box" onclick="window.timelineComponent.openPhotoLightboxById('${activeItem.id}', ${imgIdx})">
-                <img src="${img}" alt="${activeItem.title}" loading="lazy" />
+              <div class="gallery-image-box" onclick="window.timelineComponent.openPhotoLightboxById('${activeItem.id}', ${imgIdx})" style="width:100% !important; height:100% !important; border-radius:18px !important; overflow:hidden !important; position:relative !important; cursor:pointer !important; background:transparent !important; border:1px solid var(--border-color) !important; box-shadow:0 4px 14px rgba(0,0,0,0.07) !important; scroll-snap-align:start !important;">
+                <img src="${img}" alt="${activeItem.title}" loading="lazy" style="width:100% !important; height:100% !important; object-fit:cover !important; border-radius:18px !important; display:block !important;" />
                 <div class="image-hover-overlay">
                   <i class="fa-solid fa-magnifying-glass-plus"></i>
                 </div>
@@ -945,6 +956,20 @@ class TimelineComponent {
 
     window.addEventListener('mousemove', onMouseMove);
     window.addEventListener('mouseup', onMouseUp);
+  }
+
+  scrollGalleryLeft(historyId) {
+    const container = document.getElementById("hzGalleryScroll_" + historyId);
+    if (container) {
+      container.scrollBy({ left: -500, behavior: 'smooth' });
+    }
+  }
+
+  scrollGalleryRight(historyId) {
+    const container = document.getElementById("hzGalleryScroll_" + historyId);
+    if (container) {
+      container.scrollBy({ left: 500, behavior: 'smooth' });
+    }
   }
 }
 
