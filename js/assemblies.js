@@ -106,46 +106,78 @@ class FellowshipComponent {
     });
   }
 
-  readPhotoFiles(files) {
-    if (!files || files.length === 0) return;
-    if (window.showToast) window.showToast("📷 사진을 최적화 압축하는 중입니다...");
-
-    Array.from(files).forEach(file => {
-      if (!file.type.startsWith("image/")) return;
+  processPhotoFile(file) {
+    return new Promise((resolve) => {
+      if (!file || !file.type || !file.type.startsWith("image/")) {
+        resolve(null);
+        return;
+      }
       const reader = new FileReader();
       reader.onload = (e) => {
         const img = new Image();
         img.onload = () => {
-          const canvas = document.createElement("canvas");
-          let w = img.width;
-          let h = img.height;
-          const maxDim = 720;
-          if (w > maxDim || h > maxDim) {
-            if (w > h) {
-              h = Math.round((h * maxDim) / w);
-              w = maxDim;
-            } else {
-              w = Math.round((w * maxDim) / h);
-              h = maxDim;
+          try {
+            const canvas = document.createElement("canvas");
+            let w = img.width;
+            let h = img.height;
+            const maxDim = 720;
+            if (w > maxDim || h > maxDim) {
+              if (w > h) {
+                h = Math.round((h * maxDim) / w);
+                w = maxDim;
+              } else {
+                w = Math.round((w * maxDim) / h);
+                h = maxDim;
+              }
             }
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext("2d");
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = "high";
+            ctx.drawImage(img, 0, 0, w, h);
+            resolve(canvas.toDataURL("image/jpeg", 0.68));
+          } catch(err) {
+            console.error("Canvas compression error:", err);
+            resolve(null);
           }
-          canvas.width = w;
-          canvas.height = h;
-          const ctx = canvas.getContext("2d");
-          ctx.imageSmoothingEnabled = true;
-          ctx.imageSmoothingQuality = "high";
-          ctx.drawImage(img, 0, 0, w, h);
-          const dataUrl = canvas.toDataURL("image/jpeg", 0.68);
-
-          if (!this.tempFellowshipImages) this.tempFellowshipImages = [];
-          this.tempFellowshipImages.push(dataUrl);
-          this.renderPhotoPreviews();
-          if (window.showToast) window.showToast("✨ 활동 소식 사진이 첨부되었습니다!");
         };
+        img.onerror = () => resolve(null);
         img.src = e.target.result;
       };
+      reader.onerror = () => resolve(null);
       reader.readAsDataURL(file);
     });
+  }
+
+  async readPhotoFiles(files) {
+    if (!files || files.length === 0) return;
+
+    const modal = document.getElementById("fellowshipEditModal");
+    const saveBtn = modal ? modal.querySelector("button[type='submit']") : null;
+    if (saveBtn) {
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> 사진 압축 처리 중...`;
+    }
+
+    if (window.showToast) window.showToast("📷 사진을 최적화 압축하는 중입니다...");
+
+    const fileArray = Array.from(files);
+    const results = await Promise.all(fileArray.map(file => this.processPhotoFile(file)));
+
+    if (!this.tempFellowshipImages) this.tempFellowshipImages = [];
+    results.forEach(dataUrl => {
+      if (dataUrl) this.tempFellowshipImages.push(dataUrl);
+    });
+
+    this.renderPhotoPreviews();
+
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = `저장하기`;
+    }
+
+    if (window.showToast) window.showToast("✨ 활동 소식 사진이 첨부되었습니다!");
   }
 
   renderPhotoPreviews() {
