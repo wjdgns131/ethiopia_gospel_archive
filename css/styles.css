@@ -2012,24 +2012,43 @@ html.dark .mockup-member-name {
   box-sizing: border-box !important;
   width: 100% !important;
   max-width: 100% !important;
-  border-radius: 12px !important;
+  height: 320px !important;
+  border-radius: 16px !important;
   overflow: hidden !important;
   position: relative !important;
   cursor: pointer !important;
-  background: #000000 !important;
+  background: var(--bg-hover, #f1f5f9) !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+  border: 1px solid var(--border-color, #e2e8f0) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06) !important;
+  transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+}
+
+.gallery-image-box:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12) !important;
 }
 
 .gallery-image-box img {
   width: 100% !important;
-  max-width: 100% !important;
-  height: auto !important;
-  max-height: 520px !important;
-  object-fit: contain !important;
+  height: 100% !important;
+  max-height: none !important;
+  object-fit: cover !important;
   display: block !important;
-  border-radius: 12px !important;
+  border-radius: 16px !important;
+  transition: transform 0.5s ease !important;
+}
+
+.gallery-image-box:hover img {
+  transform: scale(1.05) !important;
+}
+
+@media (max-width: 640px) {
+  .gallery-image-box {
+    height: 240px !important;
+  }
 }
 
 
