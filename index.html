@@ -66,12 +66,15 @@
 
       <!-- Action Utilities -->
       <div class="header-actions">
+        <button id="langToggleBtn" class="btn btn-outline" style="border-radius:20px; font-weight:700; padding:0.4rem 0.8rem;" onclick="window.i18n.toggleLang()" title="Language / 언어 전환">
+          <i class="fa-solid fa-globe"></i> English
+        </button>
         <button id="themeToggle" class="icon-btn" title="테마 전환 (다크/라이트)">
           <i class="fa-solid fa-moon"></i>
         </button>
         <button id="adminLoginBtn" class="btn btn-outline" title="관리자/동역자 편집 모드">
           <i class="fa-solid fa-key"></i>
-          <span class="admin-btn-text">관리자 로그인</span>
+          <span class="admin-btn-text" data-i18n="adminLogin">관리자 로그인</span>
         </button>
       </div>
     </div>
@@ -727,13 +730,14 @@
   </footer>
 
   <!-- Scripts with updated cache buster -->
-  <script src="js/data.js?v=20260904_TRUE_4_HOURS_AGO_V1100"></script>
-  <script src="js/map.js?v=20260904_TRUE_4_HOURS_AGO_V1100"></script>
-  <script src="js/directory.js?v=20260904_TRUE_4_HOURS_AGO_V1100"></script>
-  <script src="js/timeline.js?v=20260904_TRUE_4_HOURS_AGO_V1100"></script>
-  <script src="js/assemblies.js?v=20260904_TRUE_4_HOURS_AGO_V1100"></script>
-  <script src="js/calendar.js?v=20260904_TRUE_4_HOURS_AGO_V1100"></script>
-  <script src="js/admin.js?v=20260904_TRUE_4_HOURS_AGO_V1100"></script>
-  <script src="js/app.js?v=20260904_TRUE_4_HOURS_AGO_V1100"></script>
+  <script src="js/data.js?v=20260904_ENGLISH_MODE_V1200"></script>
+  <script src="js/i18n.js?v=20260904_ENGLISH_MODE_V1200"></script>
+  <script src="js/map.js?v=20260904_ENGLISH_MODE_V1200"></script>
+  <script src="js/directory.js?v=20260904_ENGLISH_MODE_V1200"></script>
+  <script src="js/timeline.js?v=20260904_ENGLISH_MODE_V1200"></script>
+  <script src="js/assemblies.js?v=20260904_ENGLISH_MODE_V1200"></script>
+  <script src="js/calendar.js?v=20260904_ENGLISH_MODE_V1200"></script>
+  <script src="js/admin.js?v=20260904_ENGLISH_MODE_V1200"></script>
+  <script src="js/app.js?v=20260904_ENGLISH_MODE_V1200"></script>
 </body>
 </html>

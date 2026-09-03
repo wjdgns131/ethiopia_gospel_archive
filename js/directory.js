@@ -1077,15 +1077,21 @@ class DirectoryComponent {
     const currentCalculatedAge = this.getCalculatedAge(m);
     const testimonyUrl = (m.testimony || m.youtube || "").trim();
 
+    const nameDisp = window.i18n ? window.i18n.translateContent(m.name) : m.name;
+    const regionDisp = window.i18n ? window.i18n.translateContent(m.region) : m.region;
+    const jobDisp = window.i18n ? window.i18n.translateContent(m.job || '-') : (m.job || '-');
+    const assemblyMonthDisp = window.i18n ? window.i18n.translateContent(m.assemblyMonth || '-') : (m.assemblyMonth || '-');
+    const viewTestimonyLabel = window.i18n ? window.i18n.t("viewTestimonyBtn") : "간증 보기";
+
     return `
       <div class="member-card ${isDisrupter ? 'disrupter-card' : ''}" onclick="window.directoryComponent.openMemberDetailModal('${m.id}')" style="cursor:pointer; background:var(--bg-card); border:1px solid var(--border-color); border-radius:20px; overflow:hidden; box-shadow:var(--shadow-sm); transition:transform 0.25s, box-shadow 0.25s; display:flex; flex-direction:column; padding:0.4rem 0.4rem 1rem 0.4rem;">
         
         <!-- SQUIRCLE ROUNDED PHOTO FRAME -->
         <div style="position:relative; width:170px; height:170px; margin:0.8rem auto 0.6rem auto; border-radius:18px; overflow:hidden; border:1px solid var(--border-color); background:#ffffff; flex-shrink:0; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(0,0,0,0.06);">
-          <img src="${photoUrl}" alt="${m.name}" loading="lazy" style="width:100%; height:100%; object-fit:cover; display:block;" />
+          <img src="${photoUrl}" alt="${nameDisp}" loading="lazy" style="width:100%; height:100%; object-fit:cover; display:block;" />
           ${isDisrupter ? `
             <span class="badge badge-danger" style="position:absolute; top:6px; left:6px; font-size:0.72rem; font-weight:800; padding:0.2rem 0.5rem; border-radius:10px; z-index:2;">
-              ⚠️ 분탕꾼
+              ⚠️ Disrupter
             </span>
           ` : ''}
         </div>
@@ -1094,27 +1100,27 @@ class DirectoryComponent {
         <div style="padding:0.4rem 0.8rem 0.2rem 0.8rem; display:flex; flex-direction:column; flex:1; justify-content:space-between;">
           <div>
             <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.25rem;">
-              <h3 style="font-size:1.22rem; font-weight:800; margin:0; color:#1e3a8a; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${m.name}</h3>
+              <h3 style="font-size:1.22rem; font-weight:800; margin:0; color:#1e3a8a; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${nameDisp}</h3>
               
-              <button type="button" onclick="event.stopPropagation(); window.directoryComponent.openEditModal('${m.id}')" title="${m.name} 님 정보 수정" style="background:transparent; color:var(--text-muted); border:none; padding:2px 6px; font-size:0.85rem; cursor:pointer; border-radius:4px;" class="hover-text-primary">
+              <button type="button" onclick="event.stopPropagation(); window.directoryComponent.openEditModal('${m.id}')" title="${nameDisp} 정보 수정" style="background:transparent; color:var(--text-muted); border:none; padding:2px 6px; font-size:0.85rem; cursor:pointer; border-radius:4px;" class="hover-text-primary">
                 <i class="fa-solid fa-pen-to-square"></i>
               </button>
             </div>
 
-            <p style="font-size:0.88rem; color:var(--text-secondary); margin:0 0 0.3rem 0; font-weight:600;">${m.region} · ${currentCalculatedAge}</p>
-            <p style="font-size:0.84rem; color:var(--text-muted); margin:0 0 0.5rem 0; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;"><i class="fa-solid fa-briefcase" style="margin-right:4px;"></i> ${m.job || '-'}</p>
+            <p style="font-size:0.88rem; color:var(--text-secondary); margin:0 0 0.3rem 0; font-weight:600;">${regionDisp} · ${currentCalculatedAge}</p>
+            <p style="font-size:0.84rem; color:var(--text-muted); margin:0 0 0.5rem 0; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;"><i class="fa-solid fa-briefcase" style="margin-right:4px;"></i> ${jobDisp}</p>
           </div>
 
           <div style="padding-top:0.5rem; border-top:1px solid var(--border-color); font-size:0.82rem;">
             <div style="display:flex; align-items:center; justify-content:space-between; gap:0.4rem;">
-              <span style="color:var(--text-muted); font-weight:600;"><i class="fa-solid fa-calendar-days" style="color:var(--accent-gold); margin-right:4px;"></i> ${m.assemblyMonth || '-'}</span>
+              <span style="color:var(--text-muted); font-weight:600;"><i class="fa-solid fa-calendar-days" style="color:var(--accent-gold); margin-right:4px;"></i> ${assemblyMonthDisp}</span>
               
               ${testimonyUrl ? `
-                <button type="button" onclick="event.stopPropagation(); window.directoryComponent.openTestimonyLink('${testimonyUrl}', '${m.name}')" title="${m.name} 님 구원 간증 보기" style="background:#f0f9ff; color:#0284c7; border:1px solid #7dd3fc; border-radius:10px; padding:0.2rem 0.55rem; font-size:0.75rem; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:0.3rem; box-shadow:0 1px 4px rgba(2,132,199,0.1);">
-                  <i class="fa-solid fa-circle-play" style="color:#0284c7; font-size:0.8rem;"></i> 간증 보기
+                <button type="button" onclick="event.stopPropagation(); window.directoryComponent.openTestimonyLink('${testimonyUrl}', '${m.name}')" title="${nameDisp} 간증 보기" style="background:#f0f9ff; color:#0284c7; border:1px solid #7dd3fc; border-radius:10px; padding:0.2rem 0.55rem; font-size:0.75rem; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:0.3rem; box-shadow:0 1px 4px rgba(2,132,199,0.1);">
+                  <i class="fa-solid fa-circle-play" style="color:#0284c7; font-size:0.8rem;"></i> ${viewTestimonyLabel}
                 </button>
               ` : `
-                <button type="button" onclick="event.stopPropagation(); window.directoryComponent.openEditModal('${m.id}')" title="${m.name} 님 간증 링크 등록" style="background:#f8fafc; color:#64748b; border:1px dashed #cbd5e1; border-radius:10px; padding:0.18rem 0.45rem; font-size:0.72rem; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:0.25rem;">
+                <button type="button" onclick="event.stopPropagation(); window.directoryComponent.openEditModal('${m.id}')" title="${nameDisp} 간증 링크 등록" style="background:#f8fafc; color:#64748b; border:1px dashed #cbd5e1; border-radius:10px; padding:0.18rem 0.45rem; font-size:0.72rem; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:0.25rem;">
                   <i class="fa-solid fa-plus" style="font-size:0.68rem; color:#0284c7;"></i> 등록
                 </button>
               `}
