@@ -153,9 +153,48 @@
     }
   };
 
-  // Comprehensive Terminology, Occupations, Cities & Phrase Mappings for Dynamic Live Translation
+  // 1. Direct Occupation Translation Lookup Table
+  const occupationTranslations = {
+    "회계사": "Accountant",
+    "마취과 의사": "Anesthesiologist",
+    "의사": "Doctor",
+    "간호사": "Nurse",
+    "대학생": "University Student",
+    "고등학교생": "High School Student",
+    "고등학생": "High School Student",
+    "초등학생": "Elementary Student",
+    "학생": "Student",
+    "교사": "Teacher",
+    "선생님": "Teacher",
+    "교수": "Professor",
+    "자영업": "Self-employed",
+    "가정부": "Housekeeper",
+    "가사 도우미": "Housekeeper",
+    "식당 운영": "Restaurant Owner",
+    "음식점 운영": "Restaurant Owner",
+    "직물 사업": "Textile Business",
+    "섬유 사업": "Textile Business",
+    "공무원": "Civil Servant",
+    "엔지니어": "Engineer",
+    "기술자": "Engineer",
+    "건축가": "Architect",
+    "변호사": "Lawyer",
+    "운전기사": "Driver",
+    "운전사": "Driver",
+    "농부": "Farmer",
+    "무직": "Unemployed",
+    "전도사": "Evangelist",
+    "목사": "Pastor",
+    "선교사": "Missionary",
+    "형제": "Brother",
+    "자매": "Sister",
+    "음식&미용 전문가": "Food & Beauty Specialist",
+    "직업 정보 없음": "No Occupation Listed"
+  };
+
+  // 2. Comprehensive Terminology & Sentence Replacements
   const termReplacements = [
-    // 1. User Preferred Mappings
+    // Core User Term Mappings
     { ko: /전도집회/g, en: "Evangelical Seminar" },
     { ko: /구원받은/g, en: "saved" },
     { ko: /구원받음/g, en: "saved" },
@@ -170,42 +209,12 @@
     { ko: /이강현/g, en: "Kohen" },
     { ko: /이정훈/g, en: "Franco" },
 
-    // 2. Comprehensive Occupations (직업)
-    { ko: /회계사/g, en: "Accountant" },
-    { ko: /마취과 의사/g, en: "Anesthesiologist" },
-    { ko: /의사/g, en: "Doctor" },
-    { ko: /간호사/g, en: "Nurse" },
-    { ko: /대학생/g, en: "University Student" },
-    { ko: /고등학교생|고등학생/g, en: "High School Student" },
-    { ko: /초등학생/g, en: "Elementary Student" },
-    { ko: /학생/g, en: "Student" },
-    { ko: /교사|선생님/g, en: "Teacher" },
-    { ko: /교수/g, en: "Professor" },
-    { ko: /자영업/g, en: "Self-employed" },
-    { ko: /가정부|가사 도우미/g, en: "Housekeeper" },
-    { ko: /식당 운영|음식점 운영/g, en: "Restaurant Owner" },
-    { ko: /직물 사업|섬유 사업/g, en: "Textile Business" },
-    { ko: /공무원/g, en: "Civil Servant" },
-    { ko: /엔지니어|기술자/g, en: "Engineer" },
-    { ko: /건축가/g, en: "Architect" },
-    { ko: /변호사/g, en: "Lawyer" },
-    { ko: /운전기사|운전사/g, en: "Driver" },
-    { ko: /농부/g, en: "Farmer" },
-    { ko: /무직/g, en: "Unemployed" },
-    { ko: /전도사/g, en: "Evangelist" },
-    { ko: /목사/g, en: "Pastor" },
-    { ko: /선교사/g, en: "Missionary" },
-    { ko: /형제/g, en: "Brother" },
-    { ko: /자매/g, en: "Sister" },
-    { ko: /음식&미용 전문가/g, en: "Food & Beauty Specialist" },
-    { ko: /직업 정보 없음/g, en: "No Occupation Listed" },
-
-    // 3. Mission & Gospel Key Phrases
+    // Core Phrases & Titles
     { ko: /성경은 사실이다/g, en: "The Bible is True" },
-    { ko: /체코에서 시작된 에티오피아 복음 전파/g, en: "Gospel Spreading in Ethiopia Starting from Czech" },
-    { ko: /첫 오프라인 집회/g, en: "First Offline Assembly" },
-    { ko: /오프라인 집회/g, en: "Offline Assembly" },
-    { ko: /온라인 집회/g, en: "Online Assembly" },
+    { ko: /체코에서의 시작/g, en: "Beginning in Czech" },
+    { ko: /에티오피아 3대 언어/g, en: "3 Main Languages of Ethiopia" },
+    { ko: /번역 추진/g, en: "Translation Initiative" },
+    { ko: /온라인 집회 개시/g, en: "Launch of Online Seminars" },
     { ko: /첫 구원 열매/g, en: "First Fruit of Salvation" },
     { ko: /구원 열매/g, en: "Fruit of Salvation" },
     { ko: /구원의 고백/g, en: "Confession of Salvation" },
@@ -218,8 +227,30 @@
     { ko: /초청/g, en: "invitation" },
     { ko: /참석/g, en: "attendance" },
     { ko: /서아프리카팀/g, en: "West Africa Team" },
+    { ko: /현장 활동 사진/g, en: "Field Activity Photos" },
+    { ko: /화살표 클릭 또는 좌우 드래그로 2줄 사진 감상/g, en: "Click arrows or drag left/right to view photo gallery" },
+    { ko: /이전 사진 보기/g, en: "Previous Photo" },
+    { ko: /다음 사진 보기/g, en: "Next Photo" },
+    { ko: /문구 및 사진 수정/g, en: "Edit Content & Photos" },
+    { ko: /소식 & 구원 간증/g, en: "News & Salvation Testimony" },
 
-    // 4. Relationships
+    // Connectors & Grammar Terms
+    { ko: /에서/g, en: " in " },
+    { ko: /에서의/g, en: " in " },
+    { ko: /으로/g, en: " via " },
+    { ko: /으로/g, en: " with " },
+    { ko: /까지/g, en: " to " },
+    { ko: /부터/g, en: " from " },
+    { ko: /합류했습니다/g, en: "joined as staff" },
+    { ko: /시작되었습니다/g, en: "began" },
+    { ko: /완료했습니다/g, en: "was completed" },
+    { ko: /개최했습니다/g, en: "was held" },
+    { ko: /방문했습니다/g, en: "visited" },
+    { ko: /진행하여/g, en: "progressed and" },
+    { ko: /추진하였습니다/g, en: "was initiated" },
+    { ko: /물색하였으며/g, en: "was recruited" },
+
+    // Relationships
     { ko: /지인/g, en: "acquaintance" },
     { ko: /동료/g, en: "colleague" },
     { ko: /부부/g, en: "couple" },
@@ -229,7 +260,7 @@
     { ko: /남동생/g, en: "younger brother" },
     { ko: /친구/g, en: "friend" },
 
-    // 5. Locations & Regions
+    // Cities
     { ko: /아디스아바바\s*\([^)]*\)/g, en: "Addis Ababa" },
     { ko: /비쇼프투\s*\([^)]*\)/g, en: "Bishoftu" },
     { ko: /아다마\s*\([^)]*\)/g, en: "Adama" },
@@ -250,7 +281,7 @@
     { ko: /한국/g, en: "Korea" },
     { ko: /에티오피아/g, en: "Ethiopia" },
 
-    // 6. Dates & Month Formats
+    // Dates
     { ko: /(\d{4})년\s*12월/g, en: "December $1" },
     { ko: /(\d{4})년\s*11월/g, en: "November $1" },
     { ko: /(\d{4})년\s*10월/g, en: "October $1" },
@@ -316,6 +347,12 @@
     translateContent(text) {
       if (!text || typeof text !== "string") return text;
       if (this.currentLang === "ko") return text;
+
+      const trimmed = text.trim();
+      // Check direct occupation dictionary match first!
+      if (occupationTranslations[trimmed]) {
+        return occupationTranslations[trimmed];
+      }
 
       let translated = text;
       termReplacements.forEach(rule => {
