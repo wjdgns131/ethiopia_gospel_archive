@@ -1780,11 +1780,12 @@ class DataStore {
 
   init() {
     try {
-      const CURRENT_DATA_VERSION = "3.0_persistent_db";
+      const CURRENT_DATA_VERSION = "5.0_sync_user_photos";
       const savedVersion = localStorage.getItem("ethiopia_data_ver");
       if (savedVersion !== CURRENT_DATA_VERSION) {
-        console.log("🔄 Upgrading data version to " + CURRENT_DATA_VERSION + ", preserving user edits...");
+        console.log("🔄 Upgrading data version to " + CURRENT_DATA_VERSION + ", syncing fresh history photos...");
         localStorage.setItem("ethiopia_data_ver", CURRENT_DATA_VERSION);
+        localStorage.setItem("ethiopia_history", JSON.stringify(DEFAULT_HISTORY));
       }
 
       let historyData = null;
@@ -1846,14 +1847,24 @@ class DataStore {
     }
     let updated = false;
     DEFAULT_HISTORY.forEach(defItem => {
-      const existing = history.find(h => h.id === defItem.id);
+      if (!defItem || !defItem.id) return;
+      const existing = history.find(h => h && h.id === defItem.id);
       if (!existing) {
-        history.push(defItem);
+        history.push(JSON.parse(JSON.stringify(defItem)));
         updated = true;
       } else {
-        if (defItem.images && defItem.images.length > 0 && (!existing.images || existing.images.length === 0)) {
-          existing.images = defItem.images;
-          updated = true;
+        if (defItem.images && Array.isArray(defItem.images) && defItem.images.length > 0) {
+          if (!existing.images || !Array.isArray(existing.images)) {
+            existing.images = [...defItem.images];
+            updated = true;
+          } else {
+            defItem.images.forEach(img => {
+              if (img && !existing.images.includes(img)) {
+                existing.images.push(img);
+                updated = true;
+              }
+            });
+          }
         }
       }
     });
