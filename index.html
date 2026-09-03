@@ -50,7 +50,7 @@
       }
     } catch(e) {}
   </script>
-  <script src="js/data.js?v=20260904_V6000_UPGRADED_MAP_PHOTOS_AND_FACE_TREE"></script>
+  <script src="js/data.js?v=20260904_V7000_RESTORED_GOOGLE_MAPS_AND_CLEAN_HEADER"></script>
 </head>
 <body>
   <!-- Header / Navigation Bar -->
@@ -84,9 +84,6 @@
 
       <!-- Action Utilities -->
       <div class="header-actions">
-        <button id="syncDataPhotosBtn" class="btn btn-outline" style="border-radius:20px; font-weight:700; padding:0.4rem 0.85rem; border-color:#0284c7; color:#0284c7;" onclick="if(confirm('웹사이트 최신 사진 및 코드 데이터로 동기화하시겠습니까?')){ window.db.resetToDefaults(); }" title="최신 사진 및 코드 데이터로 강제 동기화">
-          <i class="fa-solid fa-arrows-rotate" style="color:#0284c7;"></i> <span data-i18n="syncData">사진/데이터 최신 동기화</span>
-        </button>
         <button id="langToggleBtn" class="btn btn-outline" style="border-radius:20px; font-weight:700; padding:0.4rem 0.8rem;" onclick="window.i18n.toggleLang()" title="Language / 언어 전환">
           <i class="fa-solid fa-globe"></i> English
         </button>
@@ -123,12 +120,6 @@
           <p data-i18n="membersSubtitle">구원받은 식구들의 귀한 소식과 프로필입니다.</p>
         </div>
         <div class="heading-right" style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
-          <button onclick="window.db.syncDataToFile(null, true)" class="btn btn-secondary" style="background:#f0f9ff; color:#0284c7; border:1px solid #7dd3fc; font-weight:700;" title="현재 브라우저에 저장된 식구 정보를 하드디스크 소스코드 파일(js/data.js)에 영구 동기화">
-            <i class="fa-solid fa-floppy-disk"></i> <span data-i18n="syncCodeBtn">⚡ 소스코드 파일에 영구 동기화</span>
-          </button>
-          <button onclick="window.db.exportDatabaseToJson()" class="btn btn-secondary" style="background:#ffffff; color:var(--text-secondary); border:1px solid var(--border-color); font-weight:700;">
-            <i class="fa-solid fa-download"></i> <span data-i18n="exportBackupBtn">💾 백업 다운로드 (.json)</span>
-          </button>
           <button id="addNewMemberBtn" data-action="open-add-member" class="btn btn-primary" style="font-weight:800; cursor:pointer;">
             <i class="fa-solid fa-user-plus"></i> <span data-i18n="addMemberBtn">➕ 새로운 식구 등록하기</span>
           </button>
@@ -149,11 +140,10 @@
 
           <div class="map-layout">
             <!-- Interactive Map SVG Container -->
-            <div class="map-wrapper" id="ethiopiaMapContainer" style="position:relative; width:100%; height:350px; border-radius:12px; overflow:hidden; border:1px solid var(--border-color); background:#0f172a;">
-      <div id="googleMapDiv" style="width:100%; height:100%;">
-        <img src="images/ethiopia_map_clean.png" alt="Ethiopia Map" style="width:100%; height:100%; object-fit:cover;" />
-      </div>
-    </div>
+            <div class="map-wrapper" id="ethiopiaMapContainer" style="position:relative; width:100%; height:350px; border-radius:14px; overflow:hidden; border:1px solid var(--border-color); box-shadow:var(--shadow-sm);">
+              <div id="googleMapDiv" style="width:100%; height:100%; z-index:1;"></div>
+            </div>
+
 
             <!-- Region Quick Stats & Selector List -->
             <div class="region-stats-sidebar">
@@ -3121,14 +3111,14 @@
   </footer>
 
   <!-- Scripts with updated cache buster -->
-  <script src="js/data.js?v=20260904_V6000_UPGRADED_MAP_PHOTOS_AND_FACE_TREE"></script>
-  <script src="js/i18n.js?v=20260904_V6000_UPGRADED_MAP_PHOTOS_AND_FACE_TREE"></script>
-  <script src="js/map.js?v=20260904_V6000_UPGRADED_MAP_PHOTOS_AND_FACE_TREE"></script>
-  <script src="js/directory.js?v=20260904_V6000_UPGRADED_MAP_PHOTOS_AND_FACE_TREE"></script>
-  <script src="js/timeline.js?v=20260904_V6000_UPGRADED_MAP_PHOTOS_AND_FACE_TREE"></script>
-  <script src="js/assemblies.js?v=20260904_V6000_UPGRADED_MAP_PHOTOS_AND_FACE_TREE"></script>
-  <script src="js/calendar.js?v=20260904_V6000_UPGRADED_MAP_PHOTOS_AND_FACE_TREE"></script>
-  <script src="js/admin.js?v=20260904_V6000_UPGRADED_MAP_PHOTOS_AND_FACE_TREE"></script>
-  <script src="js/app.js?v=20260904_V6000_UPGRADED_MAP_PHOTOS_AND_FACE_TREE"></script>
+  <script src="js/data.js?v=20260904_V7000_RESTORED_GOOGLE_MAPS_AND_CLEAN_HEADER"></script>
+  <script src="js/i18n.js?v=20260904_V7000_RESTORED_GOOGLE_MAPS_AND_CLEAN_HEADER"></script>
+  <script src="js/map.js?v=20260904_V7000_RESTORED_GOOGLE_MAPS_AND_CLEAN_HEADER"></script>
+  <script src="js/directory.js?v=20260904_V7000_RESTORED_GOOGLE_MAPS_AND_CLEAN_HEADER"></script>
+  <script src="js/timeline.js?v=20260904_V7000_RESTORED_GOOGLE_MAPS_AND_CLEAN_HEADER"></script>
+  <script src="js/assemblies.js?v=20260904_V7000_RESTORED_GOOGLE_MAPS_AND_CLEAN_HEADER"></script>
+  <script src="js/calendar.js?v=20260904_V7000_RESTORED_GOOGLE_MAPS_AND_CLEAN_HEADER"></script>
+  <script src="js/admin.js?v=20260904_V7000_RESTORED_GOOGLE_MAPS_AND_CLEAN_HEADER"></script>
+  <script src="js/app.js?v=20260904_V7000_RESTORED_GOOGLE_MAPS_AND_CLEAN_HEADER"></script>
 </body>
 </html>
