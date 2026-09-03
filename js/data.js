@@ -1802,7 +1802,7 @@ class DataStore {
 
   init() {
     try {
-      const FORCE_VERSION = "20260904_TITLE_RESTORE_V500";
+      const FORCE_VERSION = "20260904_EXACT_RAW_2311_BACKUP_V600";
       const currentVer = localStorage.getItem("ethiopia_master_restored_ver");
 
       if (currentVer !== FORCE_VERSION) {
