@@ -1493,7 +1493,17 @@ const DEFAULT_HISTORY = [
       "images/history_202505_first_offline_assembly_group.jpg",
       "images/history_202505_vibes_hotel.png",
       "images/history_202505_offline_support_fellowship.png",
-      "images/history_202505_vibes_table.jpg"
+      "images/history_202505_vibes_table.jpg",
+      "images/history_user_uploaded_1.jpg",
+      "images/history_user_uploaded_2.jpg",
+      "images/history_user_uploaded_3.jpg",
+      "images/history_user_uploaded_4.jpg",
+      "images/history_user_uploaded_5.jpg",
+      "images/history_user_uploaded_6.jpg",
+      "images/history_user_uploaded_7.jpg",
+      "images/history_user_uploaded_8.jpg",
+      "images/history_user_uploaded_9.jpg",
+      "images/history_user_uploaded_10.jpg"
     ],
     "desc": "장소: Vibes Hotel, 아디스아바바\n일시: 2025.5.28~6.01\n\n- 강연 : 성경은 사실이다 (암하라어 더빙)\n- 집회 말씀 보충 설명 : 이은우, 전현식\n- 사회 : 이강현, 이정훈 \n- 통역 : 요카벳, 비니암 [영어<->암하라어], 데보라(good news church staff)[한국어<->암하라어] \n- 신규 참석 인원 : 15명 대략\n\n\n집회 지원한 한국 식구들 (9명)  :\n이은우, 한경순, 류순 (Korea), 전현식(U.S), 박영성(Germany), 박건양(Germany), \nLee Benjamin Hae (Malta), 이강현(U.K), 이정훈(Ghana)"
   },
@@ -1547,7 +1557,17 @@ const DEFAULT_HISTORY = [
       "images/history_20251212_meeting_house_assembly_group.jpg",
       "images/history_20251212_auditorium_lecture.jpg",
       "images/history_20251212_kitchen_eden.png",
-      "images/history_20251212_preaching_speakers.png"
+      "images/history_20251212_preaching_speakers.png",
+      "images/history_user_uploaded_1.jpg",
+      "images/history_user_uploaded_2.jpg",
+      "images/history_user_uploaded_3.jpg",
+      "images/history_user_uploaded_4.jpg",
+      "images/history_user_uploaded_5.jpg",
+      "images/history_user_uploaded_6.jpg",
+      "images/history_user_uploaded_7.jpg",
+      "images/history_user_uploaded_8.jpg",
+      "images/history_user_uploaded_9.jpg",
+      "images/history_user_uploaded_10.jpg"
     ],
     "desc": "내부를 정성스럽게 가꾸고 사람들을 단란하게 초대하여 진행한 모임집에서의 첫 전도집회\n\n의사 일을 모두 내려놓고 ELC 스태프로 전심 헌신하게 된 피크루 형제가 이정훈 형제와 함께 움직이며 집회를 온 마음으로 준비하였습니다.\n\n[식사 준비]\n에덴 자매 혼자 12명의 식사 준비와 설거지를 맡기에는 벅차기에, 가사 도우미를 3일 동안 고용하여 에덴 자매를 돕게 하였습니다.\n\n2025년 12월 12일 (집회 첫날) 영국에 있던 이강현 형제가 에티오피아로 입국하였습니다.\n\n* 이강현 형제, 이정훈 형제 둘 다 아기가 90일쯤 됐을 때 에티오피아로 넘어옴."
   },
@@ -1592,7 +1612,17 @@ const DEFAULT_HISTORY = [
     "desc": "*마르코스 목사의 이사진과 지인들을 초청하여 은혜롭게 진행한 모임집 전도집회입니다.",
     "images": [
       "images/hist_auto_1.jpg",
-      "images/hist_auto_2.jpg"
+      "images/hist_auto_2.jpg",
+      "images/history_user_uploaded_1.jpg",
+      "images/history_user_uploaded_2.jpg",
+      "images/history_user_uploaded_3.jpg",
+      "images/history_user_uploaded_4.jpg",
+      "images/history_user_uploaded_5.jpg",
+      "images/history_user_uploaded_6.jpg",
+      "images/history_user_uploaded_7.jpg",
+      "images/history_user_uploaded_8.jpg",
+      "images/history_user_uploaded_9.jpg",
+      "images/history_user_uploaded_10.jpg"
     ],
     "id": "hist-20260226"
   },
@@ -1780,10 +1810,10 @@ class DataStore {
 
   init() {
     try {
-      const CURRENT_DATA_VERSION = "5.0_sync_user_photos";
+      const CURRENT_DATA_VERSION = "7.0_force_all_cards_sync";
       const savedVersion = localStorage.getItem("ethiopia_data_ver");
       if (savedVersion !== CURRENT_DATA_VERSION) {
-        console.log("🔄 Upgrading data version to " + CURRENT_DATA_VERSION + ", syncing fresh history photos...");
+        console.log("🔄 Upgrading data version to " + CURRENT_DATA_VERSION + ", syncing fresh history photos across all cards...");
         localStorage.setItem("ethiopia_data_ver", CURRENT_DATA_VERSION);
         localStorage.setItem("ethiopia_history", JSON.stringify(DEFAULT_HISTORY));
       }
