@@ -1785,14 +1785,24 @@ const DEFAULT_FELLOWSHIP = [];
 
 const DEFAULT_EVENTS = [
   {
-    "id": "evt-20260206",
-    "date": "2026-02-06",
-    "title": "구디나 툼사 수양관 전도집회",
-    "category": "assembly",
-    "location": "구디나 툼사, 아디스아바바",
-    "desc": "2026.2.06~08 전도집회"
+    id: "evt-20260206",
+    date: "2026-02-06",
+    title: "구디나 툼사 수양관 전도집회",
+    category: "assembly",
+    location: "구디나 툼사, 아디스아바바",
+    desc: "2026.2.06~08 전도집회"
+  },
+  {
+    id: "evt-1",
+    date: "2026-09-15",
+    title: "아디스아바바 월례 전도집회",
+    category: "assembly",
+    location: "아디스아바바 집회소",
+    desc: "9월 정기 전도집회 및 거듭남 말씀 강연"
   }
 ];
+
+// Data Store Manager Class
 
 // Data Store Manager Class
 class DataStore {
@@ -1802,6 +1812,19 @@ class DataStore {
 
   init() {
     try {
+      const FORCE_VERSION = "20260904_EXACT_4_HOURS_AGO_C3118B5_V1000";
+      const currentVer = localStorage.getItem("ethiopia_master_restored_ver");
+
+      if (currentVer !== FORCE_VERSION) {
+        console.log("🔄 Restoring exact 4 hours ago dataset (c3118b5) v1000...");
+        localStorage.setItem("ethiopia_master_restored_ver", FORCE_VERSION);
+        localStorage.setItem("ethiopia_history", JSON.stringify(DEFAULT_HISTORY));
+        localStorage.setItem("ethiopia_user_custom_edits", JSON.stringify(DEFAULT_HISTORY));
+        localStorage.setItem("ethiopia_members", JSON.stringify(DEFAULT_MEMBERS));
+        localStorage.setItem("ethiopia_assemblies", JSON.stringify(DEFAULT_ASSEMBLIES));
+        localStorage.setItem("ethiopia_events", JSON.stringify(DEFAULT_EVENTS));
+      }
+
       let historyData = null;
       try { historyData = JSON.parse(localStorage.getItem("ethiopia_history")); } catch(e) {}
       if (!historyData || !Array.isArray(historyData) || historyData.length === 0) {
@@ -1809,6 +1832,16 @@ class DataStore {
         try { localStorage.setItem("ethiopia_history", JSON.stringify(historyData)); } catch(e) {}
       }
       this._historyCache = historyData;
+
+      let membersData = null;
+      try { membersData = JSON.parse(localStorage.getItem("ethiopia_members")); } catch(e) {}
+      if (!membersData || !Array.isArray(membersData) || membersData.length === 0) {
+        try { localStorage.setItem("ethiopia_members", JSON.stringify(DEFAULT_MEMBERS)); } catch(e) {}
+      }
+    } catch(e) {
+      console.error("DataStore init error:", e);
+    }
+  }
 
       let membersData = null;
       try { membersData = JSON.parse(localStorage.getItem("ethiopia_members")); } catch(e) {}
