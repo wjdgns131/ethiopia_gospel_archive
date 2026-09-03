@@ -108,12 +108,14 @@ class DirectoryComponent {
     if (selectMemberPhotoBtn && fieldMemberFileInput) {
       selectMemberPhotoBtn.addEventListener("click", (e) => {
         e.stopPropagation();
+        fieldMemberFileInput.value = "";
         fieldMemberFileInput.click();
       });
     }
 
     if (memberDropZone && fieldMemberFileInput) {
       memberDropZone.addEventListener("click", () => {
+        fieldMemberFileInput.value = "";
         fieldMemberFileInput.click();
       });
 
@@ -139,6 +141,7 @@ class DirectoryComponent {
       fieldMemberFileInput.addEventListener("change", (e) => {
         if (e.target.files && e.target.files.length > 0) {
           this.readMemberPhotoFile(e.target.files[0]);
+          fieldMemberFileInput.value = "";
         }
       });
     }

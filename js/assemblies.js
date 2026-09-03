@@ -44,13 +44,17 @@ class FellowshipComponent {
       selectBtn.addEventListener("click", (e) => {
         e.preventDefault();
         e.stopPropagation();
+        fileInput.value = "";
         fileInput.click();
       });
     }
 
     if (dropZone && fileInput) {
       dropZone.addEventListener("click", (e) => {
-        if (e.target !== fileInput) fileInput.click();
+        if (e.target !== fileInput) {
+          fileInput.value = "";
+          fileInput.click();
+        }
       });
 
       dropZone.addEventListener("dragover", (e) => {
@@ -75,6 +79,7 @@ class FellowshipComponent {
       fileInput.addEventListener("change", (e) => {
         if (e.target.files && e.target.files.length > 0) {
           this.readPhotoFiles(e.target.files);
+          fileInput.value = "";
         }
       });
     }
