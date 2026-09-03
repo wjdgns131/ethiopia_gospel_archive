@@ -707,12 +707,12 @@ class TimelineComponent {
             ` : ''}
           </div>
 
-          <div class="timeline-gallery-grid" id="hzGalleryScroll_${activeItem.id}" onmousedown="window.timelineComponent.handleGalleryDragStart(event, this)" style="display:grid !important; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)) !important; gap:1.0rem !important; margin-top:0.5rem !important; padding:0.4rem 0.2rem 0.8rem 0.2rem !important;">
+          <div class="timeline-gallery-grid" id="hzGalleryScroll_${activeItem.id}" onmousedown="window.timelineComponent.handleGalleryDragStart(event, this)" style="display:flex !important; flex-wrap:wrap !important; gap:1.0rem !important; margin-top:0.5rem !important; padding:0.4rem 0.2rem 0.8rem 0.2rem !important; overflow-x:auto !important; -webkit-overflow-scrolling:touch !important;">
             ${activeItem.images.map((img, imgIdx) => `
-              <div class="gallery-image-box" onclick="window.timelineComponent.openPhotoLightboxById('${activeItem.id}', ${imgIdx})" style="position:relative !important; height:250px !important; border-radius:16px !important; overflow:hidden !important; cursor:pointer !important; background:#ffffff !important; border:1px solid #e2e8f0 !important; box-shadow:0 4px 15px rgba(0,0,0,0.06) !important;">
-                <img src="${img}" alt="${activeItem.title}" loading="lazy" style="width:100% !important; height:100% !important; object-fit:cover !important; object-position:center 20% !important; border-radius:16px !important; display:block !important; transition:transform 0.35s ease !important;" class="insta-hover-img" />
-                <div class="image-hover-overlay" style="position:absolute; inset:0; background:rgba(0,0,0,0.22); opacity:0; transition:opacity 0.25s ease; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:0.9rem;">
-                  <span style="background:rgba(15,23,42,0.85); color:#ffffff; padding:7px 16px; border-radius:20px; display:flex; align-items:center; gap:6px; box-shadow:0 4px 12px rgba(0,0,0,0.2);"><i class="fa-solid fa-magnifying-glass-plus" style="color:var(--accent-gold);"></i> ${window.i18n && window.i18n.getLang() === 'en' ? 'Click for Full Photo' : '클릭하여 원본 크게보기'}</span>
+              <div class="gallery-image-box" onclick="window.timelineComponent.openPhotoLightboxById('${activeItem.id}', ${imgIdx})" style="flex:${activeItem.images.length === 1 ? '1 1 100%' : '1 1 calc(50% - 0.5rem)'} !important; min-width:${activeItem.images.length === 1 ? '100%' : '300px'} !important; max-height:480px !important; border-radius:16px !important; overflow:hidden !important; position:relative !important; cursor:pointer !important; background:#0f172a !important; border:1px solid var(--border-color) !important; box-shadow:0 4px 14px rgba(0,0,0,0.12) !important;">
+                <img src="${img}" alt="${activeItem.title}" loading="lazy" style="width:100% !important; max-height:480px !important; object-fit:contain !important; border-radius:16px !important; display:block !important; margin:0 auto !important;" />
+                <div class="image-hover-overlay" style="position:absolute; bottom:8px; right:8px; background:rgba(0,0,0,0.65); color:#fff; padding:4px 10px; border-radius:12px; font-size:12px; font-weight:700; pointer-events:none; display:flex; align-items:center; gap:4px;">
+                  <i class="fa-solid fa-magnifying-glass-plus" style="color:var(--accent-gold);"></i> <span>확대보기</span>
                 </div>
               </div>
             `).join('')}

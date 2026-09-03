@@ -369,8 +369,8 @@ class FellowshipComponent {
               ${images.length > 0 ? `
                 <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap:0.9rem; margin-top:1.2rem;">
                   ${images.map((img, imgIdx) => `
-                    <div style="position:relative; height:240px; border-radius:14px; overflow:hidden; border:1px solid #e2e8f0; cursor:pointer; background:#ffffff; box-shadow:0 4px 14px rgba(0,0,0,0.06);" onclick="window.timelineComponent ? window.timelineComponent.openPhotoLightbox(${JSON.stringify(images).replace(/"/g, '&quot;')}, ${imgIdx}) : window.open('${img}', '_blank')">
-                      <img src="${img}" style="width:100%; height:100%; object-fit:cover; object-position:center 20%; display:block; transition:transform 0.3s ease;" class="insta-hover-img" />
+                    <div style="position:relative; max-height:360px; min-height:200px; border-radius:12px; overflow:hidden; border:1px solid var(--border-color); cursor:pointer; background:#0f172a; box-shadow:0 4px 12px rgba(0,0,0,0.08);" onclick="window.timelineComponent ? window.timelineComponent.openPhotoLightbox(${JSON.stringify(images).replace(/"/g, '&quot;')}, ${imgIdx}) : window.open('${img}', '_blank')">
+                      <img src="${img}" style="width:100%; max-height:360px; object-fit:contain; display:block; margin:0 auto;" class="hover-scale-img" />
                     </div>
                   `).join('')}
                 </div>

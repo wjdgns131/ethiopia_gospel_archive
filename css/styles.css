@@ -2322,21 +2322,3 @@ html.dark #hzNextBtn:hover:not(:disabled) {
   color: #ffffff !important;
   border-color: #38bdf8 !important;
 }
-
-/* Instagram Style Photo Gallery Hover Animations */
-.gallery-image-box {
-  transition: transform 0.3s ease, box-shadow 0.3s ease !important;
-}
-
-.gallery-image-box:hover {
-  transform: translateY(-4px) !important;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12) !important;
-}
-
-.gallery-image-box:hover .insta-hover-img {
-  transform: scale(1.05) !important;
-}
-
-.gallery-image-box:hover .image-hover-overlay {
-  opacity: 1 !important;
-}
