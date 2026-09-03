@@ -1802,11 +1802,11 @@ class DataStore {
 
   init() {
     try {
-      const FORCE_VERSION = "20260904_CHRONOLOGICAL_HISTORY_RESTORE_V700";
+      const FORCE_VERSION = "20260904_PERMANENT_NO_CORRUPT_V800";
       const currentVer = localStorage.getItem("ethiopia_master_restored_ver");
 
       if (currentVer !== FORCE_VERSION) {
-        console.log("🔄 Syncing full 47MB user backup dataset v400...");
+        console.log("🔄 Syncing clean master backup dataset v800...");
         localStorage.setItem("ethiopia_master_restored_ver", FORCE_VERSION);
         localStorage.setItem("ethiopia_history", JSON.stringify(DEFAULT_HISTORY));
         localStorage.setItem("ethiopia_user_custom_edits", JSON.stringify(DEFAULT_HISTORY));
@@ -1872,84 +1872,10 @@ class DataStore {
     if (!history || !Array.isArray(history) || history.length === 0) {
       history = JSON.parse(JSON.stringify(DEFAULT_HISTORY));
       try { localStorage.setItem("ethiopia_history", JSON.stringify(history)); } catch(e) {}
-      this._historyCache = history;
-      return history;
-    }
-    let updated = false;
-    DEFAULT_HISTORY.forEach(defItem => {
-      if (!defItem || !defItem.id) return;
-      const existing = history.find(h => h && h.id === defItem.id);
-      if (!existing) {
-        history.push(JSON.parse(JSON.stringify(defItem)));
-        updated = true;
-      } else {
-        if (defItem.images && Array.isArray(defItem.images) && defItem.images.length > 0) {
-          if (!existing.images || !Array.isArray(existing.images)) {
-            existing.images = [...defItem.images];
-            updated = true;
-          } else {
-            defItem.images.forEach(img => {
-              if (img && !existing.images.includes(img)) {
-                existing.images.push(img);
-                updated = true;
-              }
-            });
-          }
-        }
-      }
-    });
-
-    const isMarcosOrFeb26 = (item) => {
-      if (!item) return false;
-      const str = ((item.title || "") + " " + (item.desc || "") + " " + (item.id || "") + " " + (item.location || "")).toLowerCase();
-      const dt = String(item.date || "");
-      if (str.includes("마르코스") || str.includes("이사진") || str.includes("marcos")) return true;
-      if (dt.includes("2026.2.26") || dt.includes("2026.02.26") || dt.includes("2.26 ~ 3.02") || dt.includes("2.26~3.02")) return true;
-      if (item.id === "hist-20260226") return true;
-      if (item.images && Array.isArray(item.images) && item.images.some(img => img && (img.includes("20260226") || img.includes("marcos")))) return true;
-      return false;
-    };
-
-    const marcosIndices = [];
-    history.forEach((item, index) => {
-      if (isMarcosOrFeb26(item)) {
-        marcosIndices.push(index);
-      }
-    });
-
-    if (marcosIndices.length > 0) {
-      const primaryIndex = marcosIndices[0];
-      const primary = history[primaryIndex];
-      const allMarcosImages = [];
-
-      marcosIndices.forEach(idx => {
-        const item = history[idx];
-        if (item && item.images && Array.isArray(item.images)) {
-          item.images.forEach(img => {
-            if (img && !allMarcosImages.includes(img)) allMarcosImages.push(img);
-          });
-        }
-      });
-
-      primary.id = "hist-20260226";
-      primary.title = "모임집 전도집회 (마르코스 목사 이사진 초청)";
-      primary.date = "2026.2.26 ~ 3.02";
-      primary.location = "모임집, 아디스아바바";
-      primary.images = allMarcosImages.length > 0 ? allMarcosImages : ["images/history_20260226_group.jpg", "images/history_20260226_lecture.jpg"];
-      primary.desc = "*마르코스 목사의 이사진과 지인들을 초청하여 은혜롭게 진행한 모임집 전도집회입니다.";
-
-      if (marcosIndices.length > 1) {
-        const removeIndices = new Set(marcosIndices.slice(1));
-        history = history.filter((_, idx) => !removeIndices.has(idx));
-        updated = true;
-      }
     }
 
     history.sort((a, b) => this.parseTimelineDate(a.date).localeCompare(this.parseTimelineDate(b.date)));
     this._historyCache = history;
-    if (updated) {
-      this.saveHistory(history);
-    }
     return history;
   }
 
