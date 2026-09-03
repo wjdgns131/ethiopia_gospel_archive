@@ -564,8 +564,8 @@ class TimelineComponent {
       ${activeItem.images && activeItem.images.length > 0 ? `
         <div class="timeline-gallery-grid images-${Math.min(activeItem.images.length, 4)}" style="margin-top:1.8rem;">
           ${activeItem.images.map((img, imgIdx) => `
-            <div class="gallery-image-box" onclick="window.timelineComponent.openPhotoLightboxById('${activeItem.id}', ${imgIdx})">
-              <img src="${img}" alt="${activeItem.title}" loading="lazy" />
+            <div class="gallery-image-box" onclick="window.timelineComponent.openPhotoLightboxById('${activeItem.id}', ${imgIdx})" style="background:transparent !important; height:320px !important; border-radius:16px !important; overflow:hidden !important; border:1px solid var(--border-color) !important; box-shadow:0 4px 12px rgba(0,0,0,0.06) !important;">
+              <img src="${img}" alt="${activeItem.title}" loading="lazy" style="width:100% !important; height:100% !important; object-fit:cover !important; border-radius:16px !important; display:block !important;" />
               <div class="image-hover-overlay">
                 <i class="fa-solid fa-magnifying-glass-plus"></i>
               </div>
