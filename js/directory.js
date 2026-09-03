@@ -338,6 +338,209 @@ class DirectoryComponent {
     modal.classList.remove("hidden");
   }
 
+  // Interactive 1:1 Profile Photo Cropper Engine
+  openCropperModal() {
+    if (!this.tempMemberPhoto) {
+      alert("먼저 사진을 올려주시거나 [Ctrl + V]로 이미지 캡처를 붙여넣어 주세요.");
+      return;
+    }
+
+    let modal = document.getElementById("cropperModal");
+    if (!modal) {
+      modal = document.createElement("div");
+      modal.id = "cropperModal";
+      modal.className = "modal-backdrop";
+      modal.style.zIndex = "999999";
+      modal.innerHTML = `
+        <div class="modal-card" style="max-width:480px; background:#ffffff; color:#0f172a; padding:1.5rem; border-radius:20px; box-shadow:0 25px 50px rgba(0,0,0,0.3); text-align:center;">
+          
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid #e2e8f0; padding-bottom:0.75rem;">
+            <h3 style="font-size:1.2rem; font-weight:800; margin:0; color:#1e3a8a; display:flex; align-items:center; gap:0.4rem;">
+              <i class="fa-solid fa-crop-simple" style="color:#0284c7;"></i> 프로필 사진 구도 & 위치 구도 조정
+            </h3>
+            <button type="button" style="background:none; border:none; font-size:1.2rem; cursor:pointer; color:#64748b;" onclick="document.getElementById('cropperModal').classList.add('hidden')"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+
+          <p style="font-size:0.85rem; color:#64748b; margin-bottom:1rem; line-height:1.4;">
+            마우스 드래그로 얼굴 위치를 맞추시거나, 확대 슬라이더와 방향 버튼을 이용해 가장 예쁜 구도를 맞춰주세요.
+          </p>
+
+          <!-- 1:1 SQUARE CROP VIEWPORT -->
+          <div id="cropperViewport" style="position:relative; width:240px; height:240px; margin:0 auto 1.25rem auto; border-radius:20px; overflow:hidden; border:3px solid #0284c7; box-shadow:0 8px 20px rgba(2,132,199,0.25); background:#f8fafc; cursor:grab; user-select:none;">
+            <img id="cropperTargetImg" src="" alt="Crop Target" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%) scale(1); max-width:none; transition:none;" />
+            <div style="position:absolute; inset:0; border:2px dashed rgba(2,132,199,0.6); border-radius:18px; pointer-events:none;"></div>
+          </div>
+
+          <!-- CONTROLS TOOLBAR -->
+          <div style="background:#f1f5f9; padding:0.85rem 1rem; border-radius:14px; margin-bottom:1.25rem; display:flex; flex-direction:column; gap:0.75rem;">
+            
+            <!-- ZOOM SLIDER -->
+            <div style="display:flex; align-items:center; gap:0.6rem;">
+              <span style="font-size:0.82rem; font-weight:700; color:#334155; white-space:nowrap;"><i class="fa-solid fa-magnifying-glass-plus"></i> 크기 확대</span>
+              <input type="range" id="cropZoomSlider" min="1.0" max="3.5" step="0.05" value="1.0" style="flex:1; cursor:pointer;" />
+            </div>
+
+            <!-- 4-WAY DIRECTION BUTTONS -->
+            <div style="display:flex; justify-content:center; gap:0.5rem; align-items:center;">
+              <span style="font-size:0.8rem; font-weight:700; color:#475569; margin-right:4px;">위치 조정:</span>
+              <button type="button" id="cropBtnLeft" class="btn btn-secondary btn-sm" style="padding:0.25rem 0.6rem; font-size:0.8rem;"><i class="fa-solid fa-arrow-left"></i></button>
+              <button type="button" id="cropBtnUp" class="btn btn-secondary btn-sm" style="padding:0.25rem 0.6rem; font-size:0.8rem;"><i class="fa-solid fa-arrow-up"></i></button>
+              <button type="button" id="cropBtnDown" class="btn btn-secondary btn-sm" style="padding:0.25rem 0.6rem; font-size:0.8rem;"><i class="fa-solid fa-arrow-down"></i></button>
+              <button type="button" id="cropBtnRight" class="btn btn-secondary btn-sm" style="padding:0.25rem 0.6rem; font-size:0.8rem;"><i class="fa-solid fa-arrow-right"></i></button>
+              <button type="button" id="cropBtnReset" class="btn btn-outline btn-sm" style="padding:0.25rem 0.6rem; font-size:0.78rem; font-weight:700; color:#0284c7;">중앙</button>
+            </div>
+          </div>
+
+          <!-- MODAL ACTIONS -->
+          <div style="display:flex; justify-content:flex-end; gap:0.6rem;">
+            <button type="button" class="btn btn-secondary" onclick="document.getElementById('cropperModal').classList.add('hidden')">취소</button>
+            <button type="button" id="applyCropBtn" class="btn btn-primary" style="font-weight:800; background:#0284c7;">
+              <i class="fa-solid fa-scissors"></i> ✂️ 선택 구도로 사진 자르기 & 적용
+            </button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+
+      // Wire interactive events
+      this.initCropperInteractions();
+    }
+
+    const targetImg = document.getElementById("cropperTargetImg");
+    if (targetImg) {
+      targetImg.src = this.tempMemberPhoto;
+      this.cropState = { scale: 1.0, offsetX: 0, offsetY: 0, isDragging: false, startX: 0, startY: 0 };
+      this.applyCropTransforms();
+    }
+
+    modal.classList.remove("hidden");
+  }
+
+  initCropperInteractions() {
+    const viewport = document.getElementById("cropperViewport");
+    const slider = document.getElementById("cropZoomSlider");
+    const applyBtn = document.getElementById("applyCropBtn");
+
+    if (slider) {
+      slider.addEventListener("input", (e) => {
+        this.cropState.scale = parseFloat(e.target.value);
+        this.applyCropTransforms();
+      });
+    }
+
+    const updatePos = (dx, dy) => {
+      this.cropState.offsetX += dx;
+      this.cropState.offsetY += dy;
+      this.applyCropTransforms();
+    };
+
+    document.getElementById("cropBtnLeft")?.addEventListener("click", () => updatePos(-10, 0));
+    document.getElementById("cropBtnRight")?.addEventListener("click", () => updatePos(10, 0));
+    document.getElementById("cropBtnUp")?.addEventListener("click", () => updatePos(0, -10));
+    document.getElementById("cropBtnDown")?.addEventListener("click", () => updatePos(0, 10));
+    document.getElementById("cropBtnReset")?.addEventListener("click", () => {
+      this.cropState.offsetX = 0;
+      this.cropState.offsetY = 0;
+      this.cropState.scale = 1.0;
+      if (slider) slider.value = 1.0;
+      this.applyCropTransforms();
+    });
+
+    // Mouse & Touch Dragging Handlers
+    if (viewport) {
+      viewport.addEventListener("mousedown", (e) => {
+        this.cropState.isDragging = true;
+        this.cropState.startX = e.clientX - this.cropState.offsetX;
+        this.cropState.startY = e.clientY - this.cropState.offsetY;
+        viewport.style.cursor = "grabbing";
+      });
+
+      window.addEventListener("mousemove", (e) => {
+        if (!this.cropState || !this.cropState.isDragging) return;
+        this.cropState.offsetX = e.clientX - this.cropState.startX;
+        this.cropState.offsetY = e.clientY - this.cropState.startY;
+        this.applyCropTransforms();
+      });
+
+      window.addEventListener("mouseup", () => {
+        if (this.cropState) this.cropState.isDragging = false;
+        if (viewport) viewport.style.cursor = "grab";
+      });
+    }
+
+    if (applyBtn) {
+      applyBtn.addEventListener("click", () => this.generateCroppedCanvasResult());
+    }
+  }
+
+  applyCropTransforms() {
+    const img = document.getElementById("cropperTargetImg");
+    if (!img || !this.cropState) return;
+    const { scale, offsetX, offsetY } = this.cropState;
+    img.style.transform = `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px)) scale(${scale})`;
+  }
+
+  generateCroppedCanvasResult() {
+    const img = document.getElementById("cropperTargetImg");
+    if (!img || !this.cropState) return;
+
+    try {
+      const canvas = document.createElement("canvas");
+      canvas.width = 300;
+      canvas.height = 300;
+      const ctx = canvas.getContext("2d");
+
+      // Draw background white
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, 300, 300);
+
+      // Create a temp image element to ensure dimensions
+      const tempImg = new Image();
+      tempImg.crossOrigin = "anonymous";
+      tempImg.onload = () => {
+        const scale = this.cropState.scale;
+        const offsetX = this.cropState.offsetX;
+        const offsetY = this.cropState.offsetY;
+
+        // Viewport 240x240 mapped to canvas 300x300 (ratio 1.25)
+        const ratio = 1.25;
+
+        let renderW = tempImg.naturalWidth * scale * ratio;
+        let renderH = tempImg.naturalHeight * scale * ratio;
+
+        // Keep aspect ratio
+        if (tempImg.naturalWidth > 0 && tempImg.naturalHeight > 0) {
+          const imgAspect = tempImg.naturalWidth / tempImg.naturalHeight;
+          if (imgAspect > 1) {
+            renderH = (300 / scale) * scale;
+            renderW = renderH * imgAspect;
+          } else {
+            renderW = (300 / scale) * scale;
+            renderH = renderW / imgAspect;
+          }
+        }
+
+        renderW *= scale;
+        renderH *= scale;
+
+        const drawX = (150 - renderW / 2) + (offsetX * ratio);
+        const drawY = (150 - renderH / 2) + (offsetY * ratio);
+
+        ctx.drawImage(tempImg, drawX, drawY, renderW, renderH);
+
+        this.tempMemberPhoto = canvas.toDataURL("image/jpeg", 0.9);
+        this.renderMemberPhotoPreview();
+        
+        document.getElementById("cropperModal")?.classList.add("hidden");
+        if (window.showToast) window.showToast("✂️ 프로필 사진 구도가 성공적으로 조정되었습니다!");
+      };
+      tempImg.src = img.src;
+    } catch(e) {
+      console.error("Cropping canvas error:", e);
+      document.getElementById("cropperModal")?.classList.add("hidden");
+    }
+  }
+
   renderMemberPhotoPreview() {
     const photoInput = document.getElementById("fieldPhoto");
     if (photoInput) photoInput.value = this.tempMemberPhoto || "";
