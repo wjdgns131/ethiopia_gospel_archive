@@ -123,6 +123,9 @@ class TimelineComponent {
   }
 
   readHistoryPhotoFiles(files) {
+    if (!files || files.length === 0) return;
+    if (window.showToast) window.showToast("📷 사진을 최적화 압축하는 중입니다...");
+
     Array.from(files).forEach(file => {
       if (!file.type.startsWith("image/")) return;
       const reader = new FileReader();
@@ -132,7 +135,7 @@ class TimelineComponent {
           const canvas = document.createElement("canvas");
           let w = img.width;
           let h = img.height;
-          const maxDim = 900; // Optimized for crisp web display & fast saving
+          const maxDim = 720; // Ultra crisp, lightweight ~30KB
           if (w > maxDim || h > maxDim) {
             if (w > h) {
               h = Math.round((h * maxDim) / w);
@@ -148,11 +151,12 @@ class TimelineComponent {
           ctx.imageSmoothingEnabled = true;
           ctx.imageSmoothingQuality = "high";
           ctx.drawImage(img, 0, 0, w, h);
-          const compressedDataUrl = canvas.toDataURL("image/jpeg", 0.75); // Fast & lightweight 75% quality
+          const compressedDataUrl = canvas.toDataURL("image/jpeg", 0.68); // ~30KB lightweight JPEG
 
           if (!this.tempHistoryImages) this.tempHistoryImages = [];
           this.tempHistoryImages.push(compressedDataUrl);
           this.renderHistoryPhotoPreviews();
+          if (window.showToast) window.showToast("✨ 사진이 첨부되었습니다! (저장하기 버튼을 눌러주세요)");
         };
         img.src = e.target.result;
       };

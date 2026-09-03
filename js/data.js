@@ -1771,18 +1771,10 @@ class DataStore {
 
   init() {
     try {
-      const CURRENT_DATA_VERSION = "2.9_empty_fellowship";
+      const CURRENT_DATA_VERSION = "3.0_persistent_db";
       const savedVersion = localStorage.getItem("ethiopia_data_ver");
       if (savedVersion !== CURRENT_DATA_VERSION) {
-        console.log("🔄 Upgrading data version to " + CURRENT_DATA_VERSION + ", clearing stale cache...");
-        try {
-          localStorage.removeItem("ethiopia_members");
-          localStorage.removeItem("ethiopia_members_v2");
-          localStorage.removeItem("ethiopia_history");
-          localStorage.removeItem("ethiopia_assemblies");
-          localStorage.removeItem("ethiopia_events");
-          localStorage.removeItem("ethiopia_fellowship");
-        } catch(e) {}
+        console.log("🔄 Upgrading data version to " + CURRENT_DATA_VERSION + ", preserving user edits...");
         localStorage.setItem("ethiopia_data_ver", CURRENT_DATA_VERSION);
       }
 

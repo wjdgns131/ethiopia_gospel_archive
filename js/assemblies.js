@@ -105,6 +105,9 @@ class FellowshipComponent {
   }
 
   readPhotoFiles(files) {
+    if (!files || files.length === 0) return;
+    if (window.showToast) window.showToast("📷 사진을 최적화 압축하는 중입니다...");
+
     Array.from(files).forEach(file => {
       if (!file.type.startsWith("image/")) return;
       const reader = new FileReader();
@@ -114,7 +117,7 @@ class FellowshipComponent {
           const canvas = document.createElement("canvas");
           let w = img.width;
           let h = img.height;
-          const maxDim = 900;
+          const maxDim = 720;
           if (w > maxDim || h > maxDim) {
             if (w > h) {
               h = Math.round((h * maxDim) / w);
@@ -130,11 +133,12 @@ class FellowshipComponent {
           ctx.imageSmoothingEnabled = true;
           ctx.imageSmoothingQuality = "high";
           ctx.drawImage(img, 0, 0, w, h);
-          const dataUrl = canvas.toDataURL("image/jpeg", 0.75);
+          const dataUrl = canvas.toDataURL("image/jpeg", 0.68);
 
           if (!this.tempFellowshipImages) this.tempFellowshipImages = [];
           this.tempFellowshipImages.push(dataUrl);
           this.renderPhotoPreviews();
+          if (window.showToast) window.showToast("✨ 활동 소식 사진이 첨부되었습니다!");
         };
         img.src = e.target.result;
       };
