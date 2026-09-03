@@ -1,4 +1,4 @@
-// Ethiopia Gospel Mission Database (Updated with edited 2025.5.28 ~ 6.01 history entry: v2600)
+// Ethiopia Gospel Mission Database (Updated with edited 2025.5.28 ~ 6.01 history entry: v2800)
 const DEFAULT_MEMBERS = [
   {
     "id": "mem-gudina2026-1",
@@ -1962,80 +1962,13 @@ const DEFAULT_HISTORY = [
   }
 ];
 
-const DEFAULT_ASSEMBLIES = [
-  {
-    "id": "assm-gudina-tumsa-202602",
-    "title": "2026.02 구디나 툼사 수양관 전도집회",
-    "date": "2026.02.06 ~ 02.08",
-    "location": "구디나 툼사 수양관, 아디스아바바",
-    "attendance": "전도집회 참석 성도 및 초청자",
-    "savedCount": "구원받은 식구 구원받은 식구",
-    "baptizedCount": "-",
-    "image": "images/history_20260206_gudina_assembly.jpg",
-    "desc": "전도집회\n장소: 구디나 툼사 수양관, 아디스아바바\n일시 : 2026.2.06~08"
-  },
-  {
-    "id": "assm-1st-offline",
-    "title": "2025.05 에티오피아 첫 오프라인 집회 (Vibes Hotel)",
-    "date": "2025.5.28 ~ 6.01",
-    "location": "Vibes Hotel, 아디스아바바",
-    "attendance": "신규 참석 인원 : 15명 대략",
-    "savedCount": "6명 구원",
-    "baptizedCount": "-",
-    "image": "images/history_202505_first_offline_assembly_group.jpg",
-    "desc": "에티오피아 첫 오프라인 집회\n장소: Vibes Hotel, 아디스아바바\n일시: 2025.5.28~6.01\n- 강연 : 성경은 사실이다 (암하라어 더빙)\n- 집회 말씀 보충 설명 : 이은우, 전현식\n- 사회 : 이강현, 이정훈\n- 통역 : 요카벳, 비니암 [영어<->암하라어], 데보라(good news church staff)[한국어<->암하라어]\n- 신규 참석 인원 : 15명 대략\n\n[구원받은 식구]\n1. Biniam Alemu (약사, 34세)\n2. Bekalwa Tadesse (개인사업, 37세)\n3. Ruth Genetu (개인사업, 33세)\n4. Yemarshet Elfiyos (개인사업, 31세)\n5. Ephrem Gezahegn (택시기사, 43세)\n6. Gemechu Endale (무직, 27세)"
-  },
-  {
-    "id": "assm-1st-baptism",
-    "title": "2025.09.14 에티오피아 첫 침례식 (조립식 수영장)",
-    "date": "2025.9.14",
-    "location": "에티오피아 (아디스아바바 모임집)",
-    "attendance": "모임집 성도 및 가족",
-    "savedCount": "-",
-    "baptizedCount": "4명 (에덴, 피크루, 제리훈, 게타추)",
-    "image": "images/history_20250914_baptism_group.jpg",
-    "desc": "에티오피아 첫 침례식\n일시: 2025.9.14\n장소: 아디스아바바 모임집 조립식 수영장\n- 침례자 : 4명 (에덴, 피크루, 제리훈, 게타추)\n- 진행 : 김재원 선교사\n\n정교회의 영향력이 강한 에티오피아 환경 특성상 가나에서 가져온 조립식 수영장을 모임집에 설치하여 은혜롭게 침례를 베풀었습니다."
-  },
-  {
-    "id": "assm-2nd-meetinghouse",
-    "title": "2025.12 아디스아바바 모임집 첫 전도집회",
-    "date": "2025.12.12 ~ 12.14",
-    "location": "에티오피아 (아디스아바바 모임집)",
-    "attendance": "참석 인원 : 12명 (식사 준비 대상)",
-    "savedCount": "3명 구원 (Samrawit, Mekdes, Ahimed)",
-    "baptizedCount": "-",
-    "image": "images/history_20251212_meeting_house_assembly_group.jpg",
-    "desc": "모임집에서의 첫 전도집회\n일시: 2025.12.12 ~ 12.14\n장소: 아디스아바바 모임집\n- ELC 스태프 피크루 형제 & 이정훈 형제 집회 준비\n- 이강현 형제 영국에서 입국 합류 (12.12)\n- 에덴 자매 & 가사 도우미 12명 식사 봉사\n\n[구원받은 식구]\n1. Samrawit Megersa (대학생, 22세)\n2. Mekdes Adunga (간호사, 31세)\n3. Ahimed Seid (전 선지자/현 ELC스태프, 32세)\n\n[분탕꾼]\n- Masresha Lamrot, Yosef Solomon"
-  },
-  {
-    "id": "assm-2nd-baptism",
-    "title": "2025.12.21 침례식 (5명 침례)",
-    "date": "2025.12.21",
-    "location": "에티오피아 (아디스아바바 모임집)",
-    "attendance": "모임집 성도 및 가족",
-    "savedCount": "-",
-    "baptizedCount": "5명 (아흐메드, 삼라윗, 요셉, 마스레샤, 데레제)",
-    "image": "images/history_20251221_baptism_samrawit.jpg",
-    "desc": "12월 집회에서 구원받은 5명의 형제자매에게 침례를 줌\n(아흐메드, 삼라윗, 요셉, 마스레샤, 데레제)"
-  },
-  {
-    "id": "assm-gudina-tumsa",
-    "title": "2026.01 구디나 툼사 수양관 전도집회",
-    "date": "2026.1.17 ~ 1.19",
-    "location": "구디나 툼사 수양관, 아디스아바바",
-    "attendance": "전도집회 참석 성도 및 초청자",
-    "savedCount": "10명 구원 (Yewbdar, Psawilos, Elsa, Mebrat, Betelhem, Rae, Aregash, Nigist, Habtamu, Tigist)",
-    "baptizedCount": "-",
-    "image": "images/history_20260117_gudina_group.jpg",
-    "desc": "전도집회\n장소: 구디나 툼사 수양관, 아디스아바바\n일시 : 2026.1.17~19\n\n[분탕꾼]\n- Etsub Hailu"
-  }
-];
+const DEFAULT_ASSEMBLIES = [];
 
 if (typeof window !== 'undefined') {
   window.DEFAULT_MEMBERS = DEFAULT_MEMBERS;
   window.DEFAULT_HISTORY = DEFAULT_HISTORY;
   window.DEFAULT_ASSEMBLIES = DEFAULT_ASSEMBLIES;
-  window.DATA_VERSION = "20260904_V2600_SAVED_20250528_HISTORY";
+  window.DATA_VERSION = "20260904_V2800_CLEARED_FELLOWSHIP";
 
   // Auto-flush stale localStorage if code/data version changes
   try {
@@ -2051,7 +1984,7 @@ if (typeof window !== 'undefined') {
   window.db = {
     getMembers() {
       try {
-        const stored = localStorage.getItem("ethiopia_members_v2600");
+        const stored = localStorage.getItem("ethiopia_members_v2800");
         if (stored) {
           const parsed = JSON.parse(stored);
           if (Array.isArray(parsed) && parsed.length > 0) return parsed;
@@ -2061,12 +1994,12 @@ if (typeof window !== 'undefined') {
     },
     saveMembers(mems) {
       try {
-        localStorage.setItem("ethiopia_members_v2600", JSON.stringify(mems));
+        localStorage.setItem("ethiopia_members_v2800", JSON.stringify(mems));
       } catch(e) {}
     },
     getHistory() {
       try {
-        const stored = localStorage.getItem("ethiopia_history_v2600");
+        const stored = localStorage.getItem("ethiopia_history_v2800");
         if (stored) {
           const parsed = JSON.parse(stored);
           if (Array.isArray(parsed) && parsed.length > 0) return parsed;
@@ -2076,12 +2009,12 @@ if (typeof window !== 'undefined') {
     },
     saveHistory(hists) {
       try {
-        localStorage.setItem("ethiopia_history_v2600", JSON.stringify(hists));
+        localStorage.setItem("ethiopia_history_v2800", JSON.stringify(hists));
       } catch(e) {}
     },
     getFellowship() {
       try {
-        const stored = localStorage.getItem("ethiopia_assemblies_v2600");
+        const stored = localStorage.getItem("ethiopia_assemblies_v2800");
         if (stored) {
           const parsed = JSON.parse(stored);
           if (Array.isArray(parsed) && parsed.length > 0) return parsed;
@@ -2091,7 +2024,7 @@ if (typeof window !== 'undefined') {
     },
     saveFellowship(items) {
       try {
-        localStorage.setItem("ethiopia_assemblies_v2600", JSON.stringify(items));
+        localStorage.setItem("ethiopia_assemblies_v2800", JSON.stringify(items));
       } catch(e) {}
     },
     addMember(m) {
