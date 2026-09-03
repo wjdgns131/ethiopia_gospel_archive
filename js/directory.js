@@ -1074,7 +1074,7 @@ class DirectoryComponent {
       }
 
       // Region Filter
-      if (this.activeRegion && this.activeRegion !== "all" && this.activeRegion !== "전체") {
+      if (this.activeRegion && this.activeRegion !== "all" && this.activeRegion !== "전체" && this.activeRegion !== "전체지역" && this.activeRegion !== "전체 지역" && !this.activeRegion.toLowerCase().includes("전체") && !this.activeRegion.toLowerCase().includes("all")) {
         const target = this.activeRegion.toLowerCase().trim();
         const mReg = (m.region || "기타").toLowerCase().trim();
 
