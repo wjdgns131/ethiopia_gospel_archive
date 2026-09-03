@@ -1416,7 +1416,7 @@ const DEFAULT_HISTORY = [
   {
     "id": "hist-202308",
     "date": "2023년 8월",
-    "title": "체코에서 시작된 에티오피아 복음 전파",
+    "title": "체코에서의 시작 & 에티오피아 3대 언어 번역 추진",
     "location": "체코 ELC",
     "images": [
       "images/history_202308_czech_zoom.png",
@@ -1803,8 +1803,6 @@ const DEFAULT_EVENTS = [
 ];
 
 // Data Store Manager Class
-
-// Data Store Manager Class
 class DataStore {
   constructor() {
     this.init();
@@ -1812,17 +1810,13 @@ class DataStore {
 
   init() {
     try {
-      const FORCE_VERSION = "20260904_EXACT_4_HOURS_AGO_C3118B5_V1000";
-      const currentVer = localStorage.getItem("ethiopia_master_restored_ver");
-
-      if (currentVer !== FORCE_VERSION) {
-        console.log("🔄 Restoring exact 4 hours ago dataset (c3118b5) v1000...");
-        localStorage.setItem("ethiopia_master_restored_ver", FORCE_VERSION);
+      const CURRENT_DATA_VERSION = "9.0_true_4_hours_ago_v1100";
+      const savedVer = localStorage.getItem("ethiopia_data_ver");
+      if (savedVer !== CURRENT_DATA_VERSION) {
+        localStorage.setItem("ethiopia_data_ver", CURRENT_DATA_VERSION);
         localStorage.setItem("ethiopia_history", JSON.stringify(DEFAULT_HISTORY));
         localStorage.setItem("ethiopia_user_custom_edits", JSON.stringify(DEFAULT_HISTORY));
         localStorage.setItem("ethiopia_members", JSON.stringify(DEFAULT_MEMBERS));
-        localStorage.setItem("ethiopia_assemblies", JSON.stringify(DEFAULT_ASSEMBLIES));
-        localStorage.setItem("ethiopia_events", JSON.stringify(DEFAULT_EVENTS));
       }
 
       let historyData = null;
@@ -1831,17 +1825,8 @@ class DataStore {
         historyData = JSON.parse(JSON.stringify(DEFAULT_HISTORY));
         try { localStorage.setItem("ethiopia_history", JSON.stringify(historyData)); } catch(e) {}
       }
-      this._historyCache = historyData;
 
-      let membersData = null;
-      try { membersData = JSON.parse(localStorage.getItem("ethiopia_members")); } catch(e) {}
-      if (!membersData || !Array.isArray(membersData) || membersData.length === 0) {
-        try { localStorage.setItem("ethiopia_members", JSON.stringify(DEFAULT_MEMBERS)); } catch(e) {}
-      }
-    } catch(e) {
-      console.error("DataStore init error:", e);
-    }
-  }
+      this._historyCache = historyData;
 
       let membersData = null;
       try { membersData = JSON.parse(localStorage.getItem("ethiopia_members")); } catch(e) {}
@@ -1891,10 +1876,84 @@ class DataStore {
     if (!history || !Array.isArray(history) || history.length === 0) {
       history = JSON.parse(JSON.stringify(DEFAULT_HISTORY));
       try { localStorage.setItem("ethiopia_history", JSON.stringify(history)); } catch(e) {}
+      this._historyCache = history;
+      return history;
+    }
+    let updated = false;
+    DEFAULT_HISTORY.forEach(defItem => {
+      if (!defItem || !defItem.id) return;
+      const existing = history.find(h => h && h.id === defItem.id);
+      if (!existing) {
+        history.push(JSON.parse(JSON.stringify(defItem)));
+        updated = true;
+      } else {
+        if (defItem.images && Array.isArray(defItem.images) && defItem.images.length > 0) {
+          if (!existing.images || !Array.isArray(existing.images)) {
+            existing.images = [...defItem.images];
+            updated = true;
+          } else {
+            defItem.images.forEach(img => {
+              if (img && !existing.images.includes(img)) {
+                existing.images.push(img);
+                updated = true;
+              }
+            });
+          }
+        }
+      }
+    });
+
+    const isMarcosOrFeb26 = (item) => {
+      if (!item) return false;
+      const str = ((item.title || "") + " " + (item.desc || "") + " " + (item.id || "") + " " + (item.location || "")).toLowerCase();
+      const dt = String(item.date || "");
+      if (str.includes("마르코스") || str.includes("이사진") || str.includes("marcos")) return true;
+      if (dt.includes("2026.2.26") || dt.includes("2026.02.26") || dt.includes("2.26 ~ 3.02") || dt.includes("2.26~3.02")) return true;
+      if (item.id === "hist-20260226") return true;
+      if (item.images && Array.isArray(item.images) && item.images.some(img => img && (img.includes("20260226") || img.includes("marcos")))) return true;
+      return false;
+    };
+
+    const marcosIndices = [];
+    history.forEach((item, index) => {
+      if (isMarcosOrFeb26(item)) {
+        marcosIndices.push(index);
+      }
+    });
+
+    if (marcosIndices.length > 0) {
+      const primaryIndex = marcosIndices[0];
+      const primary = history[primaryIndex];
+      const allMarcosImages = [];
+
+      marcosIndices.forEach(idx => {
+        const item = history[idx];
+        if (item && item.images && Array.isArray(item.images)) {
+          item.images.forEach(img => {
+            if (img && !allMarcosImages.includes(img)) allMarcosImages.push(img);
+          });
+        }
+      });
+
+      primary.id = "hist-20260226";
+      primary.title = "모임집 전도집회 (마르코스 목사 이사진 초청)";
+      primary.date = "2026.2.26 ~ 3.02";
+      primary.location = "모임집, 아디스아바바";
+      primary.images = allMarcosImages.length > 0 ? allMarcosImages : ["images/history_20260226_group.jpg", "images/history_20260226_lecture.jpg"];
+      primary.desc = "*마르코스 목사의 이사진과 지인들을 초청하여 은혜롭게 진행한 모임집 전도집회입니다.";
+
+      if (marcosIndices.length > 1) {
+        const removeIndices = new Set(marcosIndices.slice(1));
+        history = history.filter((_, idx) => !removeIndices.has(idx));
+        updated = true;
+      }
     }
 
     history.sort((a, b) => this.parseTimelineDate(a.date).localeCompare(this.parseTimelineDate(b.date)));
     this._historyCache = history;
+    if (updated) {
+      this.saveHistory(history);
+    }
     return history;
   }
 
@@ -1969,9 +2028,83 @@ class DataStore {
   getMembers() {
     let members = null;
     try { members = JSON.parse(localStorage.getItem("ethiopia_members")); } catch(e) {}
-    if (!members || !Array.isArray(members) || members.length === 0) {
+    if (!members || !Array.isArray(members) || members.length < 20) {
+      try {
+        localStorage.removeItem("ethiopia_members");
+        localStorage.removeItem("ethiopia_members_v2");
+      } catch(e) {}
       members = JSON.parse(JSON.stringify(DEFAULT_MEMBERS));
-      try { localStorage.setItem("ethiopia_members", JSON.stringify(members)); } catch(e) {}
+      try {
+        localStorage.setItem("ethiopia_members", JSON.stringify(members));
+      } catch(e) {}
+      return members;
+    }
+    
+    let updated = false;
+    const defaultMap = new Map();
+    DEFAULT_MEMBERS.forEach(def => {
+      if (def && def.name) {
+        const norm = this.normalizeMemberName(def.name);
+        defaultMap.set(norm, def);
+      }
+    });
+
+    const cleanMembers = [];
+    const seenNormKeys = new Map();
+
+    members.forEach(m => {
+      if (!m || !m.name) return;
+      const normKey = this.normalizeMemberName(m.name);
+
+      if (seenNormKeys.has(normKey)) {
+        const existing = seenNormKeys.get(normKey);
+        if (m.name === "Kurse Teso" || m.name === "Kursa Teso") {
+          existing.name = "Kurse Teso";
+        }
+        if (m.testimony && !existing.testimony) existing.testimony = m.testimony;
+        if (m.youtube && !existing.youtube) existing.youtube = m.youtube;
+        if (m.photo && !existing.photo) existing.photo = m.photo;
+        if (m.assemblyMonth && !existing.assemblyMonth) existing.assemblyMonth = m.assemblyMonth;
+        updated = true;
+        return;
+      }
+
+      const def = defaultMap.get(normKey);
+      if (def) {
+        if (def.assemblyMonth && (!m.assemblyMonth || m.assemblyMonth.includes("2025.1.17"))) {
+          m.assemblyMonth = def.assemblyMonth;
+          updated = true;
+        }
+        if (def.testimony && !m.testimony) {
+          m.testimony = def.testimony;
+          updated = true;
+        }
+        if (def.youtube && !m.youtube) {
+          m.youtube = def.youtube;
+          updated = true;
+        }
+        if (def.photo && !m.photo) {
+          m.photo = def.photo;
+          updated = true;
+        }
+      }
+
+      seenNormKeys.set(normKey, m);
+      cleanMembers.push(m);
+    });
+
+    DEFAULT_MEMBERS.forEach(def => {
+      const normKey = this.normalizeMemberName(def.name);
+      if (!seenNormKeys.has(normKey)) {
+        cleanMembers.push(def);
+        seenNormKeys.set(normKey, def);
+        updated = true;
+      }
+    });
+
+    if (updated || cleanMembers.length !== members.length) {
+      this.saveMembers(cleanMembers);
+      return cleanMembers;
     }
     return members;
   }
