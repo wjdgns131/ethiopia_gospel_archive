@@ -50,7 +50,7 @@
       }
     } catch(e) {}
   </script>
-  <script src="js/data.js?v=20260904_V15000_ROBUST_PASTE_AND_UPLOAD"></script>
+  <script src="js/data.js?v=20260904_V16000_100PCT_REAL_LIVE_GOOGLE_MAPS_IFRAME"></script>
 </head>
 <body>
   <!-- Header / Navigation Bar -->
@@ -141,18 +141,9 @@
           <div class="map-layout">
             <!-- Interactive Map SVG Container -->
             <div class="map-wrapper" id="ethiopiaMapContainer" style="position:relative; width:100%; height:350px; border-radius:14px; overflow:hidden; border:1px solid var(--border-color); box-shadow:var(--shadow-sm); background:#0f172a;">
-              <div id="googleMapDiv" style="position:relative; width:100%; height:100%; background:#0f172a; overflow:hidden;">
-                <img src="images/ethiopia_map_clean.png" alt="Google Maps Ethiopia" style="width:100%; height:100%; object-fit:cover; opacity:0.95; display:block;" />
-                
-                <!-- GPS Pins Pre-rendered -->
-                <div onclick="if(window.mapComponent) window.mapComponent.selectRegion('아디스아바바')" style="position:absolute; top:42%; left:46%; transform:translate(-50%, -100%); cursor:pointer; z-index:20; display:flex; flex-direction:column; align-items:center;">
-                  <div style="background:#d97706; color:#ffffff; font-weight:900; font-size:12px; padding:3px 9px; border-radius:14px; border:2px solid #ffffff; box-shadow:0 4px 12px rgba(0,0,0,0.4); display:flex; align-items:center; gap:4px;">
-                    <i class="fa-solid fa-location-dot" style="color:#fbbf24;"></i>
-                    <span>아디스아바바</span>
-                    <span style="background:rgba(255,255,255,0.3); padding:1px 5px; border-radius:10px; font-size:10.5px;">34명</span>
-                  </div>
-                  <div style="width:0; height:0; border-left:6px solid transparent; border-right:6px solid transparent; border-top:7px solid #d97706;"></div>
-                </div>
+              <iframe id="liveGoogleMapsIframe" src="https://maps.google.com/maps?q=Ethiopia&t=m&z=7&output=embed" width="100%" height="350" frameborder="0" style="border:0; width:100%; height:350px; display:block;" allowfullscreen loading="lazy"></iframe>
+            </div>
+
 
                 <div onclick="if(window.mapComponent) window.mapComponent.selectRegion('아다마')" style="position:absolute; top:50%; left:53%; transform:translate(-50%, -100%); cursor:pointer; z-index:20; display:flex; flex-direction:column; align-items:center;">
                   <div style="background:#d97706; color:#ffffff; font-weight:900; font-size:12px; padding:3px 9px; border-radius:14px; border:2px solid #ffffff; box-shadow:0 4px 12px rgba(0,0,0,0.4); display:flex; align-items:center; gap:4px;">
@@ -3171,14 +3162,14 @@
   </footer>
 
   <!-- Scripts with updated cache buster -->
-  <script src="js/data.js?v=20260904_V15000_ROBUST_PASTE_AND_UPLOAD"></script>
-  <script src="js/i18n.js?v=20260904_V15000_ROBUST_PASTE_AND_UPLOAD"></script>
-  <script src="js/map.js?v=20260904_V15000_ROBUST_PASTE_AND_UPLOAD"></script>
-  <script src="js/directory.js?v=20260904_V15000_ROBUST_PASTE_AND_UPLOAD"></script>
-  <script src="js/timeline.js?v=20260904_V15000_ROBUST_PASTE_AND_UPLOAD"></script>
-  <script src="js/assemblies.js?v=20260904_V15000_ROBUST_PASTE_AND_UPLOAD"></script>
-  <script src="js/calendar.js?v=20260904_V15000_ROBUST_PASTE_AND_UPLOAD"></script>
-  <script src="js/admin.js?v=20260904_V15000_ROBUST_PASTE_AND_UPLOAD"></script>
-  <script src="js/app.js?v=20260904_V15000_ROBUST_PASTE_AND_UPLOAD"></script>
+  <script src="js/data.js?v=20260904_V16000_100PCT_REAL_LIVE_GOOGLE_MAPS_IFRAME"></script>
+  <script src="js/i18n.js?v=20260904_V16000_100PCT_REAL_LIVE_GOOGLE_MAPS_IFRAME"></script>
+  <script src="js/map.js?v=20260904_V16000_100PCT_REAL_LIVE_GOOGLE_MAPS_IFRAME"></script>
+  <script src="js/directory.js?v=20260904_V16000_100PCT_REAL_LIVE_GOOGLE_MAPS_IFRAME"></script>
+  <script src="js/timeline.js?v=20260904_V16000_100PCT_REAL_LIVE_GOOGLE_MAPS_IFRAME"></script>
+  <script src="js/assemblies.js?v=20260904_V16000_100PCT_REAL_LIVE_GOOGLE_MAPS_IFRAME"></script>
+  <script src="js/calendar.js?v=20260904_V16000_100PCT_REAL_LIVE_GOOGLE_MAPS_IFRAME"></script>
+  <script src="js/admin.js?v=20260904_V16000_100PCT_REAL_LIVE_GOOGLE_MAPS_IFRAME"></script>
+  <script src="js/app.js?v=20260904_V16000_100PCT_REAL_LIVE_GOOGLE_MAPS_IFRAME"></script>
 </body>
 </html>
