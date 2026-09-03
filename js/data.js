@@ -1802,16 +1802,22 @@ class DataStore {
 
   init() {
     try {
-      let userCustomHistory = null;
-      try { userCustomHistory = JSON.parse(localStorage.getItem("ethiopia_user_custom_edits")); } catch(e) {}
+      const FORCE_VERSION = "20260903_MASTER_RESTORE_V300";
+      const currentVer = localStorage.getItem("ethiopia_master_restored_ver");
+
+      if (currentVer !== FORCE_VERSION) {
+        console.log("🔄 Syncing complete backup dataset v300...");
+        localStorage.setItem("ethiopia_master_restored_ver", FORCE_VERSION);
+        localStorage.setItem("ethiopia_history", JSON.stringify(DEFAULT_HISTORY));
+        localStorage.setItem("ethiopia_user_custom_edits", JSON.stringify(DEFAULT_HISTORY));
+        localStorage.setItem("ethiopia_members", JSON.stringify(DEFAULT_MEMBERS));
+        localStorage.setItem("ethiopia_assemblies", JSON.stringify(DEFAULT_ASSEMBLIES));
+        localStorage.setItem("ethiopia_events", JSON.stringify(DEFAULT_EVENTS));
+      }
 
       let historyData = null;
       try { historyData = JSON.parse(localStorage.getItem("ethiopia_history")); } catch(e) {}
-
-      if (userCustomHistory && Array.isArray(userCustomHistory) && userCustomHistory.length > 0) {
-        historyData = userCustomHistory;
-        try { localStorage.setItem("ethiopia_history", JSON.stringify(historyData)); } catch(e) {}
-      } else if (!historyData || !Array.isArray(historyData) || historyData.length === 0) {
+      if (!historyData || !Array.isArray(historyData) || historyData.length === 0) {
         historyData = JSON.parse(JSON.stringify(DEFAULT_HISTORY));
         try { localStorage.setItem("ethiopia_history", JSON.stringify(historyData)); } catch(e) {}
       }
