@@ -1135,7 +1135,7 @@ class DirectoryComponent {
 
   createCardHtml(m) {
     const isDisrupter = m.category === "disrupter";
-    const photoUrl = m.photo || 'data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23f1f5f9'/><path d='M50 42 a14 14 0 1 0 0 -28 a14 14 0 1 0 0 28 M25 82 c0 -16 11 -24 25 -24 s25 8 25 24' fill='%2394a3b8'/></svg>';
+    const photoUrl = m.photo || "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 100 100\"><rect width=\"100\" height=\"100\" fill=\"%23f1f5f9\"/><path d=\"M50 42 a14 14 0 1 0 0 -28 a14 14 0 1 0 0 28 M25 82 c0 -16 11 -24 25 -24 s25 8 25 24\" fill=\"%2394a3b8\"/></svg>";
     const currentCalculatedAge = this.getCalculatedAge(m);
     const testimonyUrl = (m.testimony || m.youtube || "").trim();
 
