@@ -1802,26 +1802,12 @@ class DataStore {
 
   init() {
     try {
-      const FORCE_VERSION = "20260904_PERMANENT_PURE_RESTORATION_V900";
-      const currentVer = localStorage.getItem("ethiopia_master_restored_ver");
-
-      if (currentVer !== FORCE_VERSION) {
-        console.log("🔄 Syncing clean master backup dataset v800...");
-        localStorage.setItem("ethiopia_master_restored_ver", FORCE_VERSION);
-        localStorage.setItem("ethiopia_history", JSON.stringify(DEFAULT_HISTORY));
-        localStorage.setItem("ethiopia_user_custom_edits", JSON.stringify(DEFAULT_HISTORY));
-        localStorage.setItem("ethiopia_members", JSON.stringify(DEFAULT_MEMBERS));
-        localStorage.setItem("ethiopia_assemblies", JSON.stringify(DEFAULT_ASSEMBLIES));
-        localStorage.setItem("ethiopia_events", JSON.stringify(DEFAULT_EVENTS));
-      }
-
       let historyData = null;
       try { historyData = JSON.parse(localStorage.getItem("ethiopia_history")); } catch(e) {}
       if (!historyData || !Array.isArray(historyData) || historyData.length === 0) {
         historyData = JSON.parse(JSON.stringify(DEFAULT_HISTORY));
         try { localStorage.setItem("ethiopia_history", JSON.stringify(historyData)); } catch(e) {}
       }
-
       this._historyCache = historyData;
 
       let membersData = null;
