@@ -114,9 +114,11 @@ class DirectoryComponent {
     }
 
     if (memberDropZone && fieldMemberFileInput) {
-      memberDropZone.addEventListener("click", () => {
-        fieldMemberFileInput.value = "";
-        fieldMemberFileInput.click();
+      memberDropZone.addEventListener("click", (e) => {
+        if (e.target !== fieldMemberFileInput && selectMemberPhotoBtn && !selectMemberPhotoBtn.contains(e.target)) {
+          fieldMemberFileInput.value = "";
+          fieldMemberFileInput.click();
+        }
       });
 
       memberDropZone.addEventListener("dragover", (e) => {

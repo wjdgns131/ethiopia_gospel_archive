@@ -60,7 +60,7 @@ class TimelineComponent {
 
     if (dropZone && fileInput) {
       dropZone.addEventListener("click", (e) => {
-        if (e.target !== fileInput) {
+        if (e.target !== fileInput && selectBtn && !selectBtn.contains(e.target)) {
           fileInput.value = "";
           fileInput.click();
         }
@@ -97,13 +97,6 @@ class TimelineComponent {
     document.addEventListener("paste", (e) => {
       const modal = document.getElementById("historyEditModal");
       if (!modal || modal.classList.contains("hidden")) return;
-
-      // If user cursor is inside an input box or textarea, allow text to paste normally!
-      const targetTag = e.target ? e.target.tagName : "";
-      const activeTag = document.activeElement ? document.activeElement.tagName : "";
-      if (targetTag === "INPUT" || targetTag === "TEXTAREA" || activeTag === "INPUT" || activeTag === "TEXTAREA") {
-        return;
-      }
 
       const items = e.clipboardData?.items;
       if (!items) return;

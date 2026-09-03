@@ -51,7 +51,7 @@ class FellowshipComponent {
 
     if (dropZone && fileInput) {
       dropZone.addEventListener("click", (e) => {
-        if (e.target !== fileInput) {
+        if (e.target !== fileInput && selectBtn && !selectBtn.contains(e.target)) {
           fileInput.value = "";
           fileInput.click();
         }
@@ -88,9 +88,6 @@ class FellowshipComponent {
     document.addEventListener("paste", (e) => {
       const modal = document.getElementById("fellowshipEditModal");
       if (!modal || modal.classList.contains("hidden")) return;
-
-      const activeTag = document.activeElement ? document.activeElement.tagName : "";
-      if (activeTag === "INPUT" || activeTag === "TEXTAREA") return;
 
       const items = e.clipboardData?.items;
       if (!items) return;
