@@ -746,7 +746,66 @@ class DirectoryComponent {
 
   openTestimonyLink(url, name) {
     if (!url) return;
-    window.open(url, "_blank");
+    // Play directly inside the webpage modal video player without opening duplicate links/tabs!
+    this.openVideoModal(url, name);
+  }
+
+  openVideoModal(videoUrl, memberName) {
+    if (!videoUrl) return;
+
+    let iframeSrc = "";
+    if (videoUrl.includes("drive.google.com")) {
+      const driveMatch = videoUrl.match(/\/d\/([^\/]+)/);
+      if (driveMatch) {
+        iframeSrc = `https://drive.google.com/file/d/${driveMatch[1]}/preview`;
+      }
+    } else if (videoUrl.includes("youtube.com") || videoUrl.includes("youtu.be")) {
+      let videoId = "";
+      if (videoUrl.includes("v=")) {
+        videoId = videoUrl.split("v=")[1].split("&")[0];
+      } else if (videoUrl.includes("youtu.be/")) {
+        videoId = videoUrl.split("youtu.be/")[1].split("?")[0];
+      } else if (videoUrl.includes("embed/")) {
+        videoId = videoUrl.split("embed/")[1].split("?")[0];
+      }
+      if (videoId) iframeSrc = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+    }
+
+    if (!iframeSrc) {
+      iframeSrc = videoUrl;
+    }
+
+    let modal = document.getElementById("videoPlayerModal");
+    if (!modal) {
+      modal = document.createElement("div");
+      modal.id = "videoPlayerModal";
+      modal.className = "modal-backdrop";
+      modal.style.zIndex = "999999";
+      modal.innerHTML = `
+        <div class="modal-card modal-card-lg" style="max-width:860px; background:#ffffff; color:#0f172a; padding:1.5rem; border-radius:20px; position:relative; box-shadow:0 25px 50px rgba(0,0,0,0.3);">
+          <button style="position:absolute; top:14px; right:14px; background:rgba(0,0,0,0.08); color:#0f172a; border:none; border-radius:50%; width:34px; height:34px; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center;" onclick="document.getElementById('videoPlayerModal').classList.add('hidden'); document.getElementById('videoModalContainer').innerHTML='';"><i class="fa-solid fa-xmark"></i></button>
+          <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:1rem;">
+            <i class="fa-solid fa-circle-play" style="font-size:1.5rem; color:#0284c7;"></i>
+            <h3 id="videoModalTitle" style="font-size:1.2rem; font-weight:800; margin:0; color:#1e3a8a;">구원 간증 영상</h3>
+          </div>
+          <div id="videoModalContainer" class="video-responsive" style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:14px; background:#000;">
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) {
+          modal.classList.add("hidden");
+          document.getElementById("videoModalContainer").innerHTML = "";
+        }
+      });
+    }
+
+    document.getElementById("videoModalTitle").innerText = `🎬 ${memberName || '식구'} 님 구원 간증 영상`;
+    document.getElementById("videoModalContainer").innerHTML = `
+      <iframe src="${iframeSrc}" title="${memberName} 간증 영상" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position:absolute; top:0; left:0; width:100%; height:100%;"></iframe>
+    `;
+    modal.classList.remove("hidden");
   }
 }
 
