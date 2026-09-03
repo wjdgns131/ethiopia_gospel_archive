@@ -1,0 +1,24 @@
+[1] ID: hist-1788440866029 | Date: '2026.02.01' | Title: '침례식' | Location: '모임집, 아디스아바바' | Photos: 4
+[2] ID: hist-202308 | Date: '2023년 8월' | Title: '체코에서 시작된 에티오피아 복음 전파' | Location: '체코 ELC' | Photos: 2
+[3] ID: hist-202404 | Date: '2024년 4월' | Title: '온라인 집회 진행 & 에티오피아 첫 구원 열매' | Location: '온라인 (BIT channel)' | Photos: 1
+[4] ID: hist-202408 | Date: '2024년 8월' | Title: '암하라어 더빙 완성 후 첫 온라인 집회' | Location: '온라인 (BIT channel)' | Photos: 1
+[5] ID: hist-202410 | Date: '2024년 10월' | Title: '서아프리카팀 방문' | Location: '에티오피아 (아디스아바바)' | Photos: 1
+[6] ID: hist-202412 | Date: '2024년 12월 29일 - 2025년 1월 13일' | Title: '이강현 형제 부부 에티오피아 방문 & 모임집 답사' | Location: 'Addis Ababa (Mekanisa Yotek compound, Nifas Silk Lafto)' | Photos: 4
+[7] ID: hist-202505 | Date: '2025년 5월' | Title: '모임집 입주 및 오프라인 집회 준비를 위한 입국 (이강현 & 이정훈 형제)' | Location: '' | Photos: 1
+[8] ID: hist-20250528 | Date: '2025.5.28 ~ 6.01' | Title: '에티오피아 첫 오프라인 집회' | Location: 'Vibes Hotel, 아디스아바바' | Photos: 12
+[9] ID: hist-20250623 | Date: '2025.6.23 ~ 7.13' | Title: '이강현·이정훈 형제 출국 & 김재원 형제 에티오피아 방문' | Location: '에티오피아 (아디스아바바 모임집)' | Photos: 1
+[10] ID: hist-20250819 | Date: '2025.8.19 ~ 10.13' | Title: '김재원 형제 가족, 한국 수양회 후 에티오피아 방문 및 체류' | Location: '에티오피아 (아디스아바바 모임집)' | Photos: 4
+[11] ID: hist-20250914 | Date: '2025.9.14' | Title: '에티오피아 첫 침례식' | Location: '모임집, 아디스아바바' | Photos: 4
+[12] ID: hist-20251103 | Date: '2025.11.03' | Title: '이정훈 형제 재입국 & 12월 집회 준비' | Location: '에티오피아 (볼레 국제공항 / 아디스아바바)' | Photos: 15
+[13] ID: hist-20251212 | Date: '2025.12.12 ~ 12.14' | Title: '모임집에서의 첫 전도집회, 복음의 불씨를 지피다' | Location: '에티오피아 (아디스아바바 모임집)' | Photos: 12
+[14] ID: hist-20251221 | Date: '2025.12.21' | Title: '침례식' | Location: '모임집, 아디스아바바' | Photos: 5
+[15] ID: hist-20260117 | Date: '2026.1.17 ~ 1.19' | Title: '전도집회, 더욱 힘차게 번져가는 복음의 불길' | Location: '구디나 툼사 수양관, 아디스아바바' | Photos: 10
+[16] ID: hist-20260206 | Date: '2026.02.06 ~ 02.08' | Title: '구디나 툼사 수양관 전도집회' | Location: '구디나 툼사, 아디스아바바' | Photos: 11
+[17] ID: hist-20260226 | Date: '2026.2.26 ~ 3.02' | Title: '모임집 전도집회 (마르코스 목사 이사진 초청)' | Location: '모임집, 아디스아바바' | Photos: 4
+[18] ID: hist-1788349055531 | Date: '2026.3.13~16' | Title: '전도집회' | Location: '모임집, 아디스아바바' | Photos: 2
+[19] ID: hist-20260424 | Date: '2026.4.24 ~ 4.27' | Title: '4월 전도집회' | Location: '모임집, 아디스아바바' | Photos: 2
+[20] ID: hist-1788369048749 | Date: '2026.5.15~18' | Title: '전도집회' | Location: '구디나툼사, 아디스아바바' | Photos: 2
+[21] ID: hist-1788369145959 | Date: '2026.06.05~08 / 2026.06.18~22' | Title: '전도집회' | Location: '구디나툼사, 아디스아바바' | Photos: 3
+[22] ID: hist-1788369417375 | Date: '2026.7.16~20' | Title: '전도집회' | Location: 'ODA NABEE 호텔, 비쇼프투' | Photos: 7
+[23] ID: hist-1788369801465 | Date: '2026.08.16' | Title: '침례식' | Location: '모임집, 아디스아바바' | Photos: 8
+[24] ID: hist-1788370209650 | Date: '2026.8.20~24' | Title: '전도집회' | Location: 'ODA NABEE 호텔, 비쇼프투' | Photos: 12
