@@ -2033,4 +2033,116 @@ if (typeof window !== 'undefined') {
   window.DEFAULT_MEMBERS = DEFAULT_MEMBERS;
   window.DEFAULT_HISTORY = DEFAULT_HISTORY;
   window.DEFAULT_ASSEMBLIES = DEFAULT_ASSEMBLIES;
+
+  // Clear legacy localStorage cache keys so browser loads freshly restored data
+  try {
+    localStorage.removeItem("ethiopia_members");
+    localStorage.removeItem("ethiopia_history");
+    localStorage.removeItem("ethiopia_assemblies");
+  } catch(e) {}
+
+  window.db = {
+    getMembers() {
+      try {
+        const stored = localStorage.getItem("ethiopia_members_v2400");
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch(e) {}
+      return window.DEFAULT_MEMBERS || [];
+    },
+    saveMembers(mems) {
+      try {
+        localStorage.setItem("ethiopia_members_v2400", JSON.stringify(mems));
+      } catch(e) {}
+    },
+    getHistory() {
+      try {
+        const stored = localStorage.getItem("ethiopia_history_v2400");
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch(e) {}
+      return window.DEFAULT_HISTORY || [];
+    },
+    saveHistory(hists) {
+      try {
+        localStorage.setItem("ethiopia_history_v2400", JSON.stringify(hists));
+      } catch(e) {}
+    },
+    getFellowship() {
+      try {
+        const stored = localStorage.getItem("ethiopia_assemblies_v2400");
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch(e) {}
+      return window.DEFAULT_ASSEMBLIES || [];
+    },
+    saveFellowship(items) {
+      try {
+        localStorage.setItem("ethiopia_assemblies_v2400", JSON.stringify(items));
+      } catch(e) {}
+    },
+    addMember(m) {
+      const mems = this.getMembers();
+      mems.unshift(m);
+      this.saveMembers(mems);
+    },
+    updateMember(m) {
+      const mems = this.getMembers();
+      const idx = mems.findIndex(x => x.id === m.id);
+      if (idx !== -1) mems[idx] = m;
+      else mems.unshift(m);
+      this.saveMembers(mems);
+    },
+    deleteMember(id) {
+      const mems = this.getMembers().filter(x => x.id !== id);
+      this.saveMembers(mems);
+    },
+    addHistory(h) {
+      const hists = this.getHistory();
+      hists.unshift(h);
+      this.saveHistory(hists);
+    },
+    updateHistory(h) {
+      const hists = this.getHistory();
+      const idx = hists.findIndex(x => x.id === h.id);
+      if (idx !== -1) hists[idx] = h;
+      else hists.unshift(h);
+      this.saveHistory(hists);
+    },
+    deleteHistory(id) {
+      const hists = this.getHistory().filter(x => x.id !== id);
+      this.saveHistory(hists);
+    },
+    addFellowship(f) {
+      const items = this.getFellowship();
+      items.unshift(f);
+      this.saveFellowship(items);
+    },
+    updateFellowship(f) {
+      const items = this.getFellowship();
+      const idx = items.findIndex(x => x.id === f.id);
+      if (idx !== -1) items[idx] = f;
+      else items.unshift(f);
+      this.saveFellowship(items);
+    },
+    deleteFellowship(id) {
+      const items = this.getFellowship().filter(x => x.id !== id);
+      this.saveFellowship(items);
+    },
+    resetToDefaults() {
+      localStorage.removeItem("ethiopia_members");
+      localStorage.removeItem("ethiopia_history");
+      localStorage.removeItem("ethiopia_assemblies");
+      localStorage.removeItem("ethiopia_members_v2400");
+      localStorage.removeItem("ethiopia_history_v2400");
+      localStorage.removeItem("ethiopia_assemblies_v2400");
+      location.reload();
+    }
+  };
 }
