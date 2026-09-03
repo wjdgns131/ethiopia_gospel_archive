@@ -125,8 +125,9 @@
     }
   };
 
-  // Terminology mappings for custom user preferences
+  // Comprehensive Terminology & Phrase Mappings for Dynamic Live Translation
   const termReplacements = [
+    // 1. User Preferred Mappings
     { ko: /전도집회/g, en: "Evangelical Seminar" },
     { ko: /구원받은/g, en: "saved" },
     { ko: /구원받음/g, en: "saved" },
@@ -141,11 +142,59 @@
     { ko: /이강현/g, en: "Kohen" },
     { ko: /이정훈/g, en: "Franco" },
 
-    // Regions & Locations
+    // 2. Mission & Gospel Key Phrases
+    { ko: /성경은 사실이다/g, en: "'The Bible is Fact'" },
+    { ko: /체코에서 시작된 에티오피아 복음 전파/g, en: "Gospel Spreading in Ethiopia Starting from Czech" },
+    { ko: /첫 오프라인 집회/g, en: "First Offline Assembly" },
+    { ko: /오프라인 집회/g, en: "Offline Assembly" },
+    { ko: /온라인 집회/g, en: "Online Assembly" },
+    { ko: /첫 구원 열매/g, en: "First Fruit of Salvation" },
+    { ko: /구원 열매/g, en: "Fruit of Salvation" },
+    { ko: /구원의 고백/g, en: "Confession of Salvation" },
+    { ko: /간증 발표/g, en: "Testimony Presentation" },
+    { ko: /간증/g, en: "testimony" },
+    { ko: /더빙/g, en: "dubbing" },
+    { ko: /번역 작업/g, en: "translation work" },
+    { ko: /번역/g, en: "translation" },
+    { ko: /동역자/g, en: "fellow worker" },
+    { ko: /초청/g, en: "invitation" },
+    { ko: /참석/g, en: "attendance" },
+    { ko: /서아프리카팀/g, en: "West Africa Team" },
+
+    // 3. Occupations & Roles
+    { ko: /마취과 의사/g, en: "anesthesiologist" },
+    { ko: /의사/g, en: "doctor" },
+    { ko: /간호사/g, en: "nurse" },
+    { ko: /고등학교생|고등학생/g, en: "high school student" },
+    { ko: /대학생/g, en: "university student" },
+    { ko: /학생/g, en: "student" },
+    { ko: /교사|선생님/g, en: "teacher" },
+    { ko: /자영업/g, en: "self-employed" },
+    { ko: /가정부|가사 도우미/g, en: "housekeeper" },
+    { ko: /전도사/g, en: "evangelist" },
+    { ko: /목사/g, en: "Pastor" },
+    { ko: /선교사/g, en: "Missionary" },
+    { ko: /형제/g, en: "Brother" },
+    { ko: /자매/g, en: "Sister" },
+    { ko: /무직/g, en: "unemployed" },
+    { ko: /음식&미용 전문가/g, en: "Food & Beauty Specialist" },
+
+    // 4. Relationships & Categories
+    { ko: /지인/g, en: "acquaintance" },
+    { ko: /동료/g, en: "colleague" },
+    { ko: /부부/g, en: "couple" },
+    { ko: /남편/g, en: "husband" },
+    { ko: /아내/g, en: "wife" },
+    { ko: /여동생/g, en: "younger sister" },
+    { ko: /남동생/g, en: "younger brother" },
+    { ko: /친구/g, en: "friend" },
+
+    // 5. Locations & Regions
     { ko: /아디스아바바/g, en: "Addis Ababa" },
     { ko: /비쇼프투/g, en: "Bishoftu" },
     { ko: /아다마/g, en: "Adama" },
     { ko: /지마/g, en: "Jimma" },
+    { ko: /세베타/g, en: "Sebeta" },
     { ko: /체코/g, en: "Czech" },
     { ko: /독일/g, en: "Germany" },
     { ko: /말타/g, en: "Malta" },
@@ -153,10 +202,21 @@
     { ko: /토고/g, en: "Togo" },
     { ko: /영국/g, en: "UK" },
     { ko: /한국/g, en: "Korea" },
+    { ko: /에티오피아/g, en: "Ethiopia" },
 
-    // Months & Time
-    { ko: /(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일/g, en: "$1-$2-$3" },
-    { ko: /(\d{4})년\s*(\d{1,2})월/g, en: "$1-$2" },
+    // 6. Dates & Month Formats
+    { ko: /(\d{4})년\s*12월/g, en: "December $1" },
+    { ko: /(\d{4})년\s*11월/g, en: "November $1" },
+    { ko: /(\d{4})년\s*10월/g, en: "October $1" },
+    { ko: /(\d{4})년\s*9월/g, en: "September $1" },
+    { ko: /(\d{4})년\s*8월/g, en: "August $1" },
+    { ko: /(\d{4})년\s*7월/g, en: "July $1" },
+    { ko: /(\d{4})년\s*6월/g, en: "June $1" },
+    { ko: /(\d{4})년\s*5월/g, en: "May $1" },
+    { ko: /(\d{4})년\s*4월/g, en: "April $1" },
+    { ko: /(\d{4})년\s*3월/g, en: "March $1" },
+    { ko: /(\d{4})년\s*2월/g, en: "February $1" },
+    { ko: /(\d{4})년\s*1월/g, en: "January $1" },
     { ko: /년/g, en: "." },
     { ko: /월/g, en: "" },
     { ko: /일/g, en: "" }
@@ -200,6 +260,7 @@
       return dict[key] || dictionary.ko[key] || key;
     }
 
+    // Dynamic Live Translator Engine
     translateContent(text) {
       if (!text || typeof text !== "string") return text;
       if (this.currentLang === "ko") return text;
