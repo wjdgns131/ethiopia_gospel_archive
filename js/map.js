@@ -109,10 +109,12 @@ class EthiopiaMapComponent {
     }
 
     // Render Sidebar Region Pills (ONLY for regions with count > 0)
+    const isEn = window.i18n && window.i18n.getLang() === 'en';
+    const unitDisp = isEn ? '' : '명';
     let pillsHtml = `
       <button class="region-pill ${!this.activeRegion ? 'active' : ''}" data-region="all">
-        <span>📍 전체 지역</span>
-        <span class="region-badge">${members.length}명</span>
+        <span>${isEn ? '📍 All Regions' : '📍 전체 지역'}</span>
+        <span class="region-badge">${members.length}${unitDisp}</span>
       </button>
     `;
 
@@ -121,10 +123,11 @@ class EthiopiaMapComponent {
       if (cnt === 0) return; // Hide regions with 0 members!
 
       const isActive = this.activeRegion === reg.id;
+      const regNameDisp = isEn ? window.i18n.translateContent(reg.name) : reg.name;
       pillsHtml += `
         <button class="region-pill ${isActive ? 'active' : ''}" data-region="${reg.id}">
-          <span>📍 ${reg.name}</span>
-          <span class="region-badge">${cnt}명</span>
+          <span>📍 ${regNameDisp}</span>
+          <span class="region-badge">${cnt}${unitDisp}</span>
         </button>
       `;
     });

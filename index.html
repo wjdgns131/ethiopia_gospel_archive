@@ -42,8 +42,8 @@
         <a href="#directory" class="brand-link" id="brandLogo">
           <img src="images/logo.png" alt="에티오피아 선교 로고" class="brand-logo-img" />
           <div class="brand-text-group">
-            <h1 class="brand-title">에티오피아 선교</h1>
-            <p class="brand-subtitle">전도집회 · 침례식 · 식구 기록</p>
+            <h1 class="brand-title" data-i18n="siteTitle">에티오피아 선교</h1>
+            <p class="brand-subtitle" data-i18n="siteSubtitle">전도집회 · 침례식 · 식구 기록</p>
           </div>
         </a>
       </div>
@@ -52,15 +52,15 @@
       <nav class="main-nav">
         <button class="nav-tab active" data-tab="directory">
           <i class="fa-solid fa-users"></i>
-          <span>식구 기록</span>
+          <span data-i18n="tabMembers">식구 기록</span>
         </button>
         <button class="nav-tab" data-tab="timeline">
           <i class="fa-solid fa-scroll"></i>
-          <span>복음 역사</span>
+          <span data-i18n="tabHistory">복음 역사</span>
         </button>
         <button class="nav-tab" data-tab="assemblies">
           <i class="fa-solid fa-camera-retro"></i>
-          <span>교제 & 선교 활동</span>
+          <span data-i18n="tabFellowship">교제 & 선교 활동</span>
         </button>
       </nav>
 
@@ -98,18 +98,18 @@
       <!-- Section Header -->
       <div class="section-heading">
         <div class="archive-header">
-          <h2>식구 기록 아카이브</h2>
-          <p>구원받은 식구들의 귀한 소식과 프로필입니다.</p>
+          <h2 data-i18n="membersTitle">식구 기록 아카이브</h2>
+          <p data-i18n="membersSubtitle">구원받은 식구들의 귀한 소식과 프로필입니다.</p>
         </div>
         <div class="heading-right" style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
           <button onclick="window.db.syncDataToFile(null, true)" class="btn btn-secondary" style="background:#f0f9ff; color:#0284c7; border:1px solid #7dd3fc; font-weight:700;" title="현재 브라우저에 저장된 식구 정보를 하드디스크 소스코드 파일(js/data.js)에 영구 동기화">
-            <i class="fa-solid fa-floppy-disk"></i> ⚡ 소스코드 파일에 영구 동기화
+            <i class="fa-solid fa-floppy-disk"></i> <span data-i18n="syncCodeBtn">⚡ 소스코드 파일에 영구 동기화</span>
           </button>
           <button onclick="window.db.exportDatabaseToJson()" class="btn btn-secondary" style="background:#ffffff; color:var(--text-secondary); border:1px solid var(--border-color); font-weight:700;">
-            <i class="fa-solid fa-download"></i> 💾 백업 다운로드 (.json)
+            <i class="fa-solid fa-download"></i> <span data-i18n="exportBackupBtn">💾 백업 다운로드 (.json)</span>
           </button>
           <button id="addNewMemberBtn" class="btn btn-primary" style="font-weight:800;">
-            <i class="fa-solid fa-user-plus"></i> ➕ 새로운 식구 등록하기
+            <i class="fa-solid fa-user-plus"></i> <span data-i18n="addMemberBtn">➕ 새로운 식구 등록하기</span>
           </button>
         </div>
       </div>
@@ -121,9 +121,9 @@
           <div class="map-card-header">
             <div class="map-title-group">
               <i class="fa-solid fa-map-location-dot"></i>
-              <h3>에티오피아 지역별 식구 분포 지도</h3>
+              <h3 data-i18n="mapTitle">에티오피아 지역별 식구 분포 지도</h3>
             </div>
-            <span class="map-instruction"><i class="fa-solid fa-circle-info"></i> 지도의 핀을 클릭하면 필터링됩니다.</span>
+            <span class="map-instruction"><i class="fa-solid fa-circle-info"></i> <span data-i18n="mapSubtitle">지도의 핀을 클릭하면 필터링됩니다.</span></span>
           </div>
 
           <div class="map-layout">
@@ -134,7 +134,7 @@
 
             <!-- Region Quick Stats & Selector List -->
             <div class="region-stats-sidebar">
-              <h4 class="sidebar-title">지역 선택 (<span id="totalMembersCount">0</span>명)</h4>
+              <h4 class="sidebar-title"><span data-i18n="selectRegionTitle">지역 선택</span> (<span id="totalMembersCount">0</span>명)</h4>
               <div class="region-pill-list" id="regionPillsList">
                 <!-- Region Pills rendered dynamically -->
               </div>
@@ -730,14 +730,14 @@
   </footer>
 
   <!-- Scripts with updated cache buster -->
-  <script src="js/data.js?v=20260904_DYNAMIC_LIVE_I18N_V1300"></script>
-  <script src="js/i18n.js?v=20260904_DYNAMIC_LIVE_I18N_V1300"></script>
-  <script src="js/map.js?v=20260904_DYNAMIC_LIVE_I18N_V1300"></script>
-  <script src="js/directory.js?v=20260904_DYNAMIC_LIVE_I18N_V1300"></script>
-  <script src="js/timeline.js?v=20260904_DYNAMIC_LIVE_I18N_V1300"></script>
-  <script src="js/assemblies.js?v=20260904_DYNAMIC_LIVE_I18N_V1300"></script>
-  <script src="js/calendar.js?v=20260904_DYNAMIC_LIVE_I18N_V1300"></script>
-  <script src="js/admin.js?v=20260904_DYNAMIC_LIVE_I18N_V1300"></script>
-  <script src="js/app.js?v=20260904_DYNAMIC_LIVE_I18N_V1300"></script>
+  <script src="js/data.js?v=20260904_FULL_RED_CIRCLE_TRANSLATION_V1400"></script>
+  <script src="js/i18n.js?v=20260904_FULL_RED_CIRCLE_TRANSLATION_V1400"></script>
+  <script src="js/map.js?v=20260904_FULL_RED_CIRCLE_TRANSLATION_V1400"></script>
+  <script src="js/directory.js?v=20260904_FULL_RED_CIRCLE_TRANSLATION_V1400"></script>
+  <script src="js/timeline.js?v=20260904_FULL_RED_CIRCLE_TRANSLATION_V1400"></script>
+  <script src="js/assemblies.js?v=20260904_FULL_RED_CIRCLE_TRANSLATION_V1400"></script>
+  <script src="js/calendar.js?v=20260904_FULL_RED_CIRCLE_TRANSLATION_V1400"></script>
+  <script src="js/admin.js?v=20260904_FULL_RED_CIRCLE_TRANSLATION_V1400"></script>
+  <script src="js/app.js?v=20260904_FULL_RED_CIRCLE_TRANSLATION_V1400"></script>
 </body>
 </html>

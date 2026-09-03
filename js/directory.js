@@ -692,34 +692,43 @@ class DirectoryComponent {
 
     const isDisrupter = member.category === "disrupter";
 
+    const isEn = window.i18n && window.i18n.getLang() === 'en';
+    const nameDisp = isEn ? window.i18n.translateContent(member.name) : member.name;
+    const regionDisp = isEn ? window.i18n.translateContent(member.region) : member.region;
+    const jobDisp = isEn ? window.i18n.translateContent(member.job || '직업 정보 없음') : (member.job || '직업 정보 없음');
+    const assemblyMonthDisp = isEn ? window.i18n.translateContent(member.assemblyMonth || '-') : (member.assemblyMonth || '-');
+    const inviterDisp = isEn ? window.i18n.translateContent(member.inviter || '') : (member.inviter || '');
+    const inviterRelDisp = isEn ? window.i18n.translateContent(member.inviterRelation || '초대') : (member.inviterRelation || '초대');
+    const testimonyDisp = isEn ? window.i18n.translateContent(member.testimony || '등록된 간증 문구가 없습니다.') : (member.testimony || '등록된 간증 문구가 없습니다.');
+
     body.innerHTML = `
       <div class="member-detail-header" style="display:flex; gap:1.5rem; align-items:flex-start; margin-bottom:1.5rem; flex-wrap:wrap;">
         <div style="position:relative; width:130px; height:130px; border-radius:16px; overflow:hidden; border:3px solid ${isDisrupter ? '#ef4444' : '#0284c7'}; box-shadow:0 4px 15px rgba(0,0,0,0.1); flex-shrink:0; background:#ffffff;">
-          <img src="${member.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=600&auto=format&fit=crop'}" alt="${member.name}" style="width:100%; height:100%; object-fit:contain; background:#ffffff; display:block;" />
+          <img src="${member.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=600&auto=format&fit=crop'}" alt="${nameDisp}" style="width:100%; height:100%; object-fit:contain; background:#ffffff; display:block;" />
         </div>
         <div style="flex:1; min-width:200px;">
           <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.4rem; flex-wrap:wrap; gap:0.6rem;">
             <div style="display:flex; align-items:center; gap:0.6rem;">
-              <h2 style="font-size:1.6rem; font-weight:800; margin:0; color:var(--text-primary);">${member.name}</h2>
-              ${isDisrupter ? `<span class="badge badge-danger" style="font-size:0.8rem; padding:0.25rem 0.7rem;">⚠️ 분탕꾼 / 주의</span>` : ''}
+              <h2 style="font-size:1.6rem; font-weight:800; margin:0; color:var(--text-primary);">${nameDisp}</h2>
+              ${isDisrupter ? `<span class="badge badge-danger" style="font-size:0.8rem; padding:0.25rem 0.7rem;">⚠️ Disrupter</span>` : ''}
             </div>
 
             <!-- Tiny Edit Button in Detail Modal -->
-            <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('memberDetailModal').classList.add('hidden'); window.directoryComponent.openEditModal('${member.id}')" title="식구 정보 수정" style="padding:0.3rem 0.7rem; font-size:0.82rem;">
-              <i class="fa-solid fa-pen"></i> 수정
+            <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('memberDetailModal').classList.add('hidden'); window.directoryComponent.openEditModal('${member.id}')" title="Edit" style="padding:0.3rem 0.7rem; font-size:0.82rem;">
+              <i class="fa-solid fa-pen"></i> ${isEn ? 'Edit' : '수정'}
             </button>
           </div>
           
           <p style="margin:0 0 0.6rem 0; color:var(--text-secondary); font-size:0.95rem; font-weight:600;">
-            ${member.region} · ${this.getCalculatedAge(member)} · ${member.job || '직업 정보 없음'}
+            ${regionDisp} · ${this.getCalculatedAge(member)} · ${jobDisp}
           </p>
           <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
             <span style="font-size:0.82rem; background:var(--bg-main); padding:0.25rem 0.65rem; border-radius:12px; border:1px solid var(--border-color);">
-              📅 집회 참석: <strong>${member.assemblyMonth || '-'}</strong>
+              📅 ${isEn ? 'Attended Seminar:' : '집회 참석:'} <strong>${assemblyMonthDisp}</strong>
             </span>
             ${member.inviter ? `
               <span style="font-size:0.82rem; background:var(--bg-main); padding:0.25rem 0.65rem; border-radius:12px; border:1px solid var(--border-color); cursor:pointer;" onclick="document.getElementById('memberDetailModal').classList.add('hidden'); window.directoryComponent.openNetworkModal('${member.inviter}')">
-                <i class="fa-solid fa-user-plus" style="color:#0284c7;"></i> 초대자: <strong style="text-decoration:underline;">${member.inviter}</strong> (${member.inviterRelation || '초대'})
+                <i class="fa-solid fa-user-plus" style="color:#0284c7;"></i> ${isEn ? 'Inviter:' : '초대자:'} <strong style="text-decoration:underline;">${inviterDisp}</strong> (${inviterRelDisp})
               </span>
             ` : ''}
           </div>
@@ -727,15 +736,15 @@ class DirectoryComponent {
       </div>
 
       <div style="margin-top:1.2rem; padding-top:1.2rem; border-top:1px solid var(--border-color);">
-        <h4 style="font-size:1.05rem; font-weight:700; margin:0 0 0.6rem 0; color:var(--text-primary);"><i class="fa-solid fa-quote-left" style="color:#0284c7; margin-right:6px;"></i> 소식 & 구원 간증</h4>
+        <h4 style="font-size:1.05rem; font-weight:700; margin:0 0 0.6rem 0; color:var(--text-primary);"><i class="fa-solid fa-quote-left" style="color:#0284c7; margin-right:6px;"></i> ${isEn ? 'News & Salvation Testimony' : '소식 & 구원 간증'}</h4>
         <p style="font-size:0.95rem; line-height:1.7; color:var(--text-primary); white-space:pre-line; margin-bottom:1.2rem;">
-          ${member.testimony || '등록된 간증 문구가 없습니다.'}
+          ${testimonyDisp}
         </p>
 
         ${member.youtube ? `
           <div style="margin-top:1rem;">
             <button type="button" class="btn btn-secondary" style="background:var(--bg-hover); color:var(--text-primary); border:1px solid var(--border-color); width:100%; padding:0.7rem; border-radius:10px; font-weight:700; font-size:0.95rem; display:flex; align-items:center; justify-content:center; gap:0.5rem; transition:var(--transition);" onclick="window.directoryComponent.openVideoModal('${member.youtube}', '${member.name}')">
-              <i class="fa-solid fa-circle-play" style="font-size:1.1rem; color:var(--accent-gold);"></i> ${member.name} 님 간증 영상 보기
+              <i class="fa-solid fa-circle-play" style="font-size:1.1rem; color:var(--accent-gold);"></i> ${isEn ? 'Watch Testimony Video' : `${nameDisp} 님 간증 영상 보기`}
             </button>
           </div>
         ` : ''}

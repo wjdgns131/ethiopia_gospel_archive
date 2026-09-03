@@ -116,7 +116,11 @@ class CalendarComponent {
     const firstDayIndex = (rawFirstDayIndex + 6) % 7;
     const totalDays = new Date(year, month + 1, 0).getDate();
 
-    const monthNames = ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"];
+    const monthNamesKo = ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"];
+    const monthNamesEn = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+    const isEn = window.i18n && window.i18n.getLang() === 'en';
+    const monthDisp = isEn ? `${monthNamesEn[month]} ${year}` : `${year}년 ${monthNamesKo[month]}`;
 
     // Ethiopian Holidays in current month
     const currentMonthHolidays = ETHIOPIAN_HOLIDAYS.filter(h => h.month === (month + 1));
@@ -165,7 +169,7 @@ class CalendarComponent {
       }
 
       daysHtml += `
-        <div class="${dayClasses}" data-date="${dateString}" title="${holiday ? holiday.name : (dayEvents.length > 0 ? dayEvents[0].title : '')}">
+        <div class="${dayClasses}" data-date="${dateString}" title="${holiday ? (isEn ? window.i18n.translateContent(holiday.name) : holiday.name) : (dayEvents.length > 0 ? dayEvents[0].title : '')}">
           <span class="day-num">${day}</span>
           ${dotsHtml}
         </div>
@@ -180,12 +184,12 @@ class CalendarComponent {
         const sMonth = parseInt(e.date.split('-')[1], 10);
         const eMonth = parseInt(e.endDate.split('-')[1], 10);
         if (sMonth === eMonth) {
-          return `${sDay}일~${eDay}일`;
+          return isEn ? `${sDay}~${eDay}` : `${sDay}일~${eDay}일`;
         } else {
           return `${sMonth}.${sDay}~${eMonth}.${eDay}`;
         }
       }
-      return `${sDay}일`;
+      return isEn ? `${sDay}` : `${sDay}일`;
     };
 
     this.container.innerHTML = `
@@ -193,8 +197,8 @@ class CalendarComponent {
         <div class="cal-header">
           <button id="calPrevBtn" class="cal-nav-btn"><i class="fa-solid fa-chevron-left"></i></button>
           <div class="cal-title-group">
-            <span class="cal-year-month">${year}년 ${monthNames[month]}</span>
-            <span class="cal-ethiopian-note">에티오피아 명절</span>
+            <span class="cal-year-month">${monthDisp}</span>
+            <span class="cal-ethiopian-note">${isEn ? 'Ethiopian Holidays' : '에티오피아 명절'}</span>
           </div>
           <button id="calNextBtn" class="cal-nav-btn"><i class="fa-solid fa-chevron-right"></i></button>
         </div>
@@ -202,24 +206,24 @@ class CalendarComponent {
         <!-- Add Event Button -->
         <div class="cal-action-bar">
           <button id="openAddEventBtn" class="btn btn-primary btn-block" style="padding:0.35rem 0.75rem; font-size:0.8rem;">
-            <i class="fa-solid fa-plus"></i> 일정 등록
+            <i class="fa-solid fa-plus"></i> ${isEn ? '+ Add Event' : '+ 일정 등록'}
           </button>
         </div>
 
         <!-- Monday to Sunday Header -->
         <div class="cal-grid" style="margin-top:0.6rem;">
-          <div class="cal-weekday">월</div>
-          <div class="cal-weekday">화</div>
-          <div class="cal-weekday">수</div>
-          <div class="cal-weekday">목</div>
-          <div class="cal-weekday">금</div>
-          <div class="cal-weekday sat">토</div>
-          <div class="cal-weekday sun">일</div>
+          <div class="cal-weekday">${isEn ? 'Mon' : '월'}</div>
+          <div class="cal-weekday">${isEn ? 'Tue' : '화'}</div>
+          <div class="cal-weekday">${isEn ? 'Wed' : '수'}</div>
+          <div class="cal-weekday">${isEn ? 'Thu' : '목'}</div>
+          <div class="cal-weekday">${isEn ? 'Fri' : '금'}</div>
+          <div class="cal-weekday sat">${isEn ? 'Sat' : '토'}</div>
+          <div class="cal-weekday sun">${isEn ? 'Sun' : '일'}</div>
           ${daysHtml}
         </div>
 
         <div class="cal-holidays-footer">
-          <div class="cal-footer-title"><i class="fa-solid fa-calendar-check"></i> 이번 달 주요 명절</div>
+          <div class="cal-footer-title"><i class="fa-solid fa-calendar-check"></i> ${isEn ? 'Key Holidays This Month' : '이번 달 주요 명절'}</div>
           
           <!-- Custom Mission Events List -->
           ${currentMonthEvents.length > 0 ? `
@@ -227,10 +231,10 @@ class CalendarComponent {
               ${currentMonthEvents.map(e => `
                 <div class="custom-event-item">
                   <div class="evt-item-title">
-                    <span>📌 <strong>${formatEventRangeText(e)}</strong>: ${e.title}</span>
+                    <span>📌 <strong>${formatEventRangeText(e)}</strong>: ${isEn ? window.i18n.translateContent(e.title) : e.title}</span>
                     <button class="evt-delete-btn" onclick="event.stopPropagation(); window.calendarComponent.deleteEvent('${e.id}')" title="삭제"><i class="fa-solid fa-xmark"></i></button>
                   </div>
-                  ${e.location ? `<p class="evt-item-sub"><i class="fa-solid fa-location-dot"></i> ${e.location}</p>` : ''}
+                  ${e.location ? `<p class="evt-item-sub"><i class="fa-solid fa-location-dot"></i> ${isEn ? window.i18n.translateContent(e.location) : e.location}</p>` : ''}
                 </div>
               `).join("")}
             </div>
@@ -240,10 +244,10 @@ class CalendarComponent {
           ${currentMonthHolidays.length > 0 ? `
             <ul class="cal-holiday-list" style="margin-top:0.4rem;">
               ${currentMonthHolidays.map(h => `
-                <li><strong>${h.day}일</strong>: ${h.name}</li>
+                <li><strong>${h.day}${isEn ? 'th' : '일'}</strong>: ${isEn ? window.i18n.translateContent(h.name) : h.name}</li>
               `).join("")}
             </ul>
-          ` : (currentMonthEvents.length === 0 ? `<p class="no-holiday-msg">등록된 일정 및 공휴일이 없습니다.</p>` : '')}
+          ` : (currentMonthEvents.length === 0 ? `<p class="no-holiday-msg">${isEn ? 'No events scheduled for this month.' : '등록된 일정 및 공휴일이 없습니다.'}</p>` : '')}
         </div>
       </div>
     `;

@@ -18,9 +18,15 @@
       bannerRef: "(로마서 1:14)",
 
       // Members Tab
-      membersTitle: "에티오피아 복음 식구 명단",
-      membersSubtitle: "아디스아바바, 비쇼프투, 아다마 지역의 구원받은 식구와 연결된 분들의 기록입니다.",
-      addMemberBtn: "새 식구 등록",
+      membersTitle: "식구 기록 아카이브",
+      membersSubtitle: "구원받은 식구들의 귀한 소식과 프로필입니다.",
+      addMemberBtn: "➕ 새로운 식구 등록하기",
+      syncCodeBtn: "⚡ 소스코드 파일에 영구 동기화",
+      exportBackupBtn: "💾 백업 다운로드 (.json)",
+      mapTitle: "에티오피아 지역별 식구 분포 지도",
+      mapSubtitle: "지도의 핀을 클릭하면 필터링됩니다.",
+      selectRegionTitle: "지역 선택",
+      allRegionsLabel: "📍 전체 지역",
       searchPlaceholder: "이름, 추천인, 직업 검색...",
       categoryAll: "전체 식구",
       categorySaved: "✝️ 구원받은 식구",
@@ -38,9 +44,17 @@
       jobLabel: "직업 / 신분",
       inviterLabel: "추천인",
       assemblyMonthLabel: "구원 / 연결 월",
-      viewTestimonyBtn: "🎬 구원 간증 영상 보기",
+      viewTestimonyBtn: "Testimony",
       editMemberBtn: "수정",
       deleteMemberBtn: "삭제",
+
+      // Calendar Sidebar
+      addCalendarEventBtn: "+ 일정 등록",
+      keyHolidaysTitle: "이번 달 주요 명절",
+      ethiopianNoteLabel: "에티오피아 명절",
+      holidayEnkutatash: "11일 : 엔쿠타타시 (Enkutatash / 에티오피아 새해)",
+      holidayMeskel: "27일 : 메스켈 (Meskel / 십자가 발견 축제)",
+      dayMon: "월", dayTue: "화", dayWed: "수", dayThu: "목", dayFri: "금", daySat: "토", daySun: "일",
 
       // Timeline Tab
       timelineTitle: "복음 선교 역사 타임라인",
@@ -65,23 +79,29 @@
     },
     en: {
       siteTitle: "Ethiopia Mission",
-      siteSubtitle: "Evangelical Seminar · Baptism · Member Directory",
+      siteSubtitle: "Evangelical Seminar · Baptism · Directory",
       tabMembers: "Members",
       tabHistory: "Gospel History",
       tabFellowship: "Fellowship & Activities",
       tabCalendar: "Mission Calendar",
       adminLogin: "Admin Login",
       adminLogout: "Logout",
-      
+
       // Header Banner
       bannerQuote: '"I am under obligation both to Greeks and to barbarians, both to the wise and to the foolish."',
       bannerRef: "(Romans 1:14 ESV)",
 
       // Members Tab
-      membersTitle: "Ethiopia Gospel Member Directory",
-      membersSubtitle: "Records of saved members and seekers in Addis Ababa, Bishoftu, and Adama.",
-      addMemberBtn: "Add New Member",
-      searchPlaceholder: "Search by name, inviter, job...",
+      membersTitle: "Member Directory Archive",
+      membersSubtitle: "Records and profiles of saved members and seekers.",
+      addMemberBtn: "➕ Add New Member",
+      syncCodeBtn: "⚡ Sync to Code File",
+      exportBackupBtn: "💾 Export Backup (.json)",
+      mapTitle: "Ethiopia Member Map",
+      mapSubtitle: "Click map pins to filter members by region.",
+      selectRegionTitle: "Select Region",
+      allRegionsLabel: "📍 All Regions",
+      searchPlaceholder: "Search by name, inviter, occupation...",
       categoryAll: "All Members",
       categorySaved: "✝️ Saved Members",
       categorySeeking: "🌱 Seekers / Listening",
@@ -98,9 +118,17 @@
       jobLabel: "Occupation",
       inviterLabel: "Inviter",
       assemblyMonthLabel: "Saved / Connected",
-      viewTestimonyBtn: "🎬 Watch Salvation Testimony Video",
+      viewTestimonyBtn: "Testimony",
       editMemberBtn: "Edit",
       deleteMemberBtn: "Delete",
+
+      // Calendar Sidebar
+      addCalendarEventBtn: "+ Add Event",
+      keyHolidaysTitle: "Key Holidays This Month",
+      ethiopianNoteLabel: "Ethiopian Holidays",
+      holidayEnkutatash: "11th: Enkutatash (Ethiopian New Year)",
+      holidayMeskel: "27th: Meskel (Finding of True Cross)",
+      dayMon: "Mon", dayTue: "Tue", dayWed: "Wed", dayThu: "Thu", dayFri: "Fri", daySat: "Sat", daySun: "Sun",
 
       // Timeline Tab
       timelineTitle: "Gospel Mission History Timeline",
@@ -125,7 +153,7 @@
     }
   };
 
-  // Comprehensive Terminology & Phrase Mappings for Dynamic Live Translation
+  // Comprehensive Terminology, Occupations, Cities & Phrase Mappings for Dynamic Live Translation
   const termReplacements = [
     // 1. User Preferred Mappings
     { ko: /전도집회/g, en: "Evangelical Seminar" },
@@ -142,7 +170,37 @@
     { ko: /이강현/g, en: "Kohen" },
     { ko: /이정훈/g, en: "Franco" },
 
-    // 2. Mission & Gospel Key Phrases
+    // 2. Comprehensive Occupations (직업)
+    { ko: /회계사/g, en: "Accountant" },
+    { ko: /마취과 의사/g, en: "Anesthesiologist" },
+    { ko: /의사/g, en: "Doctor" },
+    { ko: /간호사/g, en: "Nurse" },
+    { ko: /대학생/g, en: "University Student" },
+    { ko: /고등학교생|고등학생/g, en: "High School Student" },
+    { ko: /초등학생/g, en: "Elementary Student" },
+    { ko: /학생/g, en: "Student" },
+    { ko: /교사|선생님/g, en: "Teacher" },
+    { ko: /교수/g, en: "Professor" },
+    { ko: /자영업/g, en: "Self-employed" },
+    { ko: /가정부|가사 도우미/g, en: "Housekeeper" },
+    { ko: /식당 운영|음식점 운영/g, en: "Restaurant Owner" },
+    { ko: /직물 사업|섬유 사업/g, en: "Textile Business" },
+    { ko: /공무원/g, en: "Civil Servant" },
+    { ko: /엔지니어|기술자/g, en: "Engineer" },
+    { ko: /건축가/g, en: "Architect" },
+    { ko: /변호사/g, en: "Lawyer" },
+    { ko: /운전기사|운전사/g, en: "Driver" },
+    { ko: /농부/g, en: "Farmer" },
+    { ko: /무직/g, en: "Unemployed" },
+    { ko: /전도사/g, en: "Evangelist" },
+    { ko: /목사/g, en: "Pastor" },
+    { ko: /선교사/g, en: "Missionary" },
+    { ko: /형제/g, en: "Brother" },
+    { ko: /자매/g, en: "Sister" },
+    { ko: /음식&미용 전문가/g, en: "Food & Beauty Specialist" },
+    { ko: /직업 정보 없음/g, en: "No Occupation Listed" },
+
+    // 3. Mission & Gospel Key Phrases
     { ko: /성경은 사실이다/g, en: "'The Bible is Fact'" },
     { ko: /체코에서 시작된 에티오피아 복음 전파/g, en: "Gospel Spreading in Ethiopia Starting from Czech" },
     { ko: /첫 오프라인 집회/g, en: "First Offline Assembly" },
@@ -161,25 +219,7 @@
     { ko: /참석/g, en: "attendance" },
     { ko: /서아프리카팀/g, en: "West Africa Team" },
 
-    // 3. Occupations & Roles
-    { ko: /마취과 의사/g, en: "anesthesiologist" },
-    { ko: /의사/g, en: "doctor" },
-    { ko: /간호사/g, en: "nurse" },
-    { ko: /고등학교생|고등학생/g, en: "high school student" },
-    { ko: /대학생/g, en: "university student" },
-    { ko: /학생/g, en: "student" },
-    { ko: /교사|선생님/g, en: "teacher" },
-    { ko: /자영업/g, en: "self-employed" },
-    { ko: /가정부|가사 도우미/g, en: "housekeeper" },
-    { ko: /전도사/g, en: "evangelist" },
-    { ko: /목사/g, en: "Pastor" },
-    { ko: /선교사/g, en: "Missionary" },
-    { ko: /형제/g, en: "Brother" },
-    { ko: /자매/g, en: "Sister" },
-    { ko: /무직/g, en: "unemployed" },
-    { ko: /음식&미용 전문가/g, en: "Food & Beauty Specialist" },
-
-    // 4. Relationships & Categories
+    // 4. Relationships
     { ko: /지인/g, en: "acquaintance" },
     { ko: /동료/g, en: "colleague" },
     { ko: /부부/g, en: "couple" },
@@ -190,11 +230,17 @@
     { ko: /친구/g, en: "friend" },
 
     // 5. Locations & Regions
+    { ko: /아디스아바바\s*\([^)]*\)/g, en: "Addis Ababa" },
+    { ko: /비쇼프투\s*\([^)]*\)/g, en: "Bishoftu" },
+    { ko: /아다마\s*\([^)]*\)/g, en: "Adama" },
+    { ko: /세베타\s*\([^)]*\)/g, en: "Sebeta" },
+    { ko: /지마\s*\([^)]*\)/g, en: "Jimma" },
     { ko: /아디스아바바/g, en: "Addis Ababa" },
     { ko: /비쇼프투/g, en: "Bishoftu" },
     { ko: /아다마/g, en: "Adama" },
     { ko: /지마/g, en: "Jimma" },
     { ko: /세베타/g, en: "Sebeta" },
+    { ko: /기타 지역|기타/g, en: "Other Regions" },
     { ko: /체코/g, en: "Czech" },
     { ko: /독일/g, en: "Germany" },
     { ko: /말타/g, en: "Malta" },
@@ -247,6 +293,12 @@
       }
       if (window.fellowshipComponent && typeof window.fellowshipComponent.render === "function") {
         window.fellowshipComponent.render();
+      }
+      if (window.calendarComponent && typeof window.calendarComponent.render === "function") {
+        window.calendarComponent.render();
+      }
+      if (window.mapComponent && typeof window.mapComponent.render === "function") {
+        window.mapComponent.render();
       }
     }
 
