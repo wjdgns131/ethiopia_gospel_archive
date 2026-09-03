@@ -1802,11 +1802,11 @@ class DataStore {
 
   init() {
     try {
-      const FORCE_VERSION = "20260903_MASTER_RESTORE_V300";
+      const FORCE_VERSION = "20260903_FULL_47MB_RESTORE_V400";
       const currentVer = localStorage.getItem("ethiopia_master_restored_ver");
 
       if (currentVer !== FORCE_VERSION) {
-        console.log("🔄 Syncing complete backup dataset v300...");
+        console.log("🔄 Syncing full 47MB user backup dataset v400...");
         localStorage.setItem("ethiopia_master_restored_ver", FORCE_VERSION);
         localStorage.setItem("ethiopia_history", JSON.stringify(DEFAULT_HISTORY));
         localStorage.setItem("ethiopia_user_custom_edits", JSON.stringify(DEFAULT_HISTORY));
