@@ -126,7 +126,7 @@ class CalendarComponent {
     const currentMonthHolidays = ETHIOPIAN_HOLIDAYS.filter(h => h.month === (month + 1));
 
     // Custom Mission Events in current month (including multi-day date range matches!)
-    const allEvents = window.db ? window.db.getEvents() : [];
+    let allEvents = []; try { allEvents = (window.db && typeof window.db.getEvents === 'function') ? window.db.getEvents() : (window.DEFAULT_EVENTS || []); } catch(e) { console.error('getEvents error:', e); }
     const currentMonthStr = `${year}-${String(month + 1).padStart(2, '0')}`;
     const currentMonthEvents = allEvents.filter(e => {
       const s = e.date;
