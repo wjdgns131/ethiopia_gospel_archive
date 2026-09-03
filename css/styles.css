@@ -1989,33 +1989,21 @@ html.dark .mockup-member-name {
   overflow-y: hidden !important;
   gap: 1.2rem !important;
   margin-top: 1rem !important;
-  padding: 0.4rem 0.2rem 1rem 0.2rem !important;
+  padding: 0.4rem 0.2rem 0.6rem 0.2rem !important;
   scroll-snap-type: x mandatory !important;
   scroll-behavior: smooth !important;
   -webkit-overflow-scrolling: touch !important;
   cursor: grab !important;
 
-  /* Sleek Custom Drag Bar */
-  scrollbar-width: thin !important;
-  scrollbar-color: #0284c7 rgba(2, 132, 199, 0.08) !important;
+  /* Hide scrollbar for clean aesthetic */
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
 }
 
 .timeline-gallery-grid::-webkit-scrollbar {
-  display: block !important;
-  height: 8px !important;
-  background: rgba(2, 132, 199, 0.08) !important;
-  border-radius: 10px !important;
-}
-
-.timeline-gallery-grid::-webkit-scrollbar-thumb {
-  background: linear-gradient(90deg, #0284c7 0%, #0369a1 100%) !important;
-  border-radius: 10px !important;
-  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.3) !important;
-  cursor: grab !important;
-}
-
-.timeline-gallery-grid::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(90deg, #38bdf8 0%, #0284c7 100%) !important;
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
 .timeline-gallery-grid:active {

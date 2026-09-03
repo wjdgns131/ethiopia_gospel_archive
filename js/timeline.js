@@ -571,9 +571,19 @@ class TimelineComponent {
               <i class="fa-solid fa-images" style="color:#0284c7;"></i> 현장 활동 사진 <span style="background:rgba(2,132,199,0.1); color:#0284c7; padding:0.15rem 0.65rem; border-radius:12px; font-size:0.82rem; font-weight:800;">${activeItem.images.length}장</span>
             </span>
             ${activeItem.images.length > 2 ? `
-              <span style="font-size:0.8rem; color:var(--text-muted); font-weight:600; display:flex; align-items:center; gap:0.3rem;">
-                <i class="fa-solid fa-arrows-left-right" style="color:#0284c7;"></i> 하단 드래그 바 또는 마우스 좌우 슬라이드로 2줄 사진 감상
-              </span>
+              <div style="display:flex; align-items:center; gap:0.7rem;">
+                <span style="font-size:0.8rem; color:var(--text-muted); font-weight:600;">
+                  <i class="fa-solid fa-arrows-left-right" style="color:#0284c7; margin-right:3px;"></i> 화살표 클릭 또는 좌우 드래그로 2줄 사진 감상
+                </span>
+                <div style="display:flex; align-items:center; gap:0.4rem;">
+                  <button type="button" onclick="event.stopPropagation(); window.timelineComponent.scrollGalleryLeft('${activeItem.id}')" title="이전 사진 보기" style="border-radius:50%; width:36px; height:36px; padding:0; display:inline-flex; align-items:center; justify-content:center; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-primary); cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.08); transition:all 0.2s;" onmouseover="this.style.background='#0284c7'; this.style.color='#fff';" onmouseout="this.style.background='var(--bg-card)'; this.style.color='var(--text-primary)';">
+                    <i class="fa-solid fa-chevron-left" style="font-size:0.9rem;"></i>
+                  </button>
+                  <button type="button" onclick="event.stopPropagation(); window.timelineComponent.scrollGalleryRight('${activeItem.id}')" title="다음 사진 보기" style="border-radius:50%; width:36px; height:36px; padding:0; display:inline-flex; align-items:center; justify-content:center; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-primary); cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.08); transition:all 0.2s;" onmouseover="this.style.background='#0284c7'; this.style.color='#fff';" onmouseout="this.style.background='var(--bg-card)'; this.style.color='var(--text-primary)';">
+                    <i class="fa-solid fa-chevron-right" style="font-size:0.9rem;"></i>
+                  </button>
+                </div>
+              </div>
             ` : ''}
           </div>
 
