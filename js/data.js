@@ -1802,7 +1802,7 @@ class DataStore {
 
   init() {
     try {
-      const FORCE_VERSION = "20260904_PERMANENT_NO_CORRUPT_V800";
+      const FORCE_VERSION = "20260904_PERMANENT_PURE_RESTORATION_V900";
       const currentVer = localStorage.getItem("ethiopia_master_restored_ver");
 
       if (currentVer !== FORCE_VERSION) {
@@ -1950,83 +1950,9 @@ class DataStore {
   getMembers() {
     let members = null;
     try { members = JSON.parse(localStorage.getItem("ethiopia_members")); } catch(e) {}
-    if (!members || !Array.isArray(members) || members.length < 20) {
-      try {
-        localStorage.removeItem("ethiopia_members");
-        localStorage.removeItem("ethiopia_members_v2");
-      } catch(e) {}
+    if (!members || !Array.isArray(members) || members.length === 0) {
       members = JSON.parse(JSON.stringify(DEFAULT_MEMBERS));
-      try {
-        localStorage.setItem("ethiopia_members", JSON.stringify(members));
-      } catch(e) {}
-      return members;
-    }
-    
-    let updated = false;
-    const defaultMap = new Map();
-    DEFAULT_MEMBERS.forEach(def => {
-      if (def && def.name) {
-        const norm = this.normalizeMemberName(def.name);
-        defaultMap.set(norm, def);
-      }
-    });
-
-    const cleanMembers = [];
-    const seenNormKeys = new Map();
-
-    members.forEach(m => {
-      if (!m || !m.name) return;
-      const normKey = this.normalizeMemberName(m.name);
-
-      if (seenNormKeys.has(normKey)) {
-        const existing = seenNormKeys.get(normKey);
-        if (m.name === "Kurse Teso" || m.name === "Kursa Teso") {
-          existing.name = "Kurse Teso";
-        }
-        if (m.testimony && !existing.testimony) existing.testimony = m.testimony;
-        if (m.youtube && !existing.youtube) existing.youtube = m.youtube;
-        if (m.photo && !existing.photo) existing.photo = m.photo;
-        if (m.assemblyMonth && !existing.assemblyMonth) existing.assemblyMonth = m.assemblyMonth;
-        updated = true;
-        return;
-      }
-
-      const def = defaultMap.get(normKey);
-      if (def) {
-        if (def.assemblyMonth && (!m.assemblyMonth || m.assemblyMonth.includes("2025.1.17"))) {
-          m.assemblyMonth = def.assemblyMonth;
-          updated = true;
-        }
-        if (def.testimony && !m.testimony) {
-          m.testimony = def.testimony;
-          updated = true;
-        }
-        if (def.youtube && !m.youtube) {
-          m.youtube = def.youtube;
-          updated = true;
-        }
-        if (def.photo && !m.photo) {
-          m.photo = def.photo;
-          updated = true;
-        }
-      }
-
-      seenNormKeys.set(normKey, m);
-      cleanMembers.push(m);
-    });
-
-    DEFAULT_MEMBERS.forEach(def => {
-      const normKey = this.normalizeMemberName(def.name);
-      if (!seenNormKeys.has(normKey)) {
-        cleanMembers.push(def);
-        seenNormKeys.set(normKey, def);
-        updated = true;
-      }
-    });
-
-    if (updated || cleanMembers.length !== members.length) {
-      this.saveMembers(cleanMembers);
-      return cleanMembers;
+      try { localStorage.setItem("ethiopia_members", JSON.stringify(members)); } catch(e) {}
     }
     return members;
   }
