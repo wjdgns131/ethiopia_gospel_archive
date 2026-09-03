@@ -1247,13 +1247,7 @@ class DirectoryComponent {
       } catch(e) {}
     }
 
-    if (!filtered || !Array.isArray(filtered) || filtered.length === 0) {
-      // Auto-healing fallback: If filters match 0 results or fail, force-render all 94 DEFAULT_MEMBERS!
-      const isDefaultFilters = (!this.activeRegion || this.activeRegion === "all" || this.activeRegion === "전체") && (this.activeCategory === "all") && !this.searchQuery;
-      if (isDefaultFilters) {
-        try { localStorage.clear(); } catch(e) {}
-        filtered = (typeof DEFAULT_MEMBERS !== 'undefined' && Array.isArray(DEFAULT_MEMBERS) && DEFAULT_MEMBERS.length > 0) ? DEFAULT_MEMBERS : (window.DEFAULT_MEMBERS || []);
-      }
+    filtered = (typeof DEFAULT_MEMBERS !== "undefined" && Array.isArray(DEFAULT_MEMBERS) && DEFAULT_MEMBERS.length > 0) ? DEFAULT_MEMBERS : (window.DEFAULT_MEMBERS || []);
     }
 
     if (!filtered || filtered.length === 0) {
