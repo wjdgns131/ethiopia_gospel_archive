@@ -20,8 +20,40 @@ class DirectoryComponent {
   // 1. Centralized Safe Event Delegation (DOM 클릭 이벤트 통일 수신기)
   // 1. Centralized Safe Event Delegation (DOM 클릭 이벤트 통일 수신기)
   // 1. Centralized Safe Event Delegation (DOM 클릭 이벤트 통일 수신기)
+  // 1. Centralized Safe Event Delegation (DOM 클릭 이벤트 통일 수신기)
   initGlobalEventDelegation() {
-    // 📋 ULTIMATE POWERPOINT (PPT) & CLIPBOARD PASTE ENGINE ([Ctrl + V])
+    // A. Card Click & Action Event Delegation
+    document.body.addEventListener("click", (e) => {
+      const target = e.target.closest("[data-action]");
+      if (!target) return;
+
+      const action = target.getAttribute("data-action");
+      const id = target.getAttribute("data-id");
+
+      if (action === "open-add-member") {
+        e.preventDefault();
+        this.openEditModal(null);
+      } else if (action === "open-edit-member") {
+        e.preventDefault();
+        e.stopPropagation();
+        this.openEditModal(id);
+      } else if (action === "open-member-detail") {
+        e.preventDefault();
+        this.openMemberDetailModal(id);
+      } else if (action === "open-inviter-network") {
+        e.preventDefault();
+        e.stopPropagation();
+        this.openNetworkModal(id);
+      } else if (action === "open-testimony-link") {
+        e.preventDefault();
+        e.stopPropagation();
+        const link = target.getAttribute("data-link");
+        const name = target.getAttribute("data-name");
+        this.openTestimonyLink(link, name);
+      }
+    });
+
+    // B. Clipboard Paste Listener ([Ctrl + V]) for PPT & KakaoTalk Photos
     window.addEventListener("paste", (e) => {
       const modal = document.getElementById("memberEditModal");
       if (!modal || modal.classList.contains("hidden")) return;
@@ -31,7 +63,6 @@ class DirectoryComponent {
 
       let imageFile = null;
 
-      // 1. Check PowerPoint text/html Base64 Clipboard Format
       const htmlData = clipboardData.getData("text/html");
       if (htmlData) {
         const imgMatch = htmlData.match(/<img[^>]+src=["'](data:image\/[^"']+)["']/i);
@@ -39,13 +70,12 @@ class DirectoryComponent {
           e.preventDefault();
           this.tempMemberPhoto = imgMatch[1];
           this.renderMemberPhotoPreview();
-          if (window.showToast) window.showToast("📋 PPT 캡처 사진이 즉시 붙여넣어졌습니다! 1:1 구도를 맞추세요.");
+          if (window.showToast) window.showToast("📋 PPT 캡처 사진이 올라갔습니다! 1:1 구도를 맞추세요.");
           setTimeout(() => this.openCropperModal(), 100);
           return;
         }
       }
 
-      // 2. Check Clipboard Files (Windows Snipping Tool & Copied Image Files)
       if (clipboardData.files && clipboardData.files.length > 0) {
         for (let i = 0; i < clipboardData.files.length; i++) {
           if (clipboardData.files[i].type.startsWith("image/")) {
@@ -55,7 +85,6 @@ class DirectoryComponent {
         }
       }
 
-      // 3. Check Clipboard Items (Chrome Browser Copy)
       if (!imageFile && clipboardData.items && clipboardData.items.length > 0) {
         for (let i = 0; i < clipboardData.items.length; i++) {
           const item = clipboardData.items[i];
@@ -72,7 +101,7 @@ class DirectoryComponent {
       }
     });
 
-    // File Input & Drag and Drop Handlers
+    // C. File Dialog & Select Button Listeners
     document.addEventListener("change", (e) => {
       const target = e.target;
       if (target && (target.id === "fieldMemberFileInput" || target.id === "fieldFileInput")) {
@@ -105,6 +134,27 @@ class DirectoryComponent {
         fileInput.click();
       }
     });
+
+    // D. Category Tabs Listener
+    const tabs = document.querySelectorAll("#categoryTabs .cat-tab");
+    tabs.forEach(tab => {
+      tab.addEventListener("click", () => {
+        tabs.forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+        this.activeCategory = tab.getAttribute("data-category") || "all";
+        this.render();
+      });
+    });
+
+    // E. Search Input Listener
+    const searchInput = document.getElementById("searchInput") || document.getElementById("memberSearchInput");
+    if (searchInput) {
+      searchInput.addEventListener("input", (e) => {
+        this.searchQuery = e.target.value.trim().toLowerCase();
+        this.render();
+      });
+    }
+  }
 
   resetFilters() {
     this.activeCategory = "all";

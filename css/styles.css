@@ -876,10 +876,9 @@ input, select, textarea {
 }
 
 .map-layout {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 1.5rem;
-  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .map-wrapper {

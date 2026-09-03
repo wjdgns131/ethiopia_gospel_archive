@@ -50,7 +50,7 @@
       }
     } catch(e) {}
   </script>
-  <script src="js/data.js?v=20260904_V18000_RESTORED_SIDE_BY_SIDE_MAP_CALENDAR_LAYOUT"></script>
+  <script src="js/data.js?v=20260904_V19000_RESTORED_CLICK_DELEGATION_AND_SCROLL_ZOOM_MAP"></script>
 </head>
 <body>
   <!-- Header / Navigation Bar -->
@@ -141,36 +141,10 @@
 
           <div class="map-layout">
             <!-- Interactive Google Maps Container -->
-            <div class="map-wrapper" id="ethiopiaMapContainer" style="position:relative; width:100%; height:320px; border-radius:14px; overflow:hidden; border:1px solid var(--border-color); box-shadow:var(--shadow-sm); background:#0f172a;">
-              <iframe id="liveGoogleMapsIframe" src="https://maps.google.com/maps?q=Ethiopia&t=m&z=7&output=embed" width="100%" height="320" frameborder="0" style="border:0; width:100%; height:320px; display:block;" allowfullscreen loading="lazy"></iframe>
+            <div class="map-wrapper" id="ethiopiaMapContainer" style="position:relative; width:100%; height:340px; border-radius:14px; overflow:hidden; border:1px solid var(--border-color); box-shadow:var(--shadow-sm); background:#0f172a;">
+              <div id="googleMapDiv" style="width:100%; height:100%; z-index:1;"></div>
             </div>
 
-            <!-- Region Quick Stats & Selector List -->
-            <div class="region-stats-sidebar">
-              <h4 class="sidebar-title"><span data-i18n="selectRegionTitle">지역 선택</span> (<span id="totalMembersCount">94</span>명)</h4>
-              <div class="region-pill-list" id="regionPillsList">
-                <button class="region-pill active" data-region="all">
-                  <span>📍 전체 지역</span>
-                  <span class="region-badge">94명</span>
-                </button>
-                <button class="region-pill" data-region="아디스아바바">
-                  <span>📍 아디스아바바 (Addis Ababa)</span>
-                  <span class="region-badge">34명</span>
-                </button>
-                <button class="region-pill" data-region="아다마">
-                  <span>📍 아다마 (Adama)</span>
-                  <span class="region-badge">42명</span>
-                </button>
-                <button class="region-pill" data-region="비쇼프투">
-                  <span>📍 비쇼프투 (Bishoftu)</span>
-                  <span class="region-badge">5명</span>
-                </button>
-                <button class="region-pill" data-region="세베타">
-                  <span>📍 세베타 (Sebeta)</span>
-                  <span class="region-badge">5명</span>
-                </button>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -3110,14 +3084,14 @@
   </footer>
 
   <!-- Scripts with updated cache buster -->
-  <script src="js/data.js?v=20260904_V18000_RESTORED_SIDE_BY_SIDE_MAP_CALENDAR_LAYOUT"></script>
-  <script src="js/i18n.js?v=20260904_V18000_RESTORED_SIDE_BY_SIDE_MAP_CALENDAR_LAYOUT"></script>
-  <script src="js/map.js?v=20260904_V18000_RESTORED_SIDE_BY_SIDE_MAP_CALENDAR_LAYOUT"></script>
-  <script src="js/directory.js?v=20260904_V18000_RESTORED_SIDE_BY_SIDE_MAP_CALENDAR_LAYOUT"></script>
-  <script src="js/timeline.js?v=20260904_V18000_RESTORED_SIDE_BY_SIDE_MAP_CALENDAR_LAYOUT"></script>
-  <script src="js/assemblies.js?v=20260904_V18000_RESTORED_SIDE_BY_SIDE_MAP_CALENDAR_LAYOUT"></script>
-  <script src="js/calendar.js?v=20260904_V18000_RESTORED_SIDE_BY_SIDE_MAP_CALENDAR_LAYOUT"></script>
-  <script src="js/admin.js?v=20260904_V18000_RESTORED_SIDE_BY_SIDE_MAP_CALENDAR_LAYOUT"></script>
-  <script src="js/app.js?v=20260904_V18000_RESTORED_SIDE_BY_SIDE_MAP_CALENDAR_LAYOUT"></script>
+  <script src="js/data.js?v=20260904_V19000_RESTORED_CLICK_DELEGATION_AND_SCROLL_ZOOM_MAP"></script>
+  <script src="js/i18n.js?v=20260904_V19000_RESTORED_CLICK_DELEGATION_AND_SCROLL_ZOOM_MAP"></script>
+  <script src="js/map.js?v=20260904_V19000_RESTORED_CLICK_DELEGATION_AND_SCROLL_ZOOM_MAP"></script>
+  <script src="js/directory.js?v=20260904_V19000_RESTORED_CLICK_DELEGATION_AND_SCROLL_ZOOM_MAP"></script>
+  <script src="js/timeline.js?v=20260904_V19000_RESTORED_CLICK_DELEGATION_AND_SCROLL_ZOOM_MAP"></script>
+  <script src="js/assemblies.js?v=20260904_V19000_RESTORED_CLICK_DELEGATION_AND_SCROLL_ZOOM_MAP"></script>
+  <script src="js/calendar.js?v=20260904_V19000_RESTORED_CLICK_DELEGATION_AND_SCROLL_ZOOM_MAP"></script>
+  <script src="js/admin.js?v=20260904_V19000_RESTORED_CLICK_DELEGATION_AND_SCROLL_ZOOM_MAP"></script>
+  <script src="js/app.js?v=20260904_V19000_RESTORED_CLICK_DELEGATION_AND_SCROLL_ZOOM_MAP"></script>
 </body>
 </html>
