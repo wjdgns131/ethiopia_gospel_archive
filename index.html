@@ -50,7 +50,7 @@
       }
     } catch(e) {}
   </script>
-  <script src="js/data.js?v=20260904_V17000_PPT_HTML_BASE64_PASTE_AND_OPTIMAL_CROPPER"></script>
+  <script src="js/data.js?v=20260904_V18000_RESTORED_SIDE_BY_SIDE_MAP_CALENDAR_LAYOUT"></script>
 </head>
 <body>
   <!-- Header / Navigation Bar -->
@@ -127,8 +127,9 @@
       </div>
 
       <!-- Dashboard Widgets Grid: Map + Calendar -->
+      <!-- Interactive Ethiopia Map & Calendar Widget Grid -->
       <div class="dashboard-widgets-grid">
-        <!-- Interactive Map Card -->
+        <!-- Interactive Map Card (Left Column) -->
         <div class="map-section-card">
           <div class="map-card-header">
             <div class="map-title-group">
@@ -139,99 +140,46 @@
           </div>
 
           <div class="map-layout">
-            <!-- Interactive Map SVG Container -->
-            <div class="map-wrapper" id="ethiopiaMapContainer" style="position:relative; width:100%; height:350px; border-radius:14px; overflow:hidden; border:1px solid var(--border-color); box-shadow:var(--shadow-sm); background:#0f172a;">
-              <iframe id="liveGoogleMapsIframe" src="https://maps.google.com/maps?q=Ethiopia&t=m&z=7&output=embed" width="100%" height="350" frameborder="0" style="border:0; width:100%; height:350px; display:block;" allowfullscreen loading="lazy"></iframe>
+            <!-- Interactive Google Maps Container -->
+            <div class="map-wrapper" id="ethiopiaMapContainer" style="position:relative; width:100%; height:320px; border-radius:14px; overflow:hidden; border:1px solid var(--border-color); box-shadow:var(--shadow-sm); background:#0f172a;">
+              <iframe id="liveGoogleMapsIframe" src="https://maps.google.com/maps?q=Ethiopia&t=m&z=7&output=embed" width="100%" height="320" frameborder="0" style="border:0; width:100%; height:320px; display:block;" allowfullscreen loading="lazy"></iframe>
             </div>
-
-
-                <div onclick="if(window.mapComponent) window.mapComponent.selectRegion('아다마')" style="position:absolute; top:50%; left:53%; transform:translate(-50%, -100%); cursor:pointer; z-index:20; display:flex; flex-direction:column; align-items:center;">
-                  <div style="background:#d97706; color:#ffffff; font-weight:900; font-size:12px; padding:3px 9px; border-radius:14px; border:2px solid #ffffff; box-shadow:0 4px 12px rgba(0,0,0,0.4); display:flex; align-items:center; gap:4px;">
-                    <i class="fa-solid fa-location-dot" style="color:#fbbf24;"></i>
-                    <span>아다마</span>
-                    <span style="background:rgba(255,255,255,0.3); padding:1px 5px; border-radius:10px; font-size:10.5px;">42명</span>
-                  </div>
-                  <div style="width:0; height:0; border-left:6px solid transparent; border-right:6px solid transparent; border-top:7px solid #d97706;"></div>
-                </div>
-
-                <div onclick="if(window.mapComponent) window.mapComponent.selectRegion('비쇼프투')" style="position:absolute; top:45%; left:49%; transform:translate(-50%, -100%); cursor:pointer; z-index:20; display:flex; flex-direction:column; align-items:center;">
-                  <div style="background:#d97706; color:#ffffff; font-weight:900; font-size:12px; padding:3px 9px; border-radius:14px; border:2px solid #ffffff; box-shadow:0 4px 12px rgba(0,0,0,0.4); display:flex; align-items:center; gap:4px;">
-                    <i class="fa-solid fa-location-dot" style="color:#fbbf24;"></i>
-                    <span>비쇼프투</span>
-                    <span style="background:rgba(255,255,255,0.3); padding:1px 5px; border-radius:10px; font-size:10.5px;">5명</span>
-                  </div>
-                  <div style="width:0; height:0; border-left:6px solid transparent; border-right:6px solid transparent; border-top:7px solid #d97706;"></div>
-                </div>
-
-                <div onclick="if(window.mapComponent) window.mapComponent.selectRegion('세베타')" style="position:absolute; top:43%; left:42%; transform:translate(-50%, -100%); cursor:pointer; z-index:20; display:flex; flex-direction:column; align-items:center;">
-                  <div style="background:#d97706; color:#ffffff; font-weight:900; font-size:12px; padding:3px 9px; border-radius:14px; border:2px solid #ffffff; box-shadow:0 4px 12px rgba(0,0,0,0.4); display:flex; align-items:center; gap:4px;">
-                    <i class="fa-solid fa-location-dot" style="color:#fbbf24;"></i>
-                    <span>세베타</span>
-                    <span style="background:rgba(255,255,255,0.3); padding:1px 5px; border-radius:10px; font-size:10.5px;">5명</span>
-                  </div>
-                  <div style="width:0; height:0; border-left:6px solid transparent; border-right:6px solid transparent; border-top:7px solid #d97706;"></div>
-                </div>
-
-                <!-- Toolbar Overlay -->
-                <div style="position:absolute; top:10px; right:10px; z-index:30; display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
-                  <div style="background:rgba(255,255,255,0.96); padding:3px; border-radius:8px; border:1px solid #cbd5e1; display:flex; gap:2px; box-shadow:0 4px 12px rgba(0,0,0,0.25);">
-                    <button type="button" onclick="if(window.mapComponent) window.mapComponent.openGoogleMapsExternal('m')" id="btnLayerRoadmap" style="padding:4px 9px; font-size:11px; font-weight:700; border-radius:6px; border:none; background:#0284c7; color:#fff; cursor:pointer;">🗺️ Google 지도</button>
-                    <button type="button" onclick="if(window.mapComponent) window.mapComponent.openGoogleMapsExternal('k')" id="btnLayerSatellite" style="padding:4px 9px; font-size:11px; font-weight:700; border-radius:6px; border:none; background:transparent; color:#334155; cursor:pointer;">🛰️ Google 위성</button>
-                    <button type="button" onclick="if(window.mapComponent) window.mapComponent.openGoogleMapsExternal('p')" id="btnLayerTerrain" style="padding:4px 9px; font-size:11px; font-weight:700; border-radius:6px; border:none; background:transparent; color:#334155; cursor:pointer;">⛰️ Google 지형</button>
-                  </div>
-                  <a href="https://www.google.com/maps/@9.0300,38.7400,7.5z" target="_blank" rel="noopener noreferrer" style="background:#ffffff; color:#15803d; border:1px solid #86efac; border-radius:8px; padding:0.35rem 0.65rem; font-weight:700; font-size:0.75rem; text-decoration:none; display:flex; align-items:center; gap:4px; box-shadow:0 2px 8px rgba(0,0,0,0.2);" title="Google Maps 외부 앱에서 열기">
-                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Google Maps 앱에서 열기
-                  </a>
-                </div>
-
-                <!-- Footer Overlay -->
-                <div style="position:absolute; bottom:8px; left:8px; right:8px; z-index:30; background:rgba(15,23,42,0.92); color:#ffffff; padding:6px 12px; border-radius:10px; font-size:11px; font-weight:700; border:1px solid rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px; box-shadow:0 4px 12px rgba(0,0,0,0.3);">
-                  <span style="display:flex; align-items:center; gap:6px;"><i class="fa-brands fa-google" style="color:#4285F4;"></i> Google Maps 실시간 연동 (GPS 핀 클릭 시 즉시 필터링)</span>
-                  <span style="color:#fbbf24; font-size:10.5px;">📍 핀을 누르시면 해당 도시 식구가 필터링됩니다</span>
-                </div>
-              </div>
-            </div>
-
-
-
-
 
             <!-- Region Quick Stats & Selector List -->
             <div class="region-stats-sidebar">
               <h4 class="sidebar-title"><span data-i18n="selectRegionTitle">지역 선택</span> (<span id="totalMembersCount">94</span>명)</h4>
               <div class="region-pill-list" id="regionPillsList">
-<button class="region-pill active" data-region="all">
-    <span>📍 전체 지역</span>
-    <span class="region-badge">94명</span>
-  </button>
-  <button class="region-pill" data-region="아디스아바바">
-    <span>📍 아디스아바바 (Addis Ababa)</span>
-    <span class="region-badge">34명</span>
-  </button>
-  <button class="region-pill" data-region="아다마">
-    <span>📍 아다마 (Adama)</span>
-    <span class="region-badge">42명</span>
-  </button>
-  <button class="region-pill" data-region="비쇼프투">
-    <span>📍 비쇼프투 (Bishoftu)</span>
-    <span class="region-badge">5명</span>
-  </button>
-  <button class="region-pill" data-region="세베타">
-    <span>📍 세베타 (Sebeta)</span>
-    <span class="region-badge">5명</span>
-  </button>
-</div>
+                <button class="region-pill active" data-region="all">
+                  <span>📍 전체 지역</span>
+                  <span class="region-badge">94명</span>
+                </button>
+                <button class="region-pill" data-region="아디스아바바">
+                  <span>📍 아디스아바바 (Addis Ababa)</span>
+                  <span class="region-badge">34명</span>
+                </button>
+                <button class="region-pill" data-region="아다마">
+                  <span>📍 아다마 (Adama)</span>
+                  <span class="region-badge">42명</span>
+                </button>
+                <button class="region-pill" data-region="비쇼프투">
+                  <span>📍 비쇼프투 (Bishoftu)</span>
+                  <span class="region-badge">5명</span>
+                </button>
+                <button class="region-pill" data-region="세베타">
+                  <span>📍 세베타 (Sebeta)</span>
+                  <span class="region-badge">5명</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Ethiopian Calendar Card -->
+        <!-- Ethiopian Calendar Card (Right Column) -->
         <div class="calendar-section-card" id="calendarContainer">
           <!-- Calendar rendered dynamically by JS -->
         </div>
       </div>
 
-      <!-- Controls Bar: Search + Category Filters + Region Dropdown -->
       <div class="controls-bar">
         <!-- Search Box -->
         <div class="search-box">
@@ -3162,14 +3110,14 @@
   </footer>
 
   <!-- Scripts with updated cache buster -->
-  <script src="js/data.js?v=20260904_V17000_PPT_HTML_BASE64_PASTE_AND_OPTIMAL_CROPPER"></script>
-  <script src="js/i18n.js?v=20260904_V17000_PPT_HTML_BASE64_PASTE_AND_OPTIMAL_CROPPER"></script>
-  <script src="js/map.js?v=20260904_V17000_PPT_HTML_BASE64_PASTE_AND_OPTIMAL_CROPPER"></script>
-  <script src="js/directory.js?v=20260904_V17000_PPT_HTML_BASE64_PASTE_AND_OPTIMAL_CROPPER"></script>
-  <script src="js/timeline.js?v=20260904_V17000_PPT_HTML_BASE64_PASTE_AND_OPTIMAL_CROPPER"></script>
-  <script src="js/assemblies.js?v=20260904_V17000_PPT_HTML_BASE64_PASTE_AND_OPTIMAL_CROPPER"></script>
-  <script src="js/calendar.js?v=20260904_V17000_PPT_HTML_BASE64_PASTE_AND_OPTIMAL_CROPPER"></script>
-  <script src="js/admin.js?v=20260904_V17000_PPT_HTML_BASE64_PASTE_AND_OPTIMAL_CROPPER"></script>
-  <script src="js/app.js?v=20260904_V17000_PPT_HTML_BASE64_PASTE_AND_OPTIMAL_CROPPER"></script>
+  <script src="js/data.js?v=20260904_V18000_RESTORED_SIDE_BY_SIDE_MAP_CALENDAR_LAYOUT"></script>
+  <script src="js/i18n.js?v=20260904_V18000_RESTORED_SIDE_BY_SIDE_MAP_CALENDAR_LAYOUT"></script>
+  <script src="js/map.js?v=20260904_V18000_RESTORED_SIDE_BY_SIDE_MAP_CALENDAR_LAYOUT"></script>
+  <script src="js/directory.js?v=20260904_V18000_RESTORED_SIDE_BY_SIDE_MAP_CALENDAR_LAYOUT"></script>
+  <script src="js/timeline.js?v=20260904_V18000_RESTORED_SIDE_BY_SIDE_MAP_CALENDAR_LAYOUT"></script>
+  <script src="js/assemblies.js?v=20260904_V18000_RESTORED_SIDE_BY_SIDE_MAP_CALENDAR_LAYOUT"></script>
+  <script src="js/calendar.js?v=20260904_V18000_RESTORED_SIDE_BY_SIDE_MAP_CALENDAR_LAYOUT"></script>
+  <script src="js/admin.js?v=20260904_V18000_RESTORED_SIDE_BY_SIDE_MAP_CALENDAR_LAYOUT"></script>
+  <script src="js/app.js?v=20260904_V18000_RESTORED_SIDE_BY_SIDE_MAP_CALENDAR_LAYOUT"></script>
 </body>
 </html>
