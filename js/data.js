@@ -1975,11 +1975,16 @@ class DataStore {
 
     try {
       localStorage.setItem("ethiopia_history", JSON.stringify(historyList));
+    } catch(e) {
+      console.warn("localStorage quota exceeded for primary history:", e);
+    }
+
+    try {
       localStorage.setItem("ethiopia_user_custom_edits", JSON.stringify(historyList));
     } catch(e) {
-      console.warn("localStorage quota exceeded for history:", e);
-      if (window.showToast) window.showToast("⚠️ 브라우저 저장용량이 가득 찼습니다. [데이터 백업 다운로드] 버튼으로 내 컴퓨터에 안전하게 보관하세요!");
+      console.warn("localStorage quota exceeded for secondary backup key:", e);
     }
+
     this.syncHistoryToFile(historyList);
   }
 

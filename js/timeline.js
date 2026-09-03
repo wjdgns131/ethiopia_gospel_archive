@@ -133,7 +133,7 @@ class TimelineComponent {
             const canvas = document.createElement("canvas");
             let w = img.width;
             let h = img.height;
-            const maxDim = 2048; // Ultra HD High Resolution 1080p/2048p
+            const maxDim = 1400; // Web Optimized HD Resolution (Crisp & Light)
             if (w > maxDim || h > maxDim) {
               if (w > h) {
                 h = Math.round((h * maxDim) / w);
@@ -149,7 +149,7 @@ class TimelineComponent {
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = "high";
             ctx.drawImage(img, 0, 0, w, h);
-            resolve(canvas.toDataURL("image/jpeg", 0.92));
+            resolve(canvas.toDataURL("image/jpeg", 0.82));
           } catch(err) {
             console.error("Canvas compression error, using raw DataURL:", err);
             resolve(rawDataUrl);
