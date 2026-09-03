@@ -261,22 +261,16 @@ class EthiopiaMapComponent {
 
   selectRegion(regionId) {
     this.activeRegion = regionId;
+    if (window.directoryComponent) {
+      window.directoryComponent.activeRegion = regionId;
+      window.directoryComponent.render();
+    }
     if (this.onRegionSelect) {
-      this.onRegionSelect(regionId);
+      try { this.onRegionSelect(regionId); } catch(e) {}
     }
-    // Re-render markers to highlight selected pin
-    if (window.db) {
-      const members = window.db.getMembers();
-      const counts = {};
-      ETHIOPIA_REGIONS.forEach(r => counts[r.id] = 0);
-      members.forEach(m => {
-        const regId = normalizeRegionId(m.region);
-        counts[regId] = (counts[regId] || 0) + 1;
-      });
-      if (this.leafletMap) {
-        this.renderGoogleMap(counts, members);
-      }
-    }
+    this.render(window.db ? window.db.getMembers() : []);
+  }
+}
   }
 }
 
