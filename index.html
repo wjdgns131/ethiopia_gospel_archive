@@ -1,6 +1,23 @@
 <!DOCTYPE html>
 <html lang="ko" class="dark">
 <head>
+  <!-- Automatic ServiceWorker & Storage Cache Cleaner -->
+  <script>
+    (function() {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for (let registration of registrations) {
+            registration.unregister();
+          }
+        });
+      }
+      if ('caches' in window) {
+        caches.keys().then(function(names) {
+          for (let name of names) caches.delete(name);
+        });
+      }
+    })();
+  </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>에티오피아 선교 | 전도집회 · 침례식 · 식구 기록</title>
@@ -733,14 +750,14 @@
   </footer>
 
   <!-- Scripts with updated cache buster -->
-  <script src="js/data.js?v=20260904_V3400_FIXED_SYNTAX_ERROR_CRASH"></script>
-  <script src="js/i18n.js?v=20260904_V3400_FIXED_SYNTAX_ERROR_CRASH"></script>
-  <script src="js/map.js?v=20260904_V3400_FIXED_SYNTAX_ERROR_CRASH"></script>
-  <script src="js/directory.js?v=20260904_V3400_FIXED_SYNTAX_ERROR_CRASH"></script>
-  <script src="js/timeline.js?v=20260904_V3400_FIXED_SYNTAX_ERROR_CRASH"></script>
-  <script src="js/assemblies.js?v=20260904_V3400_FIXED_SYNTAX_ERROR_CRASH"></script>
-  <script src="js/calendar.js?v=20260904_V3400_FIXED_SYNTAX_ERROR_CRASH"></script>
-  <script src="js/admin.js?v=20260904_V3400_FIXED_SYNTAX_ERROR_CRASH"></script>
-  <script src="js/app.js?v=20260904_V3400_FIXED_SYNTAX_ERROR_CRASH"></script>
+  <script src="js/data.js?v=20260904_V3500_MASTER_CACHE_AND_SVG_FIX"></script>
+  <script src="js/i18n.js?v=20260904_V3500_MASTER_CACHE_AND_SVG_FIX"></script>
+  <script src="js/map.js?v=20260904_V3500_MASTER_CACHE_AND_SVG_FIX"></script>
+  <script src="js/directory.js?v=20260904_V3500_MASTER_CACHE_AND_SVG_FIX"></script>
+  <script src="js/timeline.js?v=20260904_V3500_MASTER_CACHE_AND_SVG_FIX"></script>
+  <script src="js/assemblies.js?v=20260904_V3500_MASTER_CACHE_AND_SVG_FIX"></script>
+  <script src="js/calendar.js?v=20260904_V3500_MASTER_CACHE_AND_SVG_FIX"></script>
+  <script src="js/admin.js?v=20260904_V3500_MASTER_CACHE_AND_SVG_FIX"></script>
+  <script src="js/app.js?v=20260904_V3500_MASTER_CACHE_AND_SVG_FIX"></script>
 </body>
 </html>
