@@ -934,6 +934,9 @@ class TimelineComponent {
       `}
     `;
 
+    modal.classList.remove("hidden");
+  }
+
   handleGalleryDragStart(e, container) {
     if (!container) return;
     let isDown = true;
