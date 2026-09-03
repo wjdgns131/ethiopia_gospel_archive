@@ -133,7 +133,7 @@ class TimelineComponent {
             const canvas = document.createElement("canvas");
             let w = img.width;
             let h = img.height;
-            const maxDim = 720; // Ultra crisp, lightweight ~30KB
+            const maxDim = 2048; // Ultra HD High Resolution 1080p/2048p
             if (w > maxDim || h > maxDim) {
               if (w > h) {
                 h = Math.round((h * maxDim) / w);
@@ -149,7 +149,7 @@ class TimelineComponent {
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = "high";
             ctx.drawImage(img, 0, 0, w, h);
-            resolve(canvas.toDataURL("image/jpeg", 0.68));
+            resolve(canvas.toDataURL("image/jpeg", 0.92));
           } catch(err) {
             console.error("Canvas compression error, using raw DataURL:", err);
             resolve(rawDataUrl);
@@ -244,24 +244,30 @@ class TimelineComponent {
               📷 1 / 1
             </div>
 
-            <button type="button" style="pointer-events:auto; background:#ef4444; color:#fff; border:none; border-radius:50%; width:46px; height:46px; font-size:24px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 20px rgba(239,68,68,0.6); transition:transform 0.2s;" onclick="document.getElementById('photoLightboxModal').classList.add('hidden')" title="닫기 (Esc)">
-              <i class="fa-solid fa-xmark"></i>
-            </button>
+            <div style="display:flex; align-items:center; gap:0.8rem; pointer-events:auto;">
+              <button type="button" style="background:rgba(2,132,199,0.9); color:#fff; border:1px solid #38bdf8; border-radius:20px; padding:0.4rem 1.1rem; font-size:0.88rem; font-weight:800; cursor:pointer; display:flex; align-items:center; gap:0.4rem; box-shadow:0 4px 14px rgba(0,0,0,0.5); backdrop-filter:blur(8px);" onclick="window.timelineComponent.toggleLightboxZoom()" title="화면 가득 채우기 / 원본 비율 전환">
+                <i class="fa-solid fa-expand"></i> 화면 꽉 차게 확대
+              </button>
+
+              <button type="button" style="background:#ef4444; color:#fff; border:none; border-radius:50%; width:46px; height:46px; font-size:24px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 20px rgba(239,68,68,0.6); transition:transform 0.2s;" onclick="document.getElementById('photoLightboxModal').classList.add('hidden')" title="닫기 (Esc)">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
           </div>
 
-          <div style="position:relative; width:100%; height:100%; display:flex; align-items:center; justify-content:center; max-width:98vw; max-height:92vh;" onclick="window.timelineComponent.nextLightboxPhoto()">
-            <img id="lightboxImg" src="" alt="Enlarged Photo" style="max-width:98vw; max-height:92vh; width:auto; height:auto; object-fit:contain; border-radius:14px; box-shadow:0 25px 90px rgba(0,0,0,0.95); display:block;" />
+          <div style="position:relative; width:96vw; height:88vh; display:flex; align-items:center; justify-content:center;" onclick="window.timelineComponent.nextLightboxPhoto()">
+            <img id="lightboxImg" src="" alt="Enlarged Photo" style="width:96vw; height:88vh; object-fit:contain; border-radius:14px; box-shadow:0 25px 90px rgba(0,0,0,0.95); display:block; image-rendering:-webkit-optimize-contrast; transition:all 0.3s ease;" />
 
-            <button type="button" id="lightboxPrevBtn" onclick="event.stopPropagation(); window.timelineComponent.prevLightboxPhoto()" style="position:absolute; top:50%; left:16px; transform:translateY(-50%); background:rgba(15,23,42,0.82); color:#ffffff; border:2px solid rgba(255,255,255,0.9); border-radius:50%; width:60px; height:60px; font-size:26px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 30px rgba(0,0,0,0.8); backdrop-filter:blur(10px); transition:all 0.2s; z-index:100101;" title="이전 사진">
+            <button type="button" id="lightboxPrevBtn" onclick="event.stopPropagation(); window.timelineComponent.prevLightboxPhoto()" style="position:absolute; top:50%; left:16px; transform:translateY(-50%); background:rgba(15,23,42,0.85); color:#ffffff; border:2px solid rgba(255,255,255,0.9); border-radius:50%; width:60px; height:60px; font-size:26px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 30px rgba(0,0,0,0.8); backdrop-filter:blur(10px); transition:all 0.2s; z-index:100101;" title="이전 사진">
               <i class="fa-solid fa-chevron-left"></i>
             </button>
 
-            <button type="button" id="lightboxNextBtn" onclick="event.stopPropagation(); window.timelineComponent.nextLightboxPhoto()" style="position:absolute; top:50%; right:16px; transform:translateY(-50%); background:rgba(15,23,42,0.82); color:#ffffff; border:2px solid rgba(255,255,255,0.9); border-radius:50%; width:60px; height:60px; font-size:26px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 30px rgba(0,0,0,0.8); backdrop-filter:blur(10px); transition:all 0.2s; z-index:100101;" title="다음 사진">
+            <button type="button" id="lightboxNextBtn" onclick="event.stopPropagation(); window.timelineComponent.nextLightboxPhoto()" style="position:absolute; top:50%; right:16px; transform:translateY(-50%); background:rgba(15,23,42,0.85); color:#ffffff; border:2px solid rgba(255,255,255,0.9); border-radius:50%; width:60px; height:60px; font-size:26px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 30px rgba(0,0,0,0.8); backdrop-filter:blur(10px); transition:all 0.2s; z-index:100101;" title="다음 사진">
               <i class="fa-solid fa-chevron-right"></i>
             </button>
           </div>
 
-          <p style="position:absolute; bottom:14px; margin:0; font-size:0.88rem; color:#f1f5f9; font-weight:700; text-shadow:0 2px 8px rgba(0,0,0,0.9); z-index:100100;"><i class="fa-solid fa-circle-info" style="color:#38bdf8; margin-right:5px;"></i> 화살표 버튼, 사진 클릭, 또는 키보드 방향키(← →)로 감상하세요.</p>
+          <p style="position:absolute; bottom:14px; margin:0; font-size:0.88rem; color:#f1f5f9; font-weight:700; text-shadow:0 2px 8px rgba(0,0,0,0.9); z-index:100100;"><i class="fa-solid fa-circle-info" style="color:#38bdf8; margin-right:5px;"></i> [화면 꽉 차게 확대] 버튼 또는 사진을 누르시면 화면 전면에 100% 꽉 차게 확대됩니다.</p>
         </div>
       `;
       document.body.appendChild(modal);
@@ -317,6 +323,22 @@ class TimelineComponent {
     if (!this.lightboxImages || this.lightboxImages.length <= 1) return;
     this.lightboxIndex = (this.lightboxIndex - 1 + this.lightboxImages.length) % this.lightboxImages.length;
     this.updateLightboxState();
+  }
+
+  toggleLightboxZoom() {
+    const img = document.getElementById("lightboxImg");
+    if (!img) return;
+    if (img.style.objectFit === "cover" || img.getAttribute("data-zoomed") === "true") {
+      img.style.objectFit = "contain";
+      img.style.transform = "scale(1.0)";
+      img.setAttribute("data-zoomed", "false");
+      if (window.showToast) window.showToast("🔍 화면 맞춤 비율 모드로 전환되었습니다.");
+    } else {
+      img.style.objectFit = "cover";
+      img.style.transform = "scale(1.18)";
+      img.setAttribute("data-zoomed", "true");
+      if (window.showToast) window.showToast("🔎 화면 전면 100% 꽉 차게 확대되었습니다!");
+    }
   }
 
   openEditModal(historyId) {
