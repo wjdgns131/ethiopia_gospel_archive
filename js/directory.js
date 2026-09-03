@@ -916,7 +916,7 @@ class DirectoryComponent {
       return tokens.some(tok => tok.length >= 2 && invStr.includes(tok));
     });
 
-    const inviterPhoto = inviterObj && inviterObj.photo ? inviterObj.photo : 'data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23f1f5f9'/><path d='M50 42 a14 14 0 1 0 0 -28 a14 14 0 1 0 0 28 M25 82 c0 -16 11 -24 25 -24 s25 8 25 24' fill='%2394a3b8'/></svg>';
+    const inviterPhoto = (inviterObj && inviterObj.photo && inviterObj.photo.length > 10) ? inviterObj.photo : 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCI+PHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiNmMWY1ZjkiLz48cGF0aCBkPSJNNTAgNDIgYTE0IDE4IDAgMSAwIDAgLTI4 aTE0IDE4IDAgMSAwIDAgMjggTTI1IDgyIGMwIC0xNiAxMSAtMjQgMjUgLTI0IHMyNSA4IDI1IDI0IiBmaWxsPSIjOTRhM2I4Ii8+PC9zdmc+';
 
     body.innerHTML = `
       <!-- TOP INVITER PROFILE HEADER BANNER -->
@@ -1055,6 +1055,17 @@ class DirectoryComponent {
     const regionDropdown = document.getElementById("regionDropdown");
     if (regionDropdown) regionDropdown.value = "all";
     this.render();
+  }
+
+  
+  parseMemberDate(dateStr) {
+    if (!dateStr) return "0000.00.00";
+    const matches = String(dateStr).match(/\d+/g);
+    if (!matches || matches.length === 0) return "0000.00.00";
+    const year = matches[0];
+    const month = matches.length > 1 ? matches[1].padStart(2, '0') : '01';
+    const day = matches.length > 2 ? matches[2].padStart(2, '0') : '01';
+    return `${year}.${month}.${day}`;
   }
 
   filterMembers() {
