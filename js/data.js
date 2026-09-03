@@ -1469,9 +1469,18 @@ const DEFAULT_HISTORY = [
     "id": "hist-202505",
     "date": "2025년 5월",
     "title": "모임집 입주 및 오프라인 집회 준비를 위한 입국 (이강현 & 이정훈 형제)",
-    "location": "Addis Ababa (볼레 국제공항)",
     "images": [
-      "images/history_202505_airport_entry.jpg"
+      "images/history_202505_airport_entry.jpg",
+      "images/history_user_uploaded_1.jpg",
+      "images/history_user_uploaded_2.jpg",
+      "images/history_user_uploaded_3.jpg",
+      "images/history_user_uploaded_4.jpg",
+      "images/history_user_uploaded_5.jpg",
+      "images/history_user_uploaded_6.jpg",
+      "images/history_user_uploaded_7.jpg",
+      "images/history_user_uploaded_8.jpg",
+      "images/history_user_uploaded_9.jpg",
+      "images/history_user_uploaded_10.jpg"
     ],
     "desc": "- 2025년 5월 12일: 이정훈 형제 가나에서 에티오피아로 입국\n- 2025년 5월 16일: 이강현 형제 영국에서 에티오피아로 입국"
   },
