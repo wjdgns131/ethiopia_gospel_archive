@@ -1780,13 +1780,13 @@ class DataStore {
 
       let historyData = null;
       try { historyData = JSON.parse(localStorage.getItem("ethiopia_history")); } catch(e) {}
-      if (!historyData || !Array.isArray(historyData) || historyData.length < 15) {
+      if (!historyData || !Array.isArray(historyData) || historyData.length === 0) {
         try { localStorage.setItem("ethiopia_history", JSON.stringify(DEFAULT_HISTORY)); } catch(e) {}
       }
 
       let membersData = null;
       try { membersData = JSON.parse(localStorage.getItem("ethiopia_members")); } catch(e) {}
-      if (!membersData || !Array.isArray(membersData) || membersData.length < 50) {
+      if (!membersData || !Array.isArray(membersData) || membersData.length === 0) {
         try { localStorage.setItem("ethiopia_members", JSON.stringify(DEFAULT_MEMBERS)); } catch(e) {}
       }
 
@@ -1829,8 +1829,7 @@ class DataStore {
 
     let history = null;
     try { history = JSON.parse(localStorage.getItem("ethiopia_history")); } catch(e) {}
-    if (!history || !Array.isArray(history) || history.length < 10) {
-      try { localStorage.removeItem("ethiopia_history"); } catch(e) {}
+    if (!history || !Array.isArray(history) || history.length === 0) {
       history = JSON.parse(JSON.stringify(DEFAULT_HISTORY));
       try { localStorage.setItem("ethiopia_history", JSON.stringify(history)); } catch(e) {}
       this._historyCache = history;

@@ -3,14 +3,14 @@
  */
 
 document.addEventListener("DOMContentLoaded", () => {
-  // 0. Auto-healing storage check: If members or history count is depleted, clear stale key!
+  // 0. Auto-healing storage check: Ensure valid array structure without deleting user data
   try {
     const mems = JSON.parse(localStorage.getItem("ethiopia_members") || "[]");
-    if (!Array.isArray(mems) || mems.length < 20) {
+    if (!Array.isArray(mems) || mems.length === 0) {
       localStorage.removeItem("ethiopia_members");
     }
     const hists = JSON.parse(localStorage.getItem("ethiopia_history") || "[]");
-    if (!Array.isArray(hists) || hists.length < 10) {
+    if (!Array.isArray(hists) || hists.length === 0) {
       localStorage.removeItem("ethiopia_history");
     }
   } catch(e) {}
