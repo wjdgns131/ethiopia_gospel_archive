@@ -108,12 +108,13 @@ class FellowshipComponent {
 
   processPhotoFile(file) {
     return new Promise((resolve) => {
-      if (!file || !file.type || !file.type.startsWith("image/")) {
+      if (!file) {
         resolve(null);
         return;
       }
       const reader = new FileReader();
       reader.onload = (e) => {
+        const rawDataUrl = e.target.result;
         const img = new Image();
         img.onload = () => {
           try {
@@ -138,12 +139,12 @@ class FellowshipComponent {
             ctx.drawImage(img, 0, 0, w, h);
             resolve(canvas.toDataURL("image/jpeg", 0.68));
           } catch(err) {
-            console.error("Canvas compression error:", err);
-            resolve(null);
+            console.error("Canvas compression error, using raw DataURL:", err);
+            resolve(rawDataUrl);
           }
         };
-        img.onerror = () => resolve(null);
-        img.src = e.target.result;
+        img.onerror = () => resolve(rawDataUrl);
+        img.src = rawDataUrl;
       };
       reader.onerror = () => resolve(null);
       reader.readAsDataURL(file);

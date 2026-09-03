@@ -385,7 +385,7 @@
         <!-- Photo Attachment & PPT Screenshot Clipboard Paste Zone -->
         <div class="form-group">
           <label>프로필 사진 & 캡처 텍스트 자동 추출 (PPT 복사-붙여넣기 [Ctrl+V] / 파일 첨부 / 이미지 캡처)</label>
-          <div class="photo-upload-zone" id="memberDropZone">
+          <label for="fieldMemberFileInput" class="photo-upload-zone" id="memberDropZone" style="cursor:pointer; display:block;">
             <i class="fa-solid fa-cloud-arrow-up photo-zone-icon"></i>
             <p class="photo-zone-text">
               📋 <strong>사진+정보가 들어있는 캡처 이미지를 [Ctrl + V]로 바로 붙여넣으세요!</strong><br/>
@@ -393,10 +393,10 @@
               📁 클릭하여 이미지 파일 선택 또는 드래그 & 드롭도 가능합니다.
             </p>
             <input type="file" id="fieldMemberFileInput" accept="image/*" class="hidden" />
-            <button type="button" class="btn btn-secondary btn-sm" id="selectMemberPhotoBtn">
+            <span class="btn btn-secondary btn-sm" style="pointer-events:none;">
               <i class="fa-solid fa-image"></i> 캡처 이미지 / 사진 파일 선택
-            </button>
-          </div>
+            </span>
+          </label>
 
           <!-- OCR Extract Toast Indicator -->
           <div id="ocrStatusToast" style="display:none; margin-top:0.75rem; padding:0.65rem 0.9rem; background:#f0f9ff; border:1px solid #bae6fd; color:#0369a1; border-radius:10px; font-size:0.85rem; font-weight:700;"></div>
@@ -537,17 +537,17 @@
         <!-- Photo Attachment & Clipboard Paste Zone -->
         <div class="form-group">
           <label>사진 첨부 & 이미지 복사-붙여넣기 (Upload & Paste)</label>
-          <div class="photo-upload-zone" id="historyDropZone">
+          <label for="fieldHistoryFileInput" class="photo-upload-zone" id="historyDropZone" style="cursor:pointer; display:block;">
             <i class="fa-solid fa-cloud-arrow-up photo-zone-icon"></i>
             <p class="photo-zone-text">
               📁 <strong>클릭하여 사진 선택</strong> 또는 사진을 <strong>드래그 & 드롭</strong> 하세요.<br/>
               📋 클립보드의 이미지를 <strong>[Ctrl + V]</strong>로 바로 붙여넣으실 수 있습니다.
             </p>
             <input type="file" id="fieldHistoryFileInput" accept="image/*" multiple class="hidden" />
-            <button type="button" class="btn btn-secondary btn-sm" id="selectHistoryPhotosBtn">
+            <span class="btn btn-secondary btn-sm" style="pointer-events:none;">
               <i class="fa-solid fa-images"></i> 사진 파일 선택
-            </button>
-          </div>
+            </span>
+          </label>
 
           <!-- Photo Previews Grid -->
           <div id="historyImagesPreview" class="photo-preview-grid" style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:0.75rem;">
@@ -684,17 +684,17 @@
         <!-- Photo Attachment & Drag & Drop & Paste Zone -->
         <div class="form-group">
           <label>활동 사진 첨부 & 클립보드 붙여넣기 (Upload & [Ctrl+V] Paste)</label>
-          <div class="photo-upload-zone" id="fellowshipDropZone">
+          <label for="fieldFellowshipFileInput" class="photo-upload-zone" id="fellowshipDropZone" style="cursor:pointer; display:block;">
             <i class="fa-solid fa-cloud-arrow-up photo-zone-icon"></i>
             <p class="photo-zone-text">
               📁 <strong>클릭하여 사진 선택</strong> 또는 사진을 <strong>드래그 & 드롭</strong> 하세요.<br/>
               📋 이미지를 <strong>[Ctrl + V]</strong>로 바로 붙여넣으실 수 있습니다.
             </p>
             <input type="file" id="fieldFellowshipFileInput" accept="image/*" multiple class="hidden" />
-            <button type="button" class="btn btn-secondary btn-sm" id="selectFellowshipPhotosBtn">
+            <span class="btn btn-secondary btn-sm" style="pointer-events:none;">
               <i class="fa-solid fa-images"></i> 사진 파일 선택
-            </button>
-          </div>
+            </span>
+          </label>
 
           <!-- Photo Previews Grid -->
           <div id="fellowshipImagesPreview" class="photo-preview-grid" style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:0.75rem;">
@@ -724,13 +724,13 @@
   </footer>
 
   <!-- Scripts with updated cache buster -->
-  <script src="js/data.js?v=20260903_FORCE_RELOAD_v30"></script>
-  <script src="js/map.js?v=20260903_FORCE_RELOAD_v30"></script>
-  <script src="js/directory.js?v=20260903_FORCE_RELOAD_v30"></script>
-  <script src="js/timeline.js?v=20260903_FORCE_RELOAD_v30"></script>
-  <script src="js/assemblies.js?v=20260903_FORCE_RELOAD_v30"></script>
-  <script src="js/calendar.js?v=20260903_FORCE_RELOAD_v30"></script>
-  <script src="js/admin.js?v=20260903_FORCE_RELOAD_v30"></script>
-  <script src="js/app.js?v=20260903_FORCE_RELOAD_v30"></script>
+  <script src="js/data.js?v=20260903_NATIVE_LABEL_v40"></script>
+  <script src="js/map.js?v=20260903_NATIVE_LABEL_v40"></script>
+  <script src="js/directory.js?v=20260903_NATIVE_LABEL_v40"></script>
+  <script src="js/timeline.js?v=20260903_NATIVE_LABEL_v40"></script>
+  <script src="js/assemblies.js?v=20260903_NATIVE_LABEL_v40"></script>
+  <script src="js/calendar.js?v=20260903_NATIVE_LABEL_v40"></script>
+  <script src="js/admin.js?v=20260903_NATIVE_LABEL_v40"></script>
+  <script src="js/app.js?v=20260903_NATIVE_LABEL_v40"></script>
 </body>
 </html>
