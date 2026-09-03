@@ -704,7 +704,7 @@ class DirectoryComponent {
     body.innerHTML = `
       <div class="member-detail-header" style="display:flex; gap:1.5rem; align-items:flex-start; margin-bottom:1.5rem; flex-wrap:wrap;">
         <div style="position:relative; width:130px; height:130px; border-radius:16px; overflow:hidden; border:3px solid ${isDisrupter ? '#ef4444' : '#0284c7'}; box-shadow:0 4px 15px rgba(0,0,0,0.1); flex-shrink:0; background:#ffffff;">
-          <img src="${member.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=600&auto=format&fit=crop'}" alt="${nameDisp}" style="width:100%; height:100%; object-fit:contain; background:#ffffff; display:block;" />
+          <img src="${member.photo || 'data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23f1f5f9'/><path d='M50 42 a14 14 0 1 0 0 -28 a14 14 0 1 0 0 28 M25 82 c0 -16 11 -24 25 -24 s25 8 25 24' fill='%2394a3b8'/></svg>'}" alt="${nameDisp}" style="width:100%; height:100%; object-fit:contain; background:#ffffff; display:block;" />
         </div>
         <div style="flex:1; min-width:200px;">
           <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.4rem; flex-wrap:wrap; gap:0.6rem;">
@@ -870,7 +870,7 @@ class DirectoryComponent {
           ${sorted.map((m, idx) => `
             <div class="tree-step-card member" style="border:1px solid var(--border-color); border-radius:12px; padding:0.9rem 1.1rem; margin-bottom:0.4rem; background:var(--bg-card); display:flex; align-items:center; gap:1rem;">
               <div class="step-avatar-box" style="width:60px; height:60px; border-radius:12px; overflow:hidden; border:2px solid #0284c7; flex-shrink:0; background:#ffffff;">
-                <img src="${m.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=600&auto=format&fit=crop'}" alt="${m.name}" style="width:100%; height:100%; object-fit:contain; background:#ffffff; display:block;" />
+                <img src="${m.photo || 'data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23f1f5f9'/><path d='M50 42 a14 14 0 1 0 0 -28 a14 14 0 1 0 0 28 M25 82 c0 -16 11 -24 25 -24 s25 8 25 24' fill='%2394a3b8'/></svg>'}" alt="${m.name}" style="width:100%; height:100%; object-fit:contain; background:#ffffff; display:block;" />
               </div>
               <div class="step-details" style="flex:1;">
                 <div class="step-name-row" style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.2rem; flex-wrap:wrap; gap:0.4rem;">
@@ -916,7 +916,7 @@ class DirectoryComponent {
       return tokens.some(tok => tok.length >= 2 && invStr.includes(tok));
     });
 
-    const inviterPhoto = inviterObj && inviterObj.photo ? inviterObj.photo : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=600&auto=format&fit=crop';
+    const inviterPhoto = inviterObj && inviterObj.photo ? inviterObj.photo : 'data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23f1f5f9'/><path d='M50 42 a14 14 0 1 0 0 -28 a14 14 0 1 0 0 28 M25 82 c0 -16 11 -24 25 -24 s25 8 25 24' fill='%2394a3b8'/></svg>';
 
     body.innerHTML = `
       <!-- TOP INVITER PROFILE HEADER BANNER -->
@@ -958,7 +958,7 @@ class DirectoryComponent {
                 
                 <div style="display:flex; align-items:center; gap:0.9rem;">
                   <div style="width:58px; height:58px; border-radius:10px; overflow:hidden; border:2px solid ${isDisrupter ? '#ef4444' : '#0284c7'}; flex-shrink:0; background:#ffffff;">
-                    <img src="${m.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=600&auto=format&fit=crop'}" alt="${m.name}" style="width:100%; height:100%; object-fit:contain; background:#ffffff; display:block;" />
+                    <img src="${m.photo || 'data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23f1f5f9'/><path d='M50 42 a14 14 0 1 0 0 -28 a14 14 0 1 0 0 28 M25 82 c0 -16 11 -24 25 -24 s25 8 25 24' fill='%2394a3b8'/></svg>'}" alt="${m.name}" style="width:100%; height:100%; object-fit:contain; background:#ffffff; display:block;" />
                   </div>
                   <div style="flex:1; min-width:0;">
                     <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:2px;">
@@ -1129,7 +1129,7 @@ class DirectoryComponent {
 
   createCardHtml(m) {
     const isDisrupter = m.category === "disrupter";
-    const photoUrl = m.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=600&auto=format&fit=crop';
+    const photoUrl = m.photo || 'data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23f1f5f9'/><path d='M50 42 a14 14 0 1 0 0 -28 a14 14 0 1 0 0 28 M25 82 c0 -16 11 -24 25 -24 s25 8 25 24' fill='%2394a3b8'/></svg>';
     const currentCalculatedAge = this.getCalculatedAge(m);
     const testimonyUrl = (m.testimony || m.youtube || "").trim();
 

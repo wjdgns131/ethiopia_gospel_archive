@@ -66,6 +66,9 @@
 
       <!-- Action Utilities -->
       <div class="header-actions">
+        <button id="syncDataPhotosBtn" class="btn btn-outline" style="border-radius:20px; font-weight:700; padding:0.4rem 0.85rem; border-color:#0284c7; color:#0284c7;" onclick="if(confirm('웹사이트 최신 사진 및 코드 데이터로 동기화하시겠습니까?')){ window.db.resetToDefaults(); }" title="최신 사진 및 코드 데이터로 강제 동기화">
+          <i class="fa-solid fa-arrows-rotate" style="color:#0284c7;"></i> <span data-i18n="syncData">사진/데이터 최신 동기화</span>
+        </button>
         <button id="langToggleBtn" class="btn btn-outline" style="border-radius:20px; font-weight:700; padding:0.4rem 0.8rem;" onclick="window.i18n.toggleLang()" title="Language / 언어 전환">
           <i class="fa-solid fa-globe"></i> English
         </button>
@@ -730,14 +733,14 @@
   </footer>
 
   <!-- Scripts with updated cache buster -->
-  <script src="js/data.js?v=20260904_FORCE_RESET_WINDOW_DB_V2400"></script>
-  <script src="js/i18n.js?v=20260904_FORCE_RESET_WINDOW_DB_V2400"></script>
-  <script src="js/map.js?v=20260904_FORCE_RESET_WINDOW_DB_V2400"></script>
-  <script src="js/directory.js?v=20260904_FORCE_RESET_WINDOW_DB_V2400"></script>
-  <script src="js/timeline.js?v=20260904_FORCE_RESET_WINDOW_DB_V2400"></script>
-  <script src="js/assemblies.js?v=20260904_FORCE_RESET_WINDOW_DB_V2400"></script>
-  <script src="js/calendar.js?v=20260904_FORCE_RESET_WINDOW_DB_V2400"></script>
-  <script src="js/admin.js?v=20260904_FORCE_RESET_WINDOW_DB_V2400"></script>
-  <script src="js/app.js?v=20260904_FORCE_RESET_WINDOW_DB_V2400"></script>
+  <script src="js/data.js?v=20260904_V2500_PERMANENT_SYNC"></script>
+  <script src="js/i18n.js?v=20260904_V2500_PERMANENT_SYNC"></script>
+  <script src="js/map.js?v=20260904_V2500_PERMANENT_SYNC"></script>
+  <script src="js/directory.js?v=20260904_V2500_PERMANENT_SYNC"></script>
+  <script src="js/timeline.js?v=20260904_V2500_PERMANENT_SYNC"></script>
+  <script src="js/assemblies.js?v=20260904_V2500_PERMANENT_SYNC"></script>
+  <script src="js/calendar.js?v=20260904_V2500_PERMANENT_SYNC"></script>
+  <script src="js/admin.js?v=20260904_V2500_PERMANENT_SYNC"></script>
+  <script src="js/app.js?v=20260904_V2500_PERMANENT_SYNC"></script>
 </body>
 </html>
