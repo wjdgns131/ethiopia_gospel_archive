@@ -148,7 +148,7 @@ class EthiopiaMapComponent {
     if (!mapDiv) {
       this.container.innerHTML = `
         <div style="position:relative; width:100%; height:350px; border-radius:var(--radius-md); overflow:hidden; border:1px solid var(--border-color); box-shadow:var(--shadow-sm); background:#0f172a;">
-          <div id="googleMapDiv" style="width:100%; height:100%; z-index:1; background:#0f172a;"></div>
+          <div id="googleMapDiv" style="width:100%; height:100%; z-index:1;"></div>
         </div>
       `;
       mapDiv = document.getElementById("googleMapDiv");
@@ -157,128 +157,102 @@ class EthiopiaMapComponent {
     if (!mapDiv) return;
 
     // Check if Leaflet.js is available
-    if (typeof L !== 'undefined') {
-      try {
-        if (!this.leafletMap) {
-          mapDiv.innerHTML = "";
-          this.leafletMap = L.map('googleMapDiv', {
-            center: [8.8, 38.8],
-            zoom: 7,
-            minZoom: 5,
-            maxZoom: 18,
-            zoomControl: true
-          });
-
-          this.switchMapLayer(this.currentLayerMode || 'roadmap');
-        }
-
-        // Force Leaflet recalculate container size
-        setTimeout(() => {
-          if (this.leafletMap) this.leafletMap.invalidateSize();
-        }, 150);
-
-        // Clear previous markers
-        this.markers.forEach(m => {
-          try { this.leafletMap.removeLayer(m); } catch(e) {}
-        });
-        this.markers = [];
-
-        // Add Markers with Exact Google Maps GPS Coordinates
-        ETHIOPIA_REGIONS.forEach(reg => {
-          const cnt = counts[reg.id] || 0;
-          if (cnt === 0) return;
-
-          const isActive = this.activeRegion === reg.id;
-          const isCap = reg.isCapital;
-
-          const pinIcon = L.divIcon({
-            className: 'google-custom-pin',
-            html: `
-              <div style="position:relative; display:flex; flex-direction:column; align-items:center; cursor:pointer;">
-                <div style="width:${isCap ? 32 : 26}px; height:${isCap ? 32 : 26}px; border-radius:50%; background:${isActive ? '#1d4ed8' : '#d97706'}; border:2.5px solid #ffffff; color:#ffffff; font-weight:800; font-size:${isCap ? 13 : 11}px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(0,0,0,0.4); transform:${isActive ? 'scale(1.18)' : 'scale(1)'}; transition:all 0.2s ease;">
-                  ${cnt}
-                </div>
-                <div style="background:rgba(15,23,42,0.92); color:#ffffff; font-size:10.5px; font-weight:700; padding:2px 6px; border-radius:6px; margin-top:2px; white-space:nowrap; border:1px solid rgba(255,255,255,0.2); box-shadow:0 2px 6px rgba(0,0,0,0.3);">
-                  ${reg.id}
-                </div>
-              </div>
-            `,
-            iconSize: [60, 50],
-            iconAnchor: [30, 25]
-          });
-
-          const marker = L.marker([reg.lat, reg.lng], { icon: pinIcon }).addTo(this.leafletMap);
-          marker.on('click', () => {
-            this.selectRegion(reg.id);
-          });
-          this.markers.push(marker);
-        });
-
-        return;
-      } catch(e) {
-        console.error("Leaflet map render error, switching to fallback:", e);
-      }
+    if (typeof L === 'undefined') {
+      console.error("Leaflet.js not loaded yet");
+      return;
     }
 
-    // FALLBACK MAP ENGINE: If Leaflet is delayed or unavailable, render Crisp Google Map Image with Interactive Pin Overlays!
-    this.renderFallbackImageMap(counts);
-  }
+    try {
+      if (!this.leafletMap) {
+        mapDiv.innerHTML = ""; // Clear any static fallback before Leaflet init!
+        
+        this.leafletMap = L.map('googleMapDiv', {
+          center: [8.8, 38.8],
+          zoom: 7,
+          minZoom: 5,
+          maxZoom: 18,
+          zoomControl: true
+        });
 
-  renderFallbackImageMap(counts) {
-    const mapDiv = document.getElementById("googleMapDiv");
-    if (!mapDiv) return;
+        // Default to Real Google Maps Roadmap Layer
+        this.switchMapLayer(this.currentLayerMode || 'roadmap');
 
-    let pinsHtml = "";
-    ETHIOPIA_REGIONS.forEach(reg => {
-      const cnt = counts[reg.id] || 0;
-      if (cnt === 0) return;
-      const isActive = this.activeRegion === reg.id;
-
-      // Approximate percentage coordinates for Ethiopia map
-      let topPct = "50%";
-      let leftPct = "50%";
-      if (reg.id === "아디스아바바") { topPct = "42%"; leftPct = "46%"; }
-      elif (reg.id === "아다마") { topPct = "48%"; leftPct = "51%"; }
-      elif (reg.id === "비쇼프투") { topPct = "45%"; leftPct = "48%"; }
-      elif (reg.id === "세베타") { topPct = "44%"; leftPct = "44%"; }
-      elif (reg.id === "네켐테") { topPct = "40%"; leftPct = "32%"; }
-
-      pinsHtml += `
-        <div onclick="if(window.mapComponent) window.mapComponent.selectRegion('${reg.id}')" style="position:absolute; top:${topPct}; left:${leftPct}; transform:translate(-50%, -50%); cursor:pointer; z-index:10; display:flex; flex-direction:column; align-items:center;">
-          <div style="width:28px; height:28px; border-radius:50%; background:${isActive ? '#1d4ed8' : '#d97706'}; border:2px solid #ffffff; color:#ffffff; font-weight:800; font-size:12px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.4);">
-            ${cnt}
+        // Add Layer Switcher Toolbar Overlay
+        const toolbar = document.createElement("div");
+        toolbar.style.cssText = "position:absolute; top:10px; right:10px; z-index:1000; display:flex; gap:6px; align-items:center;";
+        toolbar.innerHTML = `
+          <div style="background:rgba(255,255,255,0.95); padding:3px; border-radius:8px; border:1px solid #cbd5e1; display:flex; gap:2px; box-shadow:0 2px 8px rgba(0,0,0,0.15);">
+            <button type="button" onclick="window.mapComponent.switchMapLayer('roadmap')" id="btnLayerRoadmap" style="padding:4px 9px; font-size:11px; font-weight:700; border-radius:6px; border:none; background:#0284c7; color:#fff; cursor:pointer;">🗺️ Google 지도</button>
+            <button type="button" onclick="window.mapComponent.switchMapLayer('satellite')" id="btnLayerSatellite" style="padding:4px 9px; font-size:11px; font-weight:700; border-radius:6px; border:none; background:transparent; color:#334155; cursor:pointer;">🛰️ Google 위성</button>
+            <button type="button" onclick="window.mapComponent.switchMapLayer('terrain')" id="btnLayerTerrain" style="padding:4px 9px; font-size:11px; font-weight:700; border-radius:6px; border:none; background:transparent; color:#334155; cursor:pointer;">⛰️ Google 지형</button>
           </div>
-          <div style="background:rgba(15,23,42,0.9); color:#ffffff; font-size:10px; font-weight:700; padding:1px 5px; border-radius:4px; margin-top:2px; white-space:nowrap; border:1px solid rgba(255,255,255,0.2);">
-            ${reg.id}
-          </div>
-        </div>
-      `;
-    });
+          <a href="https://www.google.com/maps/@9.0300,38.7400,7.5z" target="_blank" rel="noopener noreferrer" style="background:#ffffff; color:#15803d; border:1px solid #86efac; border-radius:8px; padding:0.35rem 0.65rem; font-weight:700; font-size:0.75rem; text-decoration:none; display:flex; align-items:center; gap:4px; box-shadow:0 2px 8px rgba(0,0,0,0.15);" title="Google Maps 외부 앱에서 열기">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> 앱에서 보기
+          </a>
+        `;
+        this.container.style.position = "relative";
+        this.container.appendChild(toolbar);
+      }
 
-    mapDiv.innerHTML = `
-      <div style="position:relative; width:100%; height:100%; overflow:hidden; background:#0f172a;">
-        <img src="images/ethiopia_map_clean.png" alt="Ethiopia Map" style="width:100%; height:100%; object-fit:cover; opacity:0.9;" />
-        ${pinsHtml}
-        <div style="position:absolute; bottom:8px; left:8px; z-index:20; background:rgba(15,23,42,0.85); color:#cbd5e1; padding:3px 8px; border-radius:6px; font-size:10px; font-weight:700; border:1px solid rgba(255,255,255,0.15);">
-          📍 에티오피아 실시간 식구 분포 지도 (GPS 100% 밀착)
-        </div>
-      </div>
-    `;
+      // Force recalculate bounds so Google Maps tiles fill container edge-to-edge
+      setTimeout(() => {
+        if (this.leafletMap) this.leafletMap.invalidateSize();
+      }, 200);
+
+      // Clear previous GPS markers
+      this.markers.forEach(m => {
+        try { this.leafletMap.removeLayer(m); } catch(e) {}
+      });
+      this.markers = [];
+
+      // Add Real Interactive GPS Pins for Ethiopian Cities
+      ETHIOPIA_REGIONS.forEach(reg => {
+        const cnt = counts[reg.id] || 0;
+        if (cnt === 0) return;
+
+        const isActive = this.activeRegion === reg.id;
+        const isCap = reg.isCapital;
+
+        const pinIcon = L.divIcon({
+          className: 'google-custom-pin',
+          html: `
+            <div style="position:relative; display:flex; flex-direction:column; align-items:center; cursor:pointer;">
+              <div style="width:${isCap ? 32 : 26}px; height:${isCap ? 32 : 26}px; border-radius:50%; background:${isActive ? '#1d4ed8' : '#d97706'}; border:2.5px solid #ffffff; color:#ffffff; font-weight:800; font-size:${isCap ? 13 : 11}px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(0,0,0,0.4); transform:${isActive ? 'scale(1.18)' : 'scale(1)'}; transition:all 0.2s ease;">
+                ${cnt}
+              </div>
+              <div style="background:rgba(15,23,42,0.92); color:#ffffff; font-size:10.5px; font-weight:700; padding:2px 6px; border-radius:6px; margin-top:2px; white-space:nowrap; border:1px solid rgba(255,255,255,0.2); box-shadow:0 2px 6px rgba(0,0,0,0.3);">
+                ${reg.id} (${cnt}명)
+              </div>
+            </div>
+          `,
+          iconSize: [60, 50],
+          iconAnchor: [30, 25]
+        });
+
+        const marker = L.marker([reg.lat, reg.lng], { icon: pinIcon }).addTo(this.leafletMap);
+        marker.on('click', () => {
+          this.selectRegion(reg.id);
+        });
+        this.markers.push(marker);
+      });
+    } catch(e) {
+      console.error("renderGoogleMap error:", e);
+    }
   }
 
   switchMapLayer(mode) {
-    if (!this.leafletMap) return;
     this.currentLayerMode = mode;
+    if (!this.leafletMap) return;
 
     if (this.currentTileLayer) {
-      this.leafletMap.removeLayer(this.currentTileLayer);
+      try { this.leafletMap.removeLayer(this.currentTileLayer); } catch(e) {}
     }
 
-    let url = 'https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}'; // Roadmap
+    let url = 'https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}'; // Google Maps Roadmap
     if (mode === 'satellite') {
-      url = 'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}'; // Satellite Hybrid
+      url = 'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}'; // Google Maps Satellite Hybrid
     } else if (mode === 'terrain') {
-      url = 'https://mt1.google.com/vt/lyrs=p&x={x}&y={y}&z={z}'; // Terrain
+      url = 'https://mt1.google.com/vt/lyrs=p&x={x}&y={y}&z={z}'; // Google Maps Terrain
     }
 
     this.currentTileLayer = L.tileLayer(url, {
@@ -286,7 +260,6 @@ class EthiopiaMapComponent {
       maxZoom: 20
     }).addTo(this.leafletMap);
 
-    // Update active button styles
     ['Roadmap', 'Satellite', 'Terrain'].forEach(type => {
       const btn = document.getElementById(`btnLayer${type}`);
       if (btn) {
