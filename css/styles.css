@@ -2011,10 +2011,10 @@ html.dark .mockup-member-name {
 
 .gallery-image-box {
   box-sizing: border-box !important;
-  flex: 0 0 min(460px, 84vw) !important;
-  width: min(460px, 84vw) !important;
-  height: 320px !important;
-  border-radius: 18px !important;
+  flex: 0 0 min(540px, 86vw) !important;
+  width: min(540px, 86vw) !important;
+  height: 400px !important;
+  border-radius: 20px !important;
   overflow: hidden !important;
   position: relative !important;
   cursor: pointer !important;
@@ -2023,7 +2023,7 @@ html.dark .mockup-member-name {
   align-items: center !important;
   justify-content: center !important;
   border: 1px solid var(--border-color, #e2e8f0) !important;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.07) !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08) !important;
   transition: transform 0.3s ease, box-shadow 0.3s ease !important;
   scroll-snap-align: start !important;
 }
@@ -2031,7 +2031,8 @@ html.dark .mockup-member-name {
 .timeline-gallery-grid.single-image .gallery-image-box {
   flex: 0 0 100% !important;
   width: 100% !important;
-  max-width: 720px !important;
+  max-width: 860px !important;
+  height: 440px !important;
 }
 
 .gallery-image-box:hover {

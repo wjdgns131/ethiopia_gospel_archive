@@ -237,28 +237,28 @@ class TimelineComponent {
       modal.className = "modal-backdrop";
       modal.style.zIndex = "99999";
       modal.innerHTML = `
-        <div class="lightbox-content-wrapper" style="position:relative; max-width:94vw; max-height:94vh; display:flex; flex-direction:column; align-items:center;">
-          <button type="button" style="position:absolute; top:-45px; right:0; background:#ef4444; color:#fff; border:none; border-radius:50%; width:36px; height:36px; font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(0,0,0,0.6);" onclick="document.getElementById('photoLightboxModal').classList.add('hidden')">
+        <div class="lightbox-content-wrapper" style="position:relative; max-width:98vw; max-height:96vh; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+          <button type="button" style="position:absolute; top:-50px; right:0; background:#ef4444; color:#fff; border:none; border-radius:50%; width:40px; height:40px; font-size:22px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 14px rgba(0,0,0,0.8); z-index:100;" onclick="document.getElementById('photoLightboxModal').classList.add('hidden')">
             <i class="fa-solid fa-xmark"></i>
           </button>
 
-          <div id="lightboxCounter" style="position:absolute; top:-42px; left:0; background:#1e3a8a; color:#fff; font-size:0.9rem; font-weight:800; padding:0.3rem 0.95rem; border-radius:20px; border:1px solid #3b82f6; box-shadow:0 4px 10px rgba(0,0,0,0.4);">
+          <div id="lightboxCounter" style="position:absolute; top:-46px; left:0; background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color:#fff; font-size:0.95rem; font-weight:800; padding:0.35rem 1.1rem; border-radius:20px; border:1px solid #38bdf8; box-shadow:0 4px 12px rgba(0,0,0,0.5); z-index:100;">
             📷 1 / 1
           </div>
 
-          <div style="position:relative; cursor:pointer; border-radius:14px; overflow:visible; box-shadow:0 25px 60px rgba(0,0,0,0.95); background:#000; display:flex; align-items:center; justify-content:center;" onclick="window.timelineComponent.nextLightboxPhoto()">
-            <img id="lightboxImg" src="" alt="Enlarged Photo" style="max-width:88vw; max-height:82vh; object-fit:contain; border-radius:12px; display:block;" />
+          <div style="position:relative; cursor:pointer; border-radius:18px; overflow:hidden; box-shadow:0 30px 80px rgba(0,0,0,0.95); background:#0f172a; display:flex; align-items:center; justify-content:center; max-width:96vw; max-height:88vh;" onclick="window.timelineComponent.nextLightboxPhoto()">
+            <img id="lightboxImg" src="" alt="Enlarged Photo" style="max-width:96vw; max-height:88vh; object-fit:contain; border-radius:16px; display:block;" />
 
-            <button type="button" id="lightboxPrevBtn" onclick="event.stopPropagation(); window.timelineComponent.prevLightboxPhoto()" style="position:absolute; top:50%; left:-70px; transform:translateY(-50%); background:#1e3a8a; color:#ffffff; border:2px solid #ffffff; border-radius:50%; width:56px; height:56px; font-size:24px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 25px rgba(0,0,0,0.6); transition:all 0.2s;" title="이전 사진">
+            <button type="button" id="lightboxPrevBtn" onclick="event.stopPropagation(); window.timelineComponent.prevLightboxPhoto()" style="position:absolute; top:50%; left:16px; transform:translateY(-50%); background:rgba(15,23,42,0.75); color:#ffffff; border:2px solid rgba(255,255,255,0.8); border-radius:50%; width:58px; height:58px; font-size:26px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 25px rgba(0,0,0,0.7); backdrop-filter:blur(8px); transition:all 0.2s;" title="이전 사진">
               <i class="fa-solid fa-chevron-left"></i>
             </button>
 
-            <button type="button" id="lightboxNextBtn" onclick="event.stopPropagation(); window.timelineComponent.nextLightboxPhoto()" style="position:absolute; top:50%; right:-70px; transform:translateY(-50%); background:#1e3a8a; color:#ffffff; border:2px solid #ffffff; border-radius:50%; width:56px; height:56px; font-size:24px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 25px rgba(0,0,0,0.6); transition:all 0.2s;" title="다음 사진">
+            <button type="button" id="lightboxNextBtn" onclick="event.stopPropagation(); window.timelineComponent.nextLightboxPhoto()" style="position:absolute; top:50%; right:16px; transform:translateY(-50%); background:rgba(15,23,42,0.75); color:#ffffff; border:2px solid rgba(255,255,255,0.8); border-radius:50%; width:58px; height:58px; font-size:26px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 25px rgba(0,0,0,0.7); backdrop-filter:blur(8px); transition:all 0.2s;" title="다음 사진">
               <i class="fa-solid fa-chevron-right"></i>
             </button>
           </div>
 
-          <p style="margin-top:0.8rem; font-size:0.85rem; color:#e2e8f0; font-weight:600; text-shadow:0 2px 4px rgba(0,0,0,0.8);"><i class="fa-solid fa-circle-info" style="color:var(--accent-gold);"></i> 양 옆 화살표 버튼, 사진 클릭, 또는 키보드 화살표(← →)를 통해 다음 사진으로 넘어갑니다.</p>
+          <p style="margin-top:0.8rem; font-size:0.88rem; color:#e2e8f0; font-weight:700; text-shadow:0 2px 4px rgba(0,0,0,0.9);"><i class="fa-solid fa-circle-info" style="color:#38bdf8;"></i> 양 옆 화살표 버튼, 사진 클릭, 또는 키보드 화살표(← →)를 통해 다음 사진으로 넘어갑니다.</p>
         </div>
       `;
       document.body.appendChild(modal);
