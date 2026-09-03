@@ -1416,7 +1416,7 @@ const DEFAULT_HISTORY = [
   {
     "id": "hist-202308",
     "date": "2023년 8월",
-    "title": "체코에서의 시작 & 에티오피아 3대 언어 번역 추진",
+    "title": "체코에서 시작된 에티오피아 복음 전파",
     "location": "체코 ELC",
     "images": [
       "images/history_202308_czech_zoom.png",
@@ -1802,7 +1802,7 @@ class DataStore {
 
   init() {
     try {
-      const FORCE_VERSION = "20260903_FULL_47MB_RESTORE_V400";
+      const FORCE_VERSION = "20260904_TITLE_RESTORE_V500";
       const currentVer = localStorage.getItem("ethiopia_master_restored_ver");
 
       if (currentVer !== FORCE_VERSION) {

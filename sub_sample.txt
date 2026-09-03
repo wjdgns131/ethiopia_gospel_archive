@@ -1,0 +1,107 @@
+DEFAULT_HISTORY = [
+  {
+    "id": "hist-202308",
+    "date": "2023년 8월",
+    "title": "체코에서의 시작 & 에티오피아 3대 언어 번역 추진",
+    "location": "체코 ELC",
+    "images": [
+      "images/history_202308_czech_zoom.png",
+      "images/history_202308_czech_eden.jpg"
+    ],
+    "desc": "체코 ELC에서 온라인 면접으로 체코 유학 중인 에티오피아인 Eden이 스태프로 합류했습니다. 사모님께서 이 연결을 계기로 에티오피아에도 복음을 전하기 위해 '성경은 사실이다' 에티오피아어(암하릭) 번역 작업을 Eden에게 맡기며 에티오피아 사역이 시작되었습니다.\n\n그러나 번역이 1번에 머물 정도로 더뎌 중단하고, 사모님 지시에 따라 현지 통역자를 온라인으로 구해 맡기기로 했습니다. \n\n체코에 있던 박재한 선교사·안드레이 형제와 함께 주로 쓰이는 3개 언어별로 통역자를 두세 명씩 모집했고, 2024.4부터 에티오피아어(암하라어) 번역을 시작해 4개월 뒤 2024.8 완료했습니다.\n\n\n이후 Eden의 박사 논문 준비 및 귀국 일정으로 인터넷에서 프리랜서 에티오피아 번역자를 새롭게 물색하였으며, 에티오피아 주요 3개 언어(암하라어 · 티그리냐어 · 오로모어)로 동시 번역을 추진하였습니다. 박재한 선교사님과 안드레이 형제 및 언어별 통역진과 함께 2024년 4월부터 에티오피아어(암하라어) 번역을 본격 진행하여 4개월 만인 2024년 8월에 완료하였습니다."
+  },
+  {
+    "id": "hist-202404",
+    "date": "2024년 4월",
+    "title": "온라인 집회 진행 & 에티오피아 첫 구원 열매 (나티나엘 형제)",
+    "location": "온라인 (BIT channel)",
+    "images": [
+      "images/history_202404_online_assembly.png"
+    ],
+    "desc": "에티오피아 공용어인 암하라어로 '성경은 사실이다' 말씀을 번역하기 위해 온라인 플랫폼을 통해 모집한 통역자들과 지인들을 대상으로 2024년 4월 영어 온라인 집회를 진행했습니다.\n\n이 집회를 통해 나티나엘 형제(Nathinael / Nhatty, 마취과 의사)가 처음으로 확실한 구원의 고백과 간증을 발표하며 에티오피아의 첫 구원받은 식구가 되었습니다."
+  },
+  {
+    "id": "hist-202408",
+    "date": "2024년 8월",
+    "title": "암하라어 더빙 완성 후 제2차 온라인 집회 & 피크루 형제 구원",
+    "location": "온라인 (BIT channel)",
+    "images": [
+      "images/history_202408_amharic_online.png"
+    ],
+    "desc": "'성경은 사실이다' 암하라어 번역 완료 후 2024년 8월 암하라어 음성 더빙으로 진행되는 제2차 온라인 집회를 개최했습니다.\n\n이 2차 집회 중 티그리냐어 더빙을 담당하던 나티나엘 형제가 초청한 병동 의사 동료 피크루(Fikru) 형제가 집회 말씀을 들은 후 은혜롭게 구원을 받았습니다."
+  },
+  {
+    "id": "hist-202410",
+    "date": "2024년 10월",
+    "title": "서아프리카팀 방문 & 예수님의 보혈 말씀 교제",
+    "location": "에티오피아 (아디스아바바)",
+    "images": [
+      "images/history_202410_west_africa_team.jpg"
+    ],
+    "desc": "2024년 10월 말, 사모님께서 에티오피아에서 구원받은 식구들에게 예수님의 보혈에 대해 자세히 설명해 주었으면 좋겠다는 말씀을 하셨고, 서아프리카팀 이은우 형제 부부와 김재원 형제가 탄자니아·콩고 집회 일정을 마치고 귀국하는 길에 에티오피아에 들렀습니다.\n\n이 방문을 통해 피크루 형제 부부와 마취과 의사 나티나엘, 마크에게 『성경은 사실이다』 말씀을 다시 한번 들려주고 예수님의 보혈에 대해 자세히 설명하는 시간을 가졌습니다."
+  },
+  {
+    "id": "hist-202412",
+    "date": "2024년 12월 29일 - 2025년 1월 13일",
+    "title": "이강현 형제 부부 에티오피아 방문 & 모임집 답사",
+    "location": "Addis Ababa (Mekanisa Yotek compound, Nifas Silk Lafto)",
+    "images": [
+      "images/history_202412_meeting_house_dinner.jpg",
+      "images/history_202412_meeting_house_compound.jpg"
+    ],
+    "desc": "이강현 형제 부부가 에티오피아 모임집 답사를 위해 2024년 12월 29일부터 2025년 1월 13일까지 에티오피아를 방문했습니다.\n\n아디스아바바 Mekanisa Yotek compound (Nifas Silk Lafto) 구역의 모임집 후보 장소를 직접 둘러보고 답사했으며, 구원받은 식구들(Nathinael, Fikru, Eden)과 함께 교제를 나누는 시간도 가졌습니다."
+  },
+  {
+    "id": "hist-202505",
+    "date": "2025년 5월",
+    "title": "모임집 입주 및 오프라인 집회 준비를 위한 입국 (이강현 & 이정훈 형제)",
+    "images": [
+      "images/history_202505_airport_entry.jpg",
+      "images/history_user_uploaded_1.jpg",
+      "images/history_user_uploaded_2.jpg",
+      "images/history_user_uploaded_3.jpg",
+      "images/history_user_uploaded_4.jpg",
+      "images/history_user_uploaded_5.jpg",
+      "images/history_user_uploaded_6.jpg",
+      "images/history_user_uploaded_7.jpg",
+      "images/history_user_uploaded_8.jpg",
+      "images/history_user_uploaded_9.jpg",
+      "images/history_user_uploaded_10.jpg"
+    ],
+    "desc": "- 2025년 5월 12일: 이정훈 형제 가나에서 에티오피아로 입국\n- 2025년 5월 16일: 이강현 형제 영국에서 에티오피아로 입국"
+  },
+  {
+    "id": "hist-20250528",
+    "date": "2025.5.28 ~ 6.01",
+    "title": "에티오피아 첫 오프라인 집회",
+    "location": "Vibes Hotel, 아디스아바바",
+    "images": [
+      "images/history_202505_first_offline_assembly_group.jpg",
+      "images/history_202505_vibes_hotel.png",
+      "images/history_202505_offline_support_fellowship.png",
+      "images/history_202505_vibes_table.jpg",
+      "images/history_user_uploaded_1.jpg",
+      "images/history_user_uploaded_2.jpg",
+      "images/history_user_uploaded_3.jpg",
+      "images/history_user_uploaded_4.jpg",
+      "images/history_user_uploaded_5.jpg",
+      "images/history_user_uploaded_6.jpg",
+      "images/history_user_uploaded_7.jpg",
+      "images/history_user_uploaded_8.jpg",
+      "images/history_user_uploaded_9.jpg",
+      "images/history_user_uploaded_10.jpg"
+    ],
+    "desc": "장소: Vibes Hotel, 아디스아바바\n일시: 2025.5.28~6.01\n\n- 강연 : 성경은 사실이다 (암하라어 더빙)\n- 집회 말씀 보충 설명 : 이은우, 전현식\n- 사회 : 이강현, 이정훈 \n- 통역 : 요카벳, 비니암 [영어<->암하라어], 데보라(good news church staff)[한국어<->암하라어] \n- 신규 참석 인원 : 15명 대략\n\n\n집회 지원한 한국 식구들 (9명)  :\n이은우, 한경순, 류순 (Korea), 전현식(U.S), 박영성(Germany), 박건양(Germany), \nLee Benjamin Hae (Malta), 이강현(U.K), 이정훈(Ghana)"
+  },
+  {
+    "id": "hist-20250623",
+    "date": "2025.6.23 ~ 7.13",
+    "title": "이강현·이정훈 형제 출국 & 김재원 형제 에티오피아 방문",
+    "location": "에티오피아 (아디스아바바 모임집)",
+    "images": [
+      "images/history_202506_jaewon_kim_visit.png"
+    ],
+    "desc": "아내의 출산을 앞둔 이강현, 이정훈 형제는 2025년 6월 23일, 6월 24일 각각 한국, 영국으로 출국하게 되었고, 두 형제가 자리를 비운 동안 김재원 형제가 토고에서 에티오피아로 넘어와 잠시 머문 후 한국으로 귀국하였습니다 (2025.6.27 ~ 7.13)."
+  },
+  {
+    "id": "hist-20250819"
