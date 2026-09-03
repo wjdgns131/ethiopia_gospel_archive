@@ -1968,7 +1968,7 @@ if (typeof window !== 'undefined') {
   window.DEFAULT_MEMBERS = DEFAULT_MEMBERS;
   window.DEFAULT_HISTORY = DEFAULT_HISTORY;
   window.DEFAULT_ASSEMBLIES = [];
-  window.DATA_VERSION = "20260904_V2900_PERMANENT_PROTECTION";
+  window.DATA_VERSION = "20260904_V3000_UNBREAKABLE_MEMBERS_GUARANTEE";
 
   // Force-clear all stale localStorage keys
   try {
@@ -1984,37 +1984,49 @@ if (typeof window !== 'undefined') {
   window.db = {
     getMembers() {
       try {
-        const stored = localStorage.getItem("ethiopia_members_v2900");
+        const stored = localStorage.getItem("ethiopia_members_v3000");
         if (stored) {
           const parsed = JSON.parse(stored);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            return parsed;
+          }
         }
       } catch(e) {}
-      return window.DEFAULT_MEMBERS || [];
+      return (typeof DEFAULT_MEMBERS !== 'undefined' && Array.isArray(DEFAULT_MEMBERS) && DEFAULT_MEMBERS.length > 0)
+        ? DEFAULT_MEMBERS
+        : (window.DEFAULT_MEMBERS || []);
     },
     saveMembers(mems) {
       try {
-        localStorage.setItem("ethiopia_members_v2900", JSON.stringify(mems));
+        if (Array.isArray(mems) && mems.length > 0) {
+          localStorage.setItem("ethiopia_members_v3000", JSON.stringify(mems));
+        }
       } catch(e) {}
     },
     getHistory() {
       try {
-        const stored = localStorage.getItem("ethiopia_history_v2900");
+        const stored = localStorage.getItem("ethiopia_history_v3000");
         if (stored) {
           const parsed = JSON.parse(stored);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            return parsed;
+          }
         }
       } catch(e) {}
-      return window.DEFAULT_HISTORY || [];
+      return (typeof DEFAULT_HISTORY !== 'undefined' && Array.isArray(DEFAULT_HISTORY) && DEFAULT_HISTORY.length > 0)
+        ? DEFAULT_HISTORY
+        : (window.DEFAULT_HISTORY || []);
     },
     saveHistory(hists) {
       try {
-        localStorage.setItem("ethiopia_history_v2900", JSON.stringify(hists));
+        if (Array.isArray(hists) && hists.length > 0) {
+          localStorage.setItem("ethiopia_history_v3000", JSON.stringify(hists));
+        }
       } catch(e) {}
     },
     getFellowship() {
       try {
-        const stored = localStorage.getItem("ethiopia_assemblies_v2900");
+        const stored = localStorage.getItem("ethiopia_assemblies_v3000");
         if (stored) {
           const parsed = JSON.parse(stored);
           if (Array.isArray(parsed)) return parsed;
@@ -2024,7 +2036,7 @@ if (typeof window !== 'undefined') {
     },
     saveFellowship(items) {
       try {
-        localStorage.setItem("ethiopia_assemblies_v2900", JSON.stringify(items));
+        localStorage.setItem("ethiopia_assemblies_v3000", JSON.stringify(items));
       } catch(e) {}
     },
     addMember(m) {

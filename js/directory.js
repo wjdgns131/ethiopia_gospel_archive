@@ -1240,14 +1240,13 @@ class DirectoryComponent {
     }
 
     if (filtered.length === 0) {
-      // Auto-healing fallback: If filters are all default but filtered count is 0 (due to stale localStorage), clear stale localStorage & re-render!
+      // Auto-healing fallback: If filters are default but filtered count is 0, force-render all 94 DEFAULT_MEMBERS!
       const isDefaultFilters = (!this.activeRegion || this.activeRegion === "all" || this.activeRegion === "전체") && (this.activeCategory === "all") && !this.searchQuery;
       if (isDefaultFilters) {
         try {
-          localStorage.removeItem("ethiopia_members");
-          localStorage.removeItem("ethiopia_members_v2");
+          localStorage.clear();
         } catch(e) {}
-        const restored = window.db ? window.db.getMembers() : (typeof DEFAULT_MEMBERS !== 'undefined' ? DEFAULT_MEMBERS : []);
+        const restored = (typeof DEFAULT_MEMBERS !== 'undefined' && Array.isArray(DEFAULT_MEMBERS) && DEFAULT_MEMBERS.length > 0) ? DEFAULT_MEMBERS : (window.DEFAULT_MEMBERS || []);
         if (restored && restored.length > 0) {
           this.container.className = "mockup-member-grid";
           this.container.innerHTML = restored.map(m => this.createCardHtml(m)).join("");
