@@ -202,14 +202,107 @@ class TimelineComponent {
       return;
     }
 
-    previewContainer.innerHTML = this.tempHistoryImages.map((src, idx) => `
-      <div style="position:relative; width:90px; height:90px; border-radius:10px; overflow:hidden; border:2px solid var(--border-color); box-shadow:0 3px 10px rgba(0,0,0,0.2);">
-        <img src="${src}" style="width:100%; height:100%; object-fit:cover;" />
-        <button type="button" onclick="event.stopPropagation(); window.timelineComponent.removeHistoryPhoto(${idx})" title="사진 삭제" style="position:absolute; top:3px; right:3px; background:rgba(239,68,68,0.9); color:#fff; border:none; border-radius:50%; width:22px; height:22px; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 6px rgba(0,0,0,0.4);">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
+    previewContainer.innerHTML = `
+      <div style="width:100%; margin-bottom:0.5rem; font-size:0.82rem; color:#0284c7; font-weight:800; display:flex; align-items:center; gap:0.4rem; background:rgba(2,132,199,0.08); padding:0.4rem 0.8rem; border-radius:8px; border:1px solid rgba(2,132,199,0.2);">
+        <i class="fa-solid fa-up-down-left-right" style="font-size:0.95rem;"></i> 마우스로 사진을 끌어서(드래그) 순서를 바꾸거나, ◀ ▶ 화살표 버튼을 눌러 위치를 이동하세요.
       </div>
-    `).join('');
+      <div style="display:flex; flex-wrap:wrap; gap:0.85rem; width:100%;">
+        ${this.tempHistoryImages.map((src, idx) => `
+          <div draggable="true"
+               ondragstart="window.timelineComponent.handlePhotoDragStart(event, ${idx})"
+               ondragover="window.timelineComponent.handlePhotoDragOver(event)"
+               ondragenter="window.timelineComponent.handlePhotoDragEnter(event)"
+               ondragleave="window.timelineComponent.handlePhotoDragLeave(event)"
+               ondrop="window.timelineComponent.handlePhotoDrop(event, ${idx})"
+               ondragend="window.timelineComponent.handlePhotoDragEnd(event)"
+               style="position:relative; width:98px; height:98px; border-radius:12px; overflow:hidden; border:2px solid var(--border-color); box-shadow:0 4px 12px rgba(0,0,0,0.15); cursor:grab; transition:all 0.2s; background:var(--bg-card);"
+               class="photo-preview-item">
+            <img src="${src}" style="width:100%; height:100%; object-fit:cover; pointer-events:none;" />
+
+            <span style="position:absolute; top:4px; left:4px; background:rgba(2,132,199,0.9); color:#fff; font-size:10px; font-weight:800; padding:1px 6px; border-radius:10px; box-shadow:0 2px 4px rgba(0,0,0,0.4); pointer-events:none;">
+              #${idx + 1}
+            </span>
+
+            <button type="button" onclick="event.stopPropagation(); window.timelineComponent.removeHistoryPhoto(${idx})" title="사진 삭제" style="position:absolute; top:4px; right:4px; background:rgba(239,68,68,0.95); color:#fff; border:none; border-radius:50%; width:22px; height:22px; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 6px rgba(0,0,0,0.4);">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div style="position:absolute; bottom:4px; left:4px; right:4px; display:flex; justify-content:space-between; pointer-events:auto;">
+              ${idx > 0 ? `
+                <button type="button" onclick="event.stopPropagation(); window.timelineComponent.moveHistoryPhoto(${idx}, ${idx - 1})" title="앞으로 이동" style="background:rgba(15,23,42,0.85); color:#fff; border:1px solid rgba(255,255,255,0.4); border-radius:4px; width:24px; height:22px; font-size:11px; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+                  <i class="fa-solid fa-chevron-left"></i>
+                </button>
+              ` : `<div></div>`}
+              ${idx < this.tempHistoryImages.length - 1 ? `
+                <button type="button" onclick="event.stopPropagation(); window.timelineComponent.moveHistoryPhoto(${idx}, ${idx + 1})" title="뒤로 이동" style="background:rgba(15,23,42,0.85); color:#fff; border:1px solid rgba(255,255,255,0.4); border-radius:4px; width:24px; height:22px; font-size:11px; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+                  <i class="fa-solid fa-chevron-right"></i>
+                </button>
+              ` : `<div></div>`}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  handlePhotoDragStart(e, idx) {
+    this._draggedPhotoIdx = idx;
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', idx);
+    if (e.currentTarget) {
+      e.currentTarget.style.opacity = '0.5';
+      e.currentTarget.style.transform = 'scale(0.95)';
+    }
+  }
+
+  handlePhotoDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  }
+
+  handlePhotoDragEnter(e) {
+    e.preventDefault();
+    const item = e.currentTarget || e.target.closest('.photo-preview-item');
+    if (item) {
+      item.style.border = '2px solid #0284c7';
+      item.style.boxShadow = '0 0 15px rgba(2, 132, 199, 0.5)';
+      item.style.transform = 'scale(1.05)';
+    }
+  }
+
+  handlePhotoDragLeave(e) {
+    const item = e.currentTarget || e.target.closest('.photo-preview-item');
+    if (item) {
+      item.style.border = '2px solid var(--border-color)';
+      item.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+      item.style.transform = 'scale(1.0)';
+    }
+  }
+
+  handlePhotoDrop(e, targetIdx) {
+    e.preventDefault();
+    const fromIdx = this._draggedPhotoIdx !== undefined ? this._draggedPhotoIdx : parseInt(e.dataTransfer.getData('text/plain'), 10);
+    if (fromIdx !== undefined && !isNaN(fromIdx) && fromIdx !== targetIdx && this.tempHistoryImages) {
+      const movedItem = this.tempHistoryImages.splice(fromIdx, 1)[0];
+      this.tempHistoryImages.splice(targetIdx, 0, movedItem);
+      this.renderHistoryPhotoPreviews();
+      if (window.showToast) window.showToast("↔️ 사진 순서가 수월하게 변경되었습니다!");
+    }
+  }
+
+  handlePhotoDragEnd(e) {
+    if (e.currentTarget) {
+      e.currentTarget.style.opacity = '1.0';
+      e.currentTarget.style.transform = 'scale(1.0)';
+    }
+    this._draggedPhotoIdx = undefined;
+  }
+
+  moveHistoryPhoto(fromIdx, toIdx) {
+    if (!this.tempHistoryImages || fromIdx < 0 || toIdx < 0 || toIdx >= this.tempHistoryImages.length) return;
+    const movedItem = this.tempHistoryImages.splice(fromIdx, 1)[0];
+    this.tempHistoryImages.splice(toIdx, 0, movedItem);
+    this.renderHistoryPhotoPreviews();
   }
 
   removeHistoryPhoto(index) {
