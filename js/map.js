@@ -58,7 +58,10 @@ class EthiopiaMapComponent {
   render(members) {
     if (!this.container) this.container = document.getElementById(this.containerId || "ethiopiaMapContainer");
     if (!this.pillsContainer) this.pillsContainer = document.getElementById(this.pillsContainerId || "regionPillsList");
-    members = members || (window.db ? window.db.getMembers() : []);
+    members = (members && Array.isArray(members) && members.length > 0) ? members : (window.db ? window.db.getMembers() : []);
+    if (!members || !Array.isArray(members) || members.length === 0) {
+      members = window.DEFAULT_MEMBERS || (typeof DEFAULT_MEMBERS !== 'undefined' ? DEFAULT_MEMBERS : []);
+    }
 
     const totalCntEl = document.getElementById("totalMembersCount");
     if (totalCntEl) totalCntEl.innerText = members ? members.length : 0;
@@ -213,7 +216,8 @@ class EthiopiaMapComponent {
     }
 
     if (window.directoryComponent) {
-      window.directoryComponent.activeRegion = regionId;
+      const reg = (typeof ETHIOPIA_REGIONS !== 'undefined') ? ETHIOPIA_REGIONS.find(r => r && (r.id === regionId || r.name === regionId)) : null;
+      window.directoryComponent.activeRegion = reg ? reg.name : (regionId === "all" || !regionId ? null : regionId);
       window.directoryComponent.render();
     }
 

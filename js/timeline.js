@@ -1005,8 +1005,8 @@ class TimelineComponent {
   }
 
   openAssemblyMembersModal(historyId) {
-    const historyList = window.db ? window.db.getHistory() : [];
-    const item = historyList.find(h => h && h.id === historyId);
+    const historyList = this.getFilteredAndSortedHistory();
+    const item = historyList.find(h => h && String(h.id) === String(historyId));
     if (!item) return;
 
     const savedMembers = this.getSavedMembersForHistory(item);

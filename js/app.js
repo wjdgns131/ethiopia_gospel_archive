@@ -116,7 +116,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Initial Render of All Tabs Safely
   try { if (window.directoryComponent) window.directoryComponent.render(); } catch (e) { console.error("Directory render error:", e); }
-  try { if (window.mapComponent) window.mapComponent.render(window.db ? window.db.getMembers() : []); } catch (e) { console.error("Map render error:", e); }
+  try { if (window.mapComponent) window.mapComponent.render((window.db && typeof window.db.getMembers === 'function') ? window.db.getMembers() : (window.DEFAULT_MEMBERS || (typeof DEFAULT_MEMBERS !== 'undefined' ? DEFAULT_MEMBERS : []))); } catch (e) { console.error("Map render error:", e); }
   try { if (window.timelineComponent) window.timelineComponent.render(); } catch (e) { console.error("Timeline render error:", e); }
   try { if (window.assembliesComponent) window.assembliesComponent.render(); } catch (e) { console.error("Assemblies render error:", e); }
   try { if (window.calendarComponent) window.calendarComponent.render(); } catch (e) { console.error("Calendar render error:", e); }
