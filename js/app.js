@@ -1,5 +1,6 @@
 /**
  * 에티오피아 선교 아카이브 - 메인 애플리케이션 진입점
+ * [Restored] Map region member linkage, Assembly testimony modal, Inviter network modal, and Gospel photo lightbox.
  */
 
 document.addEventListener("DOMContentLoaded", () => {
