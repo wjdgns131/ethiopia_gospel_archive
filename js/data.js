@@ -1,4 +1,4 @@
-// Ethiopia Gospel Mission Database (Optimized for GitHub Server Hosting v37000)
+// Ethiopia Gospel Mission Database (Optimized for GitHub Server Hosting v38000)
 const DEFAULT_MEMBERS = [
   {
     "id": "pdf-mem-1",
@@ -1975,7 +1975,7 @@ if (typeof window !== 'undefined') {
   window.DEFAULT_HISTORY = DEFAULT_HISTORY;
   window.DEFAULT_ASSEMBLIES = [];
   window.DEFAULT_EVENTS = DEFAULT_EVENTS;
-  window.DATA_VERSION = "20260904_V37000_SMART_CANVAS_PHOTO_COMPRESSION_SAFE_SAVE";
+  window.DATA_VERSION = "20260904_V38000_PERMANENT_STATIC_STORAGE_KEYS_NO_RESET_EVER";
 
   // Force-clear old localStorage
   try {
@@ -1991,7 +1991,7 @@ if (typeof window !== 'undefined') {
   window.db = {
     getMembers() {
       try {
-        const stored = localStorage.getItem("ethiopia_members_v37000");
+        const stored = getMigratedStorageItem(MEMBERS_KEY, ["ethiopia_members_v38000", "ethiopia_members_v36000", "ethiopia_members"]);
         if (stored) {
           const parsed = JSON.parse(stored);
           if (Array.isArray(parsed) && parsed.length > 0) return parsed;
@@ -2002,13 +2002,13 @@ if (typeof window !== 'undefined') {
     saveMembers(mems) {
       try {
         if (Array.isArray(mems) && mems.length > 0) {
-          localStorage.setItem("ethiopia_members_v37000", JSON.stringify(mems));
+          localStorage.setItem(MEMBERS_KEY, JSON.stringify(mems));
         }
       } catch(e) {}
     },
     getHistory() {
       try {
-        const stored = localStorage.getItem("ethiopia_history_v37000");
+        const stored = getMigratedStorageItem(HISTORY_KEY, ["ethiopia_history_v38000", "ethiopia_history_v36000", "ethiopia_history"]);
         if (stored) {
           const parsed = JSON.parse(stored);
           if (Array.isArray(parsed) && parsed.length > 0) return parsed;
@@ -2019,7 +2019,7 @@ if (typeof window !== 'undefined') {
     saveHistory(hists) {
       if (!Array.isArray(hists)) return;
       try {
-        localStorage.setItem("ethiopia_history_v37000", JSON.stringify(hists));
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(hists));
       } catch(e) {
         console.warn("LocalStorage Quota Exceeded in saveHistory. Compressing large images...", e);
         // Automatic Quota Exceeded Recovery: Compress any large base64 data URLs
@@ -2035,7 +2035,7 @@ if (typeof window !== 'undefined') {
             });
             return { ...item, images: slimImages };
           });
-          localStorage.setItem("ethiopia_history_v37000", JSON.stringify(compressedHists));
+          localStorage.setItem(HISTORY_KEY, JSON.stringify(compressedHists));
         } catch(retryErr) {
           console.error("Critical Quota Exceeded in saveHistory:", retryErr);
           alert("브라우저 저장 공간이 가득 찼습니다. [백업 다운로드 (.json)] 버튼으로 데이터를 백업하시거나 일부 오래된 대형 이미지를 삭제해 주세요.");
@@ -2044,7 +2044,7 @@ if (typeof window !== 'undefined') {
     },
     getFellowship() {
       try {
-        const stored = localStorage.getItem("ethiopia_assemblies_v37000");
+        const stored = getMigratedStorageItem(ASSEMBLIES_KEY, ["ethiopia_assemblies_v38000", "ethiopia_assemblies_v36000", "ethiopia_assemblies"]);
         if (stored) {
           const parsed = JSON.parse(stored);
           if (Array.isArray(parsed)) return parsed;
@@ -2054,12 +2054,12 @@ if (typeof window !== 'undefined') {
     },
     saveFellowship(items) {
       try {
-        localStorage.setItem("ethiopia_assemblies_v37000", JSON.stringify(items));
+        localStorage\.setItem(ASSEMBLIES_KEY, JSON.stringify(items));
       } catch(e) {}
     },
     getEvents() {
       try {
-        const stored = localStorage.getItem("ethiopia_events_v37000");
+        const stored = getMigratedStorageItem(EVENTS_KEY, ["ethiopia_events_v38000", "ethiopia_events_v36000", "ethiopia_events"]);
         if (stored) {
           const parsed = JSON.parse(stored);
           if (Array.isArray(parsed)) return parsed;
@@ -2069,7 +2069,7 @@ if (typeof window !== 'undefined') {
     },
     saveEvents(evts) {
       try {
-        localStorage.setItem("ethiopia_events_v37000", JSON.stringify(evts));
+        localStorage\.setItem(EVENTS_KEY, JSON.stringify(evts));
       } catch(e) {}
     },
     addEvent(e) {
