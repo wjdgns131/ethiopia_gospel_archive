@@ -277,7 +277,10 @@ class DirectoryComponent {
     });
   }
 
-  createMemberCardDOM(m) {
+  createMemberCardDOM(rawM) {
+    const m = (window.i18n && typeof window.i18n.getTranslatedMember === "function") ? window.i18n.getTranslatedMember(rawM) : rawM;
+    const isEn = window.i18n && window.i18n.getLang() === "en";
+
     const isDisrupter = m.category === "disrupter";
     const photoUrl = (m.photo && m.photo.length > 5) ? m.photo : "images/members/mem_pdf-mem-1.jpg";
     const testimonyUrl = (m.testimony || m.youtube || "").trim();
@@ -293,7 +296,7 @@ class DirectoryComponent {
 
     const img = document.createElement("img");
     img.src = photoUrl;
-    img.alt = m.name || "식구";
+    img.alt = m.name || (isEn ? "Member" : "식구");
     img.loading = "lazy";
     img.style.cssText = "width:100%; height:100%; object-fit:cover; display:block;";
     photoFrame.appendChild(img);
@@ -316,14 +319,14 @@ class DirectoryComponent {
 
     const h3 = document.createElement("h3");
     h3.style.cssText = "font-size:1.22rem; font-weight:800; margin:0; color:#1e3a8a; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;";
-    h3.textContent = m.name || "식구";
+    h3.textContent = m.name || (isEn ? "Member" : "식구");
     nameRow.appendChild(h3);
 
     const editBtn = document.createElement("button");
     editBtn.type = "button";
     editBtn.setAttribute("data-action", "open-edit-member");
     editBtn.setAttribute("data-id", m.id);
-    editBtn.title = `${m.name} 정보 수정`;
+    editBtn.title = isEn ? `Edit ${m.name}` : `${m.name} 정보 수정`;
     editBtn.className = "hover-text-primary";
     editBtn.style.cssText = "background:transparent; color:var(--text-muted); border:none; padding:2px 6px; font-size:0.85rem; cursor:pointer; border-radius:4px;";
     editBtn.innerHTML = `<i class="fa-solid fa-pen-to-square"></i>`;
@@ -333,7 +336,7 @@ class DirectoryComponent {
 
     const regP = document.createElement("p");
     regP.style.cssText = "font-size:0.88rem; color:var(--text-secondary); margin:0 0 0.3rem 0; font-weight:600;";
-    regP.textContent = m.region || "에티오피아";
+    regP.textContent = m.region || (isEn ? "Ethiopia" : "에티오피아");
     topInfo.appendChild(regP);
 
     const jobP = document.createElement("p");
@@ -364,7 +367,7 @@ class DirectoryComponent {
       tBtn.setAttribute("data-link", testimonyUrl);
       tBtn.setAttribute("data-name", m.name);
       tBtn.style.cssText = "background:#f0f9ff; color:#0284c7; border:1px solid #7dd3fc; border-radius:10px; padding:0.2rem 0.55rem; font-size:0.75rem; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:0.3rem;";
-      tBtn.innerHTML = `<i class="fa-solid fa-circle-play" style="color:#0284c7; font-size:0.8rem;"></i> 간증 보기`;
+      tBtn.innerHTML = `<i class="fa-solid fa-circle-play" style="color:#0284c7; font-size:0.8rem;"></i> ${isEn ? 'Testimony' : '간증 보기'}`;
       btmRow.appendChild(tBtn);
     }
     btmInfo.appendChild(btmRow);
@@ -375,7 +378,7 @@ class DirectoryComponent {
       invDiv.setAttribute("data-id", m.inviter);
       invDiv.className = "hover-text-primary";
       invDiv.style.cssText = "cursor:pointer; color:var(--text-secondary); font-weight:600; margin-top:0.35rem; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;";
-      invDiv.innerHTML = `<i class="fa-solid fa-user-plus" style="color:#0284c7; margin-right:4px;"></i> 초대자: <strong style="color:var(--text-primary); text-decoration:underline;">${m.inviter}</strong>`;
+      invDiv.innerHTML = `<i class="fa-solid fa-user-plus" style="color:#0284c7; margin-right:4px;"></i> ${isEn ? 'Inviter:' : '초대자:'} <strong style="color:var(--text-primary); text-decoration:underline;">${m.inviter}</strong>`;
       btmInfo.appendChild(invDiv);
     }
 
@@ -730,8 +733,11 @@ class DirectoryComponent {
 
   openMemberDetailModal(memberId) {
     const members = window.db ? window.db.getMembers() : [];
-    const m = members.find(x => x.id === memberId);
-    if (!m) return;
+    const rawM = members.find(x => x.id === memberId);
+    if (!rawM) return;
+
+    const m = (window.i18n && typeof window.i18n.getTranslatedMember === "function") ? window.i18n.getTranslatedMember(rawM) : rawM;
+    const isEn = window.i18n && window.i18n.getLang() === "en";
 
     const modal = document.getElementById("memberDetailModal");
     const body = document.getElementById("memberDetailBody");
@@ -753,18 +759,18 @@ class DirectoryComponent {
         <!-- MEMBER INFO HEADER -->
         <div style="text-align:center; margin-bottom:1.2rem;">
           <h2 style="font-size:1.7rem; font-weight:900; margin:0 0 0.4rem 0; color:#1e3a8a;">${m.name}</h2>
-          <p style="font-size:1.02rem; color:var(--text-secondary); margin:0; font-weight:700;">📍 ${m.region} · 💼 ${m.job || '직업 정보 없음'}</p>
+          <p style="font-size:1.02rem; color:var(--text-secondary); margin:0; font-weight:700;">📍 ${m.region} · 💼 ${m.job || (isEn ? 'No occupation listed' : '직업 정보 없음')}</p>
         </div>
 
         <!-- DETAILS CARD LIST -->
         <div style="background:var(--bg-main); border:1px solid var(--border-color); border-radius:16px; padding:1rem 1.25rem; margin-bottom:1.2rem; display:flex; flex-direction:column; gap:0.75rem;">
           <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.92rem;">
-            <span style="color:var(--text-muted); font-weight:600;"><i class="fa-solid fa-calendar-days" style="color:var(--accent-gold); margin-right:6px;"></i> 참석/구원 일자</span>
+            <span style="color:var(--text-muted); font-weight:600;"><i class="fa-solid fa-calendar-days" style="color:var(--accent-gold); margin-right:6px;"></i> ${isEn ? 'Saved / Connected Date' : '참석/구원 일자'}</span>
             <strong style="color:var(--text-primary); font-weight:800;">${m.assemblyMonth || '-'}</strong>
           </div>
           ${m.inviter ? `
             <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.92rem; border-top:1px solid var(--border-color); padding-top:0.6rem;">
-              <span style="color:var(--text-muted); font-weight:600;"><i class="fa-solid fa-user-plus" style="color:#0284c7; margin-right:6px;"></i> 초대자</span>
+              <span style="color:var(--text-muted); font-weight:600;"><i class="fa-solid fa-user-plus" style="color:#0284c7; margin-right:6px;"></i> ${isEn ? 'Inviter' : '초대자'}</span>
               <span data-action="open-inviter-network" data-id="${m.inviter}" style="cursor:pointer; color:#0284c7; font-weight:800; text-decoration:underline;">${m.inviter}</span>
             </div>
           ` : ''}
@@ -774,14 +780,14 @@ class DirectoryComponent {
         ${testimonyUrl ? `
           <div style="text-align:center; margin-bottom:1rem;">
             <button type="button" data-action="open-testimony-link" data-link="${testimonyUrl}" data-name="${m.name}" class="btn btn-primary" style="width:100%; padding:0.8rem; font-size:1rem; font-weight:800; border-radius:14px; box-shadow:0 4px 15px rgba(2,132,199,0.3); display:inline-flex; align-items:center; justify-content:center; gap:0.5rem;">
-              <i class="fa-solid fa-circle-play" style="font-size:1.1rem; color:#fbbf24;"></i> 🎬 ${m.name} 님 구원 간증 보기
+              <i class="fa-solid fa-circle-play" style="font-size:1.1rem; color:#fbbf24;"></i> 🎬 ${isEn ? `Watch ${m.name}'s Salvation Testimony` : `${m.name} 님 구원 간증 보기`}
             </button>
           </div>
         ` : ''}
 
         <div style="display:flex; justify-content:flex-end; gap:0.6rem; margin-top:1rem; padding-top:0.8rem; border-top:1px solid var(--border-color);">
           <button type="button" class="btn btn-secondary btn-sm" data-action="open-edit-member" data-id="${m.id}" style="padding:0.4rem 0.9rem; font-weight:700;">
-            <i class="fa-solid fa-pen"></i> 수정하기
+            <i class="fa-solid fa-pen"></i> ${isEn ? 'Edit' : '수정하기'}
           </button>
         </div>
       </div>
@@ -794,6 +800,8 @@ class DirectoryComponent {
     const modal = document.getElementById("networkModal");
     const body = document.getElementById("networkModalBody");
     if (!modal || !body) return;
+
+    const isEn = window.i18n && window.i18n.getLang() === "en";
 
     const members = (window.db && typeof window.db.getMembers === 'function') ? window.db.getMembers() : (window.DEFAULT_MEMBERS || (typeof DEFAULT_MEMBERS !== 'undefined' ? DEFAULT_MEMBERS : []));
     const inviterNameClean = (inviterName || '').trim();
@@ -828,28 +836,29 @@ class DirectoryComponent {
 
           <div>
             <span style="font-size:0.8rem; color:#e0f2fe; font-weight:800; letter-spacing:0.5px; text-transform:uppercase;">
-              <i class="fa-solid fa-sitemap"></i> 전도 초대자 계보
+              <i class="fa-solid fa-sitemap"></i> ${isEn ? 'Inviter Network' : '전도 초대자 계보'}
             </span>
             <h2 style="font-size:1.5rem; font-weight:900; margin:2px 0; color:#ffffff;">${inviterNameClean}</h2>
             <p style="font-size:0.92rem; color:#f0f9ff; margin:0; font-weight:700;">
-              직접 초청한 참석자: <strong style="color:#fbbf24; font-size:1.1rem;">총 ${invitedMembers.length}명</strong>
+              ${isEn ? 'Directly Invited Members' : '직접 초청한 참석자'}: <strong style="color:#fbbf24; font-size:1.1rem;">${isEn ? 'Total ' : '총 '}${invitedMembers.length}${isEn ? '' : '명'}</strong>
             </p>
           </div>
         </div>
 
         <!-- INVITED MEMBERS GRID WITH MINI FACE AVATARS -->
         <h4 style="font-size:1.05rem; font-weight:800; color:var(--text-primary); margin-bottom:0.8rem; display:flex; align-items:center; gap:0.4rem;">
-          <i class="fa-solid fa-users" style="color:#0284c7;"></i> 초청된 식구 명단 (${invitedMembers.length}명)
+          <i class="fa-solid fa-users" style="color:#0284c7;"></i> ${isEn ? 'Invited Members List' : '초청된 식구 명단'} (${invitedMembers.length}${isEn ? '' : '명'})
         </h4>
 
         ${invitedMembers.length === 0 ? `
           <div style="text-align:center; padding:2.5rem 1rem; color:var(--text-muted); background:var(--bg-main); border-radius:14px; border:1px solid var(--border-color);">
             <i class="fa-solid fa-users-slash" style="font-size:2rem; margin-bottom:0.5rem; color:#0284c7;"></i>
-            <p style="font-size:0.95rem; font-weight:700; margin:0;">등록된 초청 식구가 없습니다.</p>
+            <p style="font-size:0.95rem; font-weight:700; margin:0;">${isEn ? 'No invited members found.' : '등록된 초청 식구가 없습니다.'}</p>
           </div>
         ` : `
           <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:0.9rem;">
-            ${invitedMembers.map(m => {
+            ${invitedMembers.map(rawM => {
+              const m = (window.i18n && typeof window.i18n.getTranslatedMember === "function") ? window.i18n.getTranslatedMember(rawM) : rawM;
               const photo = m.photo || "images/members/mem_pdf-mem-1.jpg";
               return `
                 <div data-action="open-member-detail" data-id="${m.id}" style="cursor:pointer; background:var(--bg-card); border:1px solid var(--border-color); border-radius:16px; padding:0.75rem; display:flex; align-items:center; gap:0.85rem; box-shadow:var(--shadow-sm); transition:transform 0.2s;" class="hover-text-primary">

@@ -206,8 +206,12 @@
     { ko: /사모님/g, en: "Samonim" },
     { ko: /권 목사님/g, en: "Reverend Kwon" },
     { ko: /권목사님/g, en: "Reverend Kwon" },
+        { ko: /김재용 형제/g, en: "Brother Jay Kim" },
+    { ko: /이강현 형제/g, en: "Brother Kohen" },
+    { ko: /이정훈 형제/g, en: "Brother Franco" },
     { ko: /이강현/g, en: "Kohen" },
     { ko: /이정훈/g, en: "Franco" },
+    { ko: /김재용/g, en: "Jay Kim" },
 
     // Core Phrases & Titles
     { ko: /성경은 사실이다/g, en: "The Bible is True" },
@@ -299,6 +303,769 @@
     { ko: /일/g, en: "" }
   ];
 
+  // 3. Region English Lookup Map
+  const REGION_EN_MAP = {
+    "아디스아바바": "Addis Ababa",
+    "비쇼프투": "Bishoftu",
+    "아다마": "Adama",
+    "세베타": "Sebeta",
+    "모조": "Mojo",
+    "네켐테": "Nekemte",
+    "하와사": "Hawassa",
+    "아르바민치": "Arba Minch",
+    "알렘테나": "Alem Tena",
+    "알렘 테나": "Alem Tena",
+    "아사사": "Asasa",
+    "바히르다르": "Bahir Dar",
+    "디레다와": "Dire Dawa",
+    "곤다르": "Gondar",
+    "지마": "Jimma",
+    "기타": "Other Regions",
+    "기타 지역": "Other Regions",
+    "에티오피아": "Ethiopia"
+  };
+
+  // 4. Member Specific English Overlay Map (Indexed by member id or name)
+  const MEMBER_EN_MAP = {
+    "mem-gudina2026-1": {
+      name: "Eliyana",
+      region: "Addis Ababa",
+      job: "High School Student",
+      inviter: "Etsub (not currently attending)"
+    },
+    "mem-gudina2026-2": {
+      name: "Sena",
+      region: "Addis Ababa",
+      job: "Domestic Worker",
+      inviter: "Fikru & Eden"
+    },
+    "mem-gudina2026-3": {
+      name: "Helen Abebe",
+      region: "Addis Ababa",
+      job: "Clothing Sales",
+      inviter: "Eliyana"
+    },
+    "mem-gudina2026-4": {
+      name: "Sitota",
+      region: "Adama",
+      job: "High School Student",
+      inviter: "Etsub (not currently attending)"
+    },
+    "mem-gudina2026-5": {
+      name: "Nunu Abera",
+      region: "Addis Ababa",
+      job: "Evangelist",
+      inviter: "Ahimed Seid"
+    },
+    "mem-gudina2026-6": {
+      name: "Mhirat",
+      region: "Adama",
+      job: "Student",
+      inviter: ""
+    },
+    "mem-gudina2026-7": {
+      name: "Firehiwot Fikadu",
+      region: "Addis Ababa",
+      job: "Evangelist",
+      inviter: "Ahimed Seid"
+    },
+    "mem-gudina2026-8": {
+      name: "Atsede Addis",
+      region: "Addis Ababa",
+      job: "Evangelist",
+      inviter: "Abdissa Ketema"
+    },
+    "mem-gudina2026-9": {
+      name: "Shambel",
+      region: "Adama",
+      job: "Evangelist",
+      inviter: "Ahimed Seid"
+    },
+    "mem-gudina2026-10": {
+      name: "Atalu Zelega",
+      region: "Adama",
+      job: "Unemployed",
+      inviter: "Yewbdar Hailu"
+    },
+    "mem-gudina2026-11": {
+      name: "Ashenafi Maru",
+      region: "Adama",
+      job: "Student",
+      inviter: "Tigist Eliyas"
+    },
+    "mem-gudina2026-12": {
+      name: "Gabriel",
+      region: "Adama",
+      job: "Pastor",
+      inviter: "Yewbdar Hailu"
+    },
+    "mem-gudina2026-13": {
+      name: "Mesfin",
+      region: "Adama",
+      job: "Church Volunteer",
+      inviter: ""
+    },
+    "mem-gudina2026-14": {
+      name: "Abdissa Ketema",
+      region: "Addis Ababa",
+      job: "Former Evangelist, now ELC Staff",
+      inviter: "Ahimed Seid"
+    },
+
+    "pdf-mem-1": {
+      name: "Nathinael",
+      region: "Addis Ababa",
+      job: "Anesthesiologist",
+      inviter: "Czech ELC"
+    },
+    "pdf-mem-2": {
+      name: "Eden Megersa",
+      region: "Addis Ababa",
+      job: "Accountant",
+      inviter: "Fikru Tesfaye"
+    },
+    "pdf-mem-3": {
+      name: "Fikru Tesfaye",
+      region: "Addis Ababa",
+      job: "Former OB/GYN, now ELC Staff",
+      inviter: "Nathinael"
+    },
+    "pdf-mem-4": {
+      name: "Biniam Alemu",
+      region: "Adama",
+      job: "Pharmacist",
+      inviter: "Fikru Tesfaye"
+    },
+    "pdf-mem-5": {
+      name: "Ruth Genetu",
+      region: "Addis Ababa",
+      job: "Private Business Owner",
+      inviter: "Bekalwa Tadesse (Getachew's wife)"
+    },
+    "pdf-mem-6": {
+      name: "Yemarshet Elfiyos",
+      region: "Addis Ababa",
+      job: "Private Business Owner",
+      inviter: "Bekalwa Tadesse"
+    },
+    "pdf-mem-7": {
+      name: "Bekalwa Tadesse (Getachew's wife)",
+      region: "Addis Ababa",
+      job: "Private Business Owner",
+      inviter: "Brother Jaeyong Kim"
+    },
+    "pdf-mem-8": {
+      name: "Ephrem Gezahegn",
+      region: "Addis Ababa",
+      job: "Taxi Driver",
+      inviter: "Kanghyun Lee & Junghoon Lee"
+    },
+    "pdf-mem-9": {
+      name: "Gemechu Endale",
+      region: "Addis Ababa",
+      job: "Unemployed",
+      inviter: "Facebook Ad"
+    },
+    "pdf-mem-10": {
+      name: "Samrawit Megersa",
+      region: "Addis Ababa",
+      job: "University Student (Civil Engineering)",
+      inviter: "Eden Megersa"
+    },
+    "pdf-mem-11": {
+      name: "Ahimed Seid",
+      region: "Adama",
+      job: "Former Prophet, now ELC Staff",
+      inviter: "Biniam Alemu"
+    },
+    "pdf-mem-12": {
+      name: "Mekdes Adunga",
+      region: "Addis Ababa",
+      job: "Nurse",
+      inviter: "Fikru Tesfaye"
+    },
+    "pdf-mem-13": {
+      name: "Masresha Lamrot",
+      region: "Adama",
+      job: "Church Singer",
+      inviter: "Biniam Alemu"
+    },
+    "pdf-mem-14": {
+      name: "Yosef Solomon",
+      region: "Adama",
+      job: "Church Singer",
+      inviter: "Biniam Alemu"
+    },
+    "pdf-mem-15": {
+      name: "Yewbdar Hailu",
+      region: "Adama",
+      job: "Teacher / Leader at a Welfare Organization",
+      inviter: "Ahimed Seid"
+    },
+    "pdf-mem-16": {
+      name: "Elsa Damtew",
+      region: "Addis Ababa",
+      job: "Homemaker",
+      inviter: "Psawilos Tadese"
+    },
+    "pdf-mem-17": {
+      name: "Psawilos Tadese",
+      region: "Addis Ababa",
+      job: "Former Government Employee, now Engineer",
+      inviter: "Ahimed Seid"
+    },
+    "pdf-mem-18": {
+      name: "Mebrat Alemu",
+      region: "Adama",
+      job: "Church Volunteer",
+      inviter: "Ahimed Seid"
+    },
+    "pdf-mem-19": {
+      name: "Aregash Abera",
+      region: "Adama",
+      job: "Day Laborer",
+      inviter: "Ahimed Seid"
+    },
+    "pdf-mem-20": {
+      name: "Betelhem Abayneh",
+      region: "Adama",
+      job: "Day Laborer",
+      inviter: "Ahimed Seid"
+    },
+    "pdf-mem-21": {
+      name: "Rae Shifera",
+      region: "Adama",
+      job: "Student",
+      inviter: "Ahimed Seid"
+    },
+    "pdf-mem-22": {
+      name: "Nigist Daniel",
+      region: "Adama",
+      job: "Student",
+      inviter: "Yosef Solomon"
+    },
+    "pdf-mem-23": {
+      name: "Habtamu Mokonin",
+      region: "Adama",
+      job: "Singer",
+      inviter: "Yosef Solomon"
+    },
+    "pdf-mem-24": {
+      name: "Etsub Hailu",
+      region: "Adama",
+      job: "Day Laborer",
+      inviter: "Yosef Solomon"
+    },
+    "pdf-mem-25": {
+      name: "Tigist Eliyas",
+      region: "Adama",
+      job: "Day Laborer",
+      inviter: "Ahimed Seid"
+    },
+
+    "pdf-mem-40": {
+      name: "Markos Buta",
+      region: "Hawassa",
+      job: "Bishop / Pastor",
+      inviter: "Ahimed Seid"
+    },
+    "pdf-mem-41": {
+      name: "Wasihun Tamirat",
+      region: "Hawassa",
+      job: "Lawyer",
+      inviter: "Markos Buta"
+    },
+    "pdf-mem-42": {
+      name: "Yakob Buta",
+      region: "Hawassa",
+      job: "Pastor",
+      inviter: "Markos Buta"
+    },
+    "pdf-mem-43": {
+      name: "Arfasa Beyene",
+      region: "Hawassa",
+      job: "Pastor",
+      inviter: "Markos Buta"
+    },
+    "pdf-mem-44": {
+      name: "Aynalem",
+      region: "Addis Ababa",
+      job: "Church Worker",
+      inviter: "Abdissa Ketema"
+    },
+    "pdf-mem-45": {
+      name: "Geletu Ganta",
+      region: "Addis Ababa",
+      job: "Pastor",
+      inviter: "Atsede Addis"
+    },
+    "pdf-mem-46": {
+      name: "Tilahun Woldemadhin",
+      region: "Addis Ababa",
+      job: "Pastor",
+      inviter: "Abdissa Ketema"
+    },
+    "pdf-mem-47": {
+      name: "Akawak Tufa",
+      region: "Adama",
+      job: "Singer",
+      inviter: "Abdissa Ketema"
+    },
+    "pdf-mem-48": {
+      name: "Dave Daimo",
+      region: "Addis Ababa",
+      job: "Pastor",
+      inviter: "Atsede Addis"
+    },
+    "pdf-mem-49": {
+      name: "Woyinishet Wondimu",
+      region: "Addis Ababa",
+      job: "Former Laboratory Technician, now Unemployed",
+      inviter: "Nunu Abera"
+    },
+    "pdf-mem-50": {
+      name: "Abel Alemayehu",
+      region: "Addis Ababa",
+      job: "Church Worker",
+      inviter: "Abdissa Ketema"
+    },
+    "pdf-mem-51": {
+      name: "Abenezer Agasa",
+      region: "Addis Ababa",
+      job: "Unemployed",
+      inviter: "Nunu Abera"
+    },
+    "pdf-mem-52": {
+      name: "Asefa Ambe",
+      region: "Addis Ababa, China Camp",
+      job: "Security Guard",
+      inviter: "Abdissa Ketema"
+    },
+    "pdf-mem-53": {
+      name: "Abenezer Tadese",
+      region: "Addis Ababa",
+      job: "Former Elementary School English Teacher, now ELC Staff",
+      inviter: "Abdissa Ketema"
+    },
+    "pdf-mem-54": {
+      name: "Tefelagi Matiwos",
+      region: "Adama",
+      job: "Security Guard",
+      inviter: "Mesfin"
+    },
+    "pdf-mem-55": {
+      name: "Nahom Gule",
+      region: "Addis Ababa",
+      job: "Singer",
+      inviter: "Habtamu Mokonin"
+    },
+    "pdf-mem-56": {
+      name: "Anteneh Mulat",
+      region: "Sebeta",
+      job: "Church Volunteer",
+      inviter: "Abdissa Ketema"
+    },
+    "pdf-mem-57": {
+      name: "Zed Fantahun",
+      region: "Adama",
+      job: "Private Business Owner",
+      inviter: "Mesfin"
+    },
+    "pdf-mem-58": {
+      name: "Samuel Tamiru",
+      region: "Asasa",
+      job: "Student",
+      inviter: "Habtamu Mokonin"
+    },
+    "pdf-mem-59": {
+      name: "Kurse Teso",
+      region: "Arsi",
+      job: "",
+      inviter: "Ahimed Seid"
+    },
+    "pdf-mem-60": {
+      name: "Tewodros Tewolde",
+      region: "Adama",
+      job: "Dairy Worker / Church Volunteer",
+      inviter: "Yewbdar Hailu"
+    },
+    "pdf-mem-61": {
+      name: "Zeleke Zewde",
+      region: "Adama",
+      job: "Church Volunteer",
+      inviter: "Abdissa Ketema"
+    },
+    "pdf-mem-62": {
+      name: "Tefera Dare",
+      region: "Adama",
+      job: "Chemical Products Sales",
+      inviter: "Yewbdar Hailu"
+    },
+    "pdf-mem-63": {
+      name: "Tokuma",
+      region: "Adama",
+      job: "Church Minister",
+      inviter: "Ahimed Seid"
+    },
+    "pdf-mem-64": {
+      name: "Teshome Tiksa",
+      region: "Mojo",
+      job: "Church Volunteer",
+      inviter: "Shambel"
+    },
+    "pdf-mem-65": {
+      name: "Melese Turich",
+      region: "Addis Ababa (from Arba Minch)",
+      job: "Church Volunteer",
+      inviter: "Ahimed Seid"
+    },
+    "pdf-mem-66": {
+      name: "Admasu Alemayehu",
+      region: "Addis Ababa",
+      job: "Church Volunteer",
+      inviter: "Zeleke Zewde"
+    },
+    "pdf-mem-67": {
+      name: "Mikal Ermiyas",
+      region: "Adama",
+      job: "Unemployed",
+      inviter: "Nigist Daniel"
+    },
+    "pdf-mem-68": {
+      name: "Mengistu Chala",
+      region: "Addis Ababa",
+      job: "Church Worker",
+      inviter: "Kurse Teso"
+    },
+    "pdf-mem-69": {
+      name: "Jerusalem",
+      region: "Sebeta",
+      job: "Food Processing Worker",
+      inviter: "Anteneh"
+    },
+    "pdf-mem-70": {
+      name: "Zelalem Worku",
+      region: "Sebeta",
+      job: "",
+      inviter: "Anteneh"
+    },
+    "pdf-mem-71": {
+      name: "Abebe Tafese",
+      region: "Bishoftu",
+      job: "Private Business Owner (Electronics Sales)",
+      inviter: "Tewodros Tewolde"
+    },
+    "pdf-mem-72": {
+      name: "Ahimed Kedir",
+      region: "Adama",
+      job: "Church Volunteer",
+      inviter: "Tokuma"
+    },
+    "pdf-mem-73": {
+      name: "Samuel Sisay",
+      region: "Addis Ababa",
+      job: "Church Volunteer / Construction Worker",
+      inviter: "Ahimed Seid"
+    },
+    "pdf-mem-74": {
+      name: "Zinabu Fikadu",
+      region: "Bishoftu",
+      job: "Former Church Volunteer, now Poultry Farmer",
+      inviter: "Tewodros Tewolde"
+    },
+    "pdf-mem-75": {
+      name: "Hailu Deribe",
+      region: "Adama",
+      job: "",
+      inviter: "Ahimed Seid"
+    },
+    "pdf-mem-76": {
+      name: "Naol Mesfin",
+      region: "Adama",
+      job: "Singer",
+      inviter: "Nigist Daniel"
+    },
+    "pdf-mem-77": {
+      name: "Eliyas Adane",
+      region: "Addis Ababa",
+      job: "Bible School Student",
+      inviter: "Samuel Sisay"
+    },
+    "pdf-mem-78": {
+      name: "Rekik Zewde",
+      region: "Adama",
+      job: "Homemaker",
+      inviter: "Ahmed Kedir"
+    },
+    "pdf-mem-79": {
+      name: "Abebe Fikadu",
+      region: "Sebeta",
+      job: "",
+      inviter: "Zelalem Worku"
+    },
+    "pdf-mem-80": {
+      name: "Debora Mebratu",
+      region: "Adama",
+      job: "",
+      inviter: "Ahimed Kedir"
+    },
+    "pdf-mem-81": {
+      name: "Rhema Gezahange",
+      region: "Bishoftu",
+      job: "University Student (Computer Science)",
+      inviter: "Abebe Tafese"
+    },
+    "pdf-mem-82": {
+      name: "Beemnet Mohammed",
+      region: "Adama",
+      job: "Unemployed",
+      inviter: "Nigist Daniel"
+    },
+    "pdf-mem-83": {
+      name: "Tsega Serum",
+      region: "Bishoftu",
+      job: "Self-employed",
+      inviter: "Abebe Tafese"
+    },
+    "pdf-mem-84": {
+      name: "Haregeweyin Solomon",
+      region: "Adama",
+      job: "Evangelist",
+      inviter: "Yewbdar Hailu"
+    },
+    "pdf-mem-85": {
+      name: "Addishiwot Ambesa",
+      region: "Adama",
+      job: "Evangelist",
+      inviter: "Yewbdar Hailu"
+    },
+    "pdf-mem-86": {
+      name: "Chocolate Gezahange",
+      region: "Bishoftu",
+      job: "Student",
+      inviter: "Rhema Gezahange"
+    },
+    "pdf-mem-87": {
+      name: "Betelhem Dinku",
+      region: "Adama",
+      job: "Food & Beauty Specialist",
+      inviter: "Tewodros Tewolde"
+    },
+    "pdf-mem-88": {
+      name: "Tsihon Tesfaye",
+      region: "Adama",
+      job: "Student",
+      inviter: "Mikal Ermiyas"
+    },
+    "pdf-mem-89": {
+      name: "Teshalew Tafesse",
+      region: "Nekemte",
+      job: "Ethiopian Orthodox Priest / Legal Officer",
+      inviter: "Abebe Tafese"
+    },
+    "pdf-mem-90": {
+      name: "Betse'lotAbraham",
+      region: "Adama",
+      job: "Student",
+      inviter: "Rekik Zewde"
+    },
+    "pdf-mem-91": {
+      name: "Wude Degefa",
+      region: "Adama",
+      job: "Domestic Worker",
+      inviter: "Rekik Zewde"
+    },
+    "pdf-mem-92": {
+      name: "Biruk Tsagaye",
+      region: "Adama",
+      job: "Driver",
+      inviter: "Yewbdar Hailu"
+    },
+    "pdf-mem-93": {
+      name: "Tadesse Degaga",
+      region: "Alem Tena",
+      job: "Church Volunteer",
+      inviter: "Tewodros Tewolde"
+    },
+    "pdf-mem-94": {
+      name: "Ermiyas Mohammed",
+      region: "Adama",
+      job: "Driver",
+      inviter: "Beemnet Mohammed"
+    }
+  };
+
+  // 5. History Specific English Overlay Map (Indexed by history id)
+  const HISTORY_EN_MAP = {
+    "hist-202308": {
+      date: "August 2023",
+      location: "Czech ELC",
+      title: "The Beginning of Gospel Outreach to Ethiopia from the Czech Republic",
+      desc: ""
+    },
+
+    "hist-202404": {
+      date: "April 2024",
+      location: "Online (BIT Channel)",
+      title: "Online Seminar and the First Fruit of Salvation in Ethiopia",
+      desc: ""
+    },
+
+    "hist-202408": {
+      date: "August 2024",
+      location: "Online (BIT Channel)",
+      title: "First Online Seminar After Completing the Amharic Dubbing",
+      desc: ""
+    },
+
+    "hist-202410": {
+      date: "October 2024",
+      location: "Addis Ababa, Ethiopia",
+      title: "Visit by the West Africa Team",
+      desc: ""
+    },
+
+    "hist-202412": {
+      date: "December 29, 2024 – January 13, 2025",
+      location: "Mekanisa Yotek Compound, Nifas Silk Lafto, Addis Ababa",
+      title: "Visit to Ethiopia by Brother Kanghyun Lee and His Wife & Search for a Moim House",
+      desc: ""
+    },
+
+    "hist-202505": {
+      date: "May 2025",
+      location: "",
+      title: "Arrival of Brothers Kanghyun Lee and Junghoon Lee to Move into the Moim House and Prepare for In-Person Seminars",
+      desc: ""
+    },
+
+    "hist-20250528": {
+      date: "May 28 – June 1, 2025",
+      location: "Vibes Hotel, Addis Ababa",
+      title: "Ethiopia’s First In-Person Evangelical Seminar",
+      desc: ""
+    },
+
+    "hist-20250623": {
+      date: "June 23 – July 13, 2025",
+      location: "Moim House, Addis Ababa, Ethiopia",
+      title: "Departure of Brothers Kanghyun Lee and Junghoon Lee & Visit by Brother Jaewon Kim",
+      desc: ""
+    },
+
+    "hist-20250819": {
+      date: "August 19 – October 13, 2025",
+      location: "Moim House, Addis Ababa, Ethiopia",
+      title: "Brother Jaewon Kim and His Family Stay in Ethiopia After the Korea Retreat",
+      desc: ""
+    },
+
+    "hist-20250914": {
+      date: "September 14, 2025",
+      location: "Moim House, Addis Ababa",
+      title: "Ethiopia’s First Baptism",
+      desc: ""
+    },
+
+    "hist-20251103": {
+      date: "November 3, 2025",
+      location: "Bole International Airport / Addis Ababa, Ethiopia",
+      title: "Brother Junghoon Lee Re-enters Ethiopia & Preparations Begin for the December Seminar",
+      desc: ""
+    },
+
+    "hist-20251212": {
+      date: "December 12–14, 2025",
+      location: "Moim House, Addis Ababa, Ethiopia",
+      title: "First Evangelical Seminar at the Moim House — Kindling the Flame of the Gospel",
+      desc: ""
+    },
+
+    "hist-20251221": {
+      date: "December 21, 2025",
+      location: "Moim House, Addis Ababa",
+      title: "Baptism",
+      desc: ""
+    },
+
+    "hist-20260117": {
+      date: "January 17–19, 2026",
+      location: "Gudina Tumsa Retreat Center, Addis Ababa",
+      title: "Evangelical Seminar — The Flame of the Gospel Spreads Further",
+      desc: ""
+    },
+
+    "hist-1788440866029": {
+      date: "February 1, 2026",
+      location: "Moim House, Addis Ababa",
+      title: "Baptism",
+      desc: ""
+    },
+
+    "hist-20260206": {
+      date: "February 6–8, 2026",
+      location: "Gudina Tumsa Retreat Center, Addis Ababa",
+      title: "Evangelical Seminar at Gudina Tumsa Retreat Center",
+      desc: ""
+    },
+
+    "hist-20260226": {
+      date: "February 26 – March 2, 2026",
+      location: "Moim House, Addis Ababa",
+      title: "Evangelical Seminar at the Moim House (Invitation for Pastor Marcos and Church Board Members)",
+      desc: ""
+    },
+
+    "hist-1788349055531": {
+      date: "March 13–16, 2026",
+      location: "Moim House, Addis Ababa",
+      title: "Evangelical Seminar",
+      desc: ""
+    },
+
+    "hist-20260424": {
+      date: "April 24–27, 2026",
+      location: "Moim House, Addis Ababa",
+      title: "April Evangelical Seminar",
+      desc: ""
+    },
+
+    "hist-1788369048749": {
+      date: "May 15–18, 2026",
+      location: "Gudina Tumsa Retreat Center, Addis Ababa",
+      title: "Evangelical Seminar",
+      desc: ""
+    },
+
+    "hist-1788369145959": {
+      date: "June 5–8 / June 18–22, 2026",
+      location: "Gudina Tumsa Retreat Center, Addis Ababa",
+      title: "Evangelical Seminar",
+      desc: ""
+    },
+
+    "hist-1788369417375": {
+      date: "July 16–20, 2026",
+      location: "ODA NABEE Hotel, Bishoftu",
+      title: "Evangelical Seminar",
+      desc: ""
+    },
+
+    "hist-1788369801465": {
+      date: "August 16, 2026",
+      location: "Moim House, Addis Ababa",
+      title: "Baptism",
+      desc: ""
+    },
+
+    "hist-1788370209650": {
+      date: "August 20–24, 2026",
+      location: "ODA NABEE Hotel, Bishoftu",
+      title: "Evangelical Seminar",
+      desc: ""
+    }
+  };
+
   class I18nManager {
     constructor() {
       this.currentLang = localStorage.getItem("ethiopia_archive_lang") || "ko";
@@ -329,7 +1096,7 @@
         window.calendarComponent.render();
       }
       if (window.mapComponent && typeof window.mapComponent.render === "function") {
-        window.mapComponent.render();
+        window.mapComponent.render(window.db ? window.db.getMembers() : []);
       }
     }
 
@@ -343,6 +1110,57 @@
       return dict[key] || dictionary.ko[key] || key;
     }
 
+    getRegionTranslation(region) {
+      if (!region) return region;
+      const clean = String(region).trim();
+      return REGION_EN_MAP[clean] || this.translateContent(clean);
+    }
+
+    getTranslatedMember(member) {
+      if (!member) return member;
+      if (this.currentLang === "ko") return member;
+
+      const idKey = member.id || member.name;
+      const customEn = (idKey && MEMBER_EN_MAP[idKey]) ? MEMBER_EN_MAP[idKey] : {};
+
+      const translatedRegion = customEn.region || (member.region ? this.getRegionTranslation(member.region) : member.region);
+      const translatedJob = customEn.job || (member.job ? (occupationTranslations[member.job.trim()] || this.translateContent(member.job)) : member.job);
+      // member.inviter is a person/group name: keep raw original unless explicitly set in MEMBER_EN_MAP
+      const translatedInviter = customEn.inviter || (member.inviter ? this.translateContent(member.inviter) : member.inviter);
+      const translatedName = customEn.name || member.name;
+
+      return {
+        ...member,
+        name: translatedName,
+        region: translatedRegion,
+        job: translatedJob,
+        inviter: translatedInviter
+      };
+    }
+
+    getTranslatedHistory(historyItem) {
+      if (!historyItem) return historyItem;
+      if (this.currentLang === "ko") return historyItem;
+
+      const idKey = historyItem.id;
+      const customEn = (idKey && HISTORY_EN_MAP[idKey]) ? HISTORY_EN_MAP[idKey] : {};
+
+      const translatedTitle = customEn.title || this.translateContent(historyItem.title);
+      // Location: prefer customEn.location -> translateContent -> raw location
+      const translatedLocation = customEn.location || (historyItem.location ? this.translateContent(historyItem.location) : historyItem.location);
+      const translatedDesc = customEn.desc || historyItem.desc; // Fallback to raw desc
+      // Date: keep raw original date as-is (do NOT translate)
+      const translatedDate = customEn.date || historyItem.date;
+
+      return {
+        ...historyItem,
+        title: translatedTitle,
+        location: translatedLocation,
+        desc: translatedDesc,
+        date: translatedDate
+      };
+    }
+
     // Dynamic Live Translator Engine
     translateContent(text) {
       if (!text || typeof text !== "string") return text;
@@ -352,6 +1170,9 @@
       // Check direct occupation dictionary match first!
       if (occupationTranslations[trimmed]) {
         return occupationTranslations[trimmed];
+      }
+      if (REGION_EN_MAP[trimmed]) {
+        return REGION_EN_MAP[trimmed];
       }
 
       let translated = text;
@@ -373,6 +1194,23 @@
           }
         }
       });
+
+      // Update Region Dropdown Option Labels dynamically
+      const regionDropdown = document.getElementById("regionDropdown");
+      if (regionDropdown) {
+        const opts = regionDropdown.querySelectorAll("option");
+        opts.forEach(opt => {
+          const val = opt.value;
+          if (val === "all") {
+            opt.textContent = this.currentLang === "en" ? "All Regions ∨" : "모든 지역 ∨";
+          } else if (val === "기타") {
+            opt.textContent = this.currentLang === "en" ? "Other Regions" : "기타 지역";
+          } else {
+            const tr = REGION_EN_MAP[val] || val;
+            opt.textContent = (this.currentLang === "en" && tr) ? tr : val;
+          }
+        });
+      }
     }
 
     updateToggleButton() {

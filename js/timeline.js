@@ -671,14 +671,17 @@ class TimelineComponent {
     }
   }
 
-  renderCardInner(activeItem, activeIndex, totalCount, historyList) {
+  renderCardInner(rawActiveItem, activeIndex, totalCount, historyList) {
     const prevItem = activeIndex > 0 ? historyList[activeIndex - 1] : null;
     const nextItem = activeIndex < totalCount - 1 ? historyList[activeIndex + 1] : null;
 
-    const dateDisp = window.i18n ? window.i18n.translateContent(activeItem.date) : activeItem.date;
-    const locationDisp = window.i18n ? window.i18n.translateContent(activeItem.location) : activeItem.location;
-    const titleDisp = window.i18n ? window.i18n.translateContent(activeItem.title) : activeItem.title;
-    const descDisp = window.i18n ? window.i18n.translateContent(activeItem.desc) : activeItem.desc;
+    const activeItem = (window.i18n && typeof window.i18n.getTranslatedHistory === "function") ? window.i18n.getTranslatedHistory(rawActiveItem) : rawActiveItem;
+    const isEn = window.i18n && window.i18n.getLang() === "en";
+
+    const dateDisp = activeItem.date;
+    const locationDisp = activeItem.location;
+    const titleDisp = activeItem.title;
+    const descDisp = activeItem.desc;
 
     return `
       <div class="timeline-item-header" style="display:flex; align-items:center; justify-content:space-between; width:100%; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem;">
@@ -692,7 +695,7 @@ class TimelineComponent {
         <!-- Right Side: Edit & Delete Buttons -->
         <div class="timeline-action-buttons" style="margin-left:auto;">
           <button type="button" class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); window.timelineComponent.openEditModal('${activeItem.id}')" title="Edit">
-            <i class="fa-solid fa-pen-to-square"></i> ${window.i18n && window.i18n.getLang() === 'en' ? 'Edit' : '문구 및 사진 수정'}
+            <i class="fa-solid fa-pen-to-square"></i> ${isEn ? 'Edit' : '문구 및 사진 수정'}
           </button>
           <button type="button" class="btn btn-danger btn-sm icon-only" onclick="event.stopPropagation(); window.timelineComponent.deleteHistory('${activeItem.id}')" title="Delete">
             <i class="fa-solid fa-trash-can"></i>
@@ -714,18 +717,18 @@ class TimelineComponent {
         <div style="margin-top:2rem; position:relative;">
           <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.75rem; padding:0 0.2rem; flex-wrap:wrap; gap:0.5rem;">
             <span style="font-size:0.95rem; font-weight:800; color:var(--text-primary); display:flex; align-items:center; gap:0.4rem;">
-              <i class="fa-solid fa-images" style="color:#0284c7;"></i> ${window.i18n && window.i18n.getLang() === 'en' ? 'Field Activity Photos' : '현장 활동 사진'} <span style="background:rgba(2,132,199,0.1); color:#0284c7; padding:0.15rem 0.65rem; border-radius:12px; font-size:0.82rem; font-weight:800;">${activeItem.images.length}${window.i18n && window.i18n.getLang() === 'en' ? ' Photos' : '장'}</span>
+              <i class="fa-solid fa-images" style="color:#0284c7;"></i> ${isEn ? 'Field Activity Photos' : '현장 활동 사진'} <span style="background:rgba(2,132,199,0.1); color:#0284c7; padding:0.15rem 0.65rem; border-radius:12px; font-size:0.82rem; font-weight:800;">${activeItem.images.length}${isEn ? ' Photos' : '장'}</span>
             </span>
             ${activeItem.images.length > 2 ? `
               <div style="display:flex; align-items:center; gap:0.7rem;">
                 <span style="font-size:0.8rem; color:var(--text-muted); font-weight:600;">
-                  <i class="fa-solid fa-arrows-left-right" style="color:#0284c7; margin-right:3px;"></i> ${window.i18n && window.i18n.getLang() === 'en' ? 'Click arrows or drag left/right to view gallery' : '화살표 클릭 또는 좌우 드래그로 2줄 사진 감상'}
+                  <i class="fa-solid fa-arrows-left-right" style="color:#0284c7; margin-right:3px;"></i> ${isEn ? 'Click arrows or drag left/right to view gallery' : '화살표 클릭 또는 좌우 드래그로 2줄 사진 감상'}
                 </span>
                 <div style="display:flex; align-items:center; gap:0.4rem;">
-                  <button type="button" onclick="event.stopPropagation(); window.timelineComponent.scrollGalleryLeft('${activeItem.id}')" title="${window.i18n && window.i18n.getLang() === 'en' ? 'Previous Photo' : '이전 사진 보기'}" style="border-radius:50%; width:36px; height:36px; padding:0; display:inline-flex; align-items:center; justify-content:center; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-primary); cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.08); transition:all 0.2s;" onmouseover="this.style.background='#0284c7'; this.style.color='#fff';" onmouseout="this.style.background='var(--bg-card)'; this.style.color='var(--text-primary)';">
+                  <button type="button" onclick="event.stopPropagation(); window.timelineComponent.scrollGalleryLeft('${activeItem.id}')" title="${isEn ? 'Previous Photo' : '이전 사진 보기'}" style="border-radius:50%; width:36px; height:36px; padding:0; display:inline-flex; align-items:center; justify-content:center; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-primary); cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.08); transition:all 0.2s;" onmouseover="this.style.background='#0284c7'; this.style.color='#fff';" onmouseout="this.style.background='var(--bg-card)'; this.style.color='var(--text-primary)';">
                     <i class="fa-solid fa-chevron-left" style="font-size:0.9rem;"></i>
                   </button>
-                  <button type="button" onclick="event.stopPropagation(); window.timelineComponent.scrollGalleryRight('${activeItem.id}')" title="${window.i18n && window.i18n.getLang() === 'en' ? 'Next Photo' : '다음 사진 보기'}" style="border-radius:50%; width:36px; height:36px; padding:0; display:inline-flex; align-items:center; justify-content:center; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-primary); cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.08); transition:all 0.2s;" onmouseover="this.style.background='#0284c7'; this.style.color='#fff';" onmouseout="this.style.background='var(--bg-card)'; this.style.color='var(--text-primary)';">
+                  <button type="button" onclick="event.stopPropagation(); window.timelineComponent.scrollGalleryRight('${activeItem.id}')" title="${isEn ? 'Next Photo' : '다음 사진 보기'}" style="border-radius:50%; width:36px; height:36px; padding:0; display:inline-flex; align-items:center; justify-content:center; border:1px solid var(--border-color); background:var(--bg-card); color:var(--text-primary); cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.08); transition:all 0.2s;" onmouseover="this.style.background='#0284c7'; this.style.color='#fff';" onmouseout="this.style.background='var(--bg-card)'; this.style.color='var(--text-primary)';">
                     <i class="fa-solid fa-chevron-right" style="font-size:0.9rem;"></i>
                   </button>
                 </div>
@@ -738,7 +741,7 @@ class TimelineComponent {
               <div class="gallery-image-box" onclick="window.timelineComponent.openPhotoLightboxById('${activeItem.id}', ${imgIdx})" style="width:100% !important; height:100% !important; border-radius:16px !important; overflow:hidden !important; position:relative !important; cursor:pointer !important; background:#ffffff !important; border:1px solid var(--border-color) !important; box-shadow:0 4px 14px rgba(0,0,0,0.08) !important; scroll-snap-align:start !important;">
                 <img src="${img}" alt="${activeItem.title}" loading="lazy" style="width:100% !important; height:100% !important; object-fit:cover !important; object-position:center 20% !important; border-radius:16px !important; display:block !important; transition:transform 0.3s ease !important;" class="insta-hover-img" />
                 <div class="image-hover-overlay" style="position:absolute; bottom:8px; right:8px; background:rgba(15,23,42,0.85); color:#fff; padding:5px 12px; border-radius:14px; font-size:12px; font-weight:700; pointer-events:none; display:flex; align-items:center; gap:5px; box-shadow:0 3px 10px rgba(0,0,0,0.25);">
-                  <i class="fa-solid fa-magnifying-glass-plus" style="color:var(--accent-gold);"></i> <span>확대보기</span>
+                  <i class="fa-solid fa-magnifying-glass-plus" style="color:var(--accent-gold);"></i> <span>${isEn ? 'Enlarge' : '확대보기'}</span>
                 </div>
               </div>
             `).join('')}
@@ -753,8 +756,8 @@ class TimelineComponent {
           <div onclick="event.stopPropagation(); window.timelineComponent.setActive('${prevItem.id}')" style="cursor:pointer; display:flex; align-items:center; gap:0.6rem; color:var(--text-secondary); transition:all 0.2s;" class="hover-text-primary">
             <i class="fa-solid fa-arrow-left" style="color:#0284c7;"></i>
             <div>
-              <div style="font-size:0.78rem; color:var(--text-muted);">이전 사건 (${prevItem.date})</div>
-              <div style="font-size:0.92rem; font-weight:700; color:var(--text-primary);">${prevItem.title}</div>
+              <div style="font-size:0.78rem; color:var(--text-muted);">${isEn ? 'Previous Event' : '이전 사건'} (${prevItem.date})</div>
+              <div style="font-size:0.92rem; font-weight:700; color:var(--text-primary);">${(window.i18n && typeof window.i18n.getTranslatedHistory === 'function') ? window.i18n.getTranslatedHistory(prevItem).title : prevItem.title}</div>
             </div>
           </div>
         ` : '<div></div>'}
@@ -762,8 +765,8 @@ class TimelineComponent {
         ${nextItem ? `
           <div onclick="event.stopPropagation(); window.timelineComponent.setActive('${nextItem.id}')" style="cursor:pointer; display:flex; align-items:center; gap:0.6rem; text-align:right; color:var(--text-secondary); transition:all 0.2s; margin-left:auto;" class="hover-text-primary">
             <div>
-              <div style="font-size:0.78rem; color:var(--text-muted);">다음 사건 (${nextItem.date})</div>
-              <div style="font-size:0.92rem; font-weight:700; color:var(--text-primary);">${nextItem.title}</div>
+              <div style="font-size:0.78rem; color:var(--text-muted);">${isEn ? 'Next Event' : '다음 사건'} (${nextItem.date})</div>
+              <div style="font-size:0.92rem; font-weight:700; color:var(--text-primary);">${(window.i18n && typeof window.i18n.getTranslatedHistory === 'function') ? window.i18n.getTranslatedHistory(nextItem).title : nextItem.title}</div>
             </div>
             <i class="fa-solid fa-arrow-right" style="color:#0284c7;"></i>
           </div>
@@ -806,6 +809,8 @@ class TimelineComponent {
     // Ensure ample spacing per node (minimum 140px per node) to completely prevent date overlap
     const trackMinWidth = Math.max(1200, totalCount * 140);
 
+    const isEn = window.i18n && window.i18n.getLang() === "en";
+
     let html = `
       <!-- ULTRA WIDE CONTAINER -->
       <div class="hz-sketch-timeline-container" style="max-width:1200px; width:98%; margin:0 auto; padding: 0.5rem 0;">
@@ -813,11 +818,11 @@ class TimelineComponent {
         <!-- Year Filter Selector Pill Bar (연도별 구분 선택 탭바) -->
         <div class="timeline-year-filter-bar" style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap; margin-bottom:1.5rem; padding:0.85rem 1.25rem; background:#ffffff; border:1px solid var(--border-color); border-radius:14px; box-shadow:var(--shadow-sm);">
           <span style="font-size:0.92rem; font-weight:800; color:var(--text-primary); display:flex; align-items:center; gap:6px; margin-right:0.4rem;">
-            <i class="fa-solid fa-calendar-days" style="color:#0284c7;"></i> 연도별 구분:
+            <i class="fa-solid fa-calendar-days" style="color:#0284c7;"></i> ${isEn ? 'Filter by Year:' : '연도별 구분:'}
           </span>
 
           <button type="button" class="btn-year-pill ${!this.activeYear ? 'active' : ''}" onclick="event.stopPropagation(); window.timelineComponent.filterByYear(null)" style="padding:0.45rem 1.05rem; font-size:0.88rem; font-weight:800; border-radius:20px; border:1.5px solid ${!this.activeYear ? '#0284c7' : '#cbd5e1'}; background:${!this.activeYear ? '#0284c7' : '#ffffff'}; color:${!this.activeYear ? '#ffffff' : '#334155'}; cursor:pointer; transition:all 0.18s ease; box-shadow:${!this.activeYear ? '0 3px 10px rgba(2, 132, 199, 0.3)' : 'none'};">
-            📍 전체 연도 (${allHistoryList.length}건)
+            📍 ${isEn ? `All Years (${allHistoryList.length})` : `전체 연도 (${allHistoryList.length}건)`}
           </button>
 
           ${allYears.map(year => {
@@ -825,17 +830,17 @@ class TimelineComponent {
             const isActive = this.activeYear === year;
             return `
               <button type="button" class="btn-year-pill ${isActive ? 'active' : ''}" onclick="event.stopPropagation(); window.timelineComponent.filterByYear('${year}')" style="padding:0.45rem 1.05rem; font-size:0.88rem; font-weight:800; border-radius:20px; border:1.5px solid ${isActive ? '#0284c7' : '#cbd5e1'}; background:${isActive ? '#0284c7' : '#ffffff'}; color:${isActive ? '#ffffff' : '#334155'}; cursor:pointer; transition:all 0.18s ease; box-shadow:${isActive ? '0 3px 10px rgba(2, 132, 199, 0.3)' : 'none'};">
-                🗓️ ${year}년 (${count}건)
+                🗓️ ${isEn ? `${year} (${count})` : `${year}년 (${count}건)`}
               </button>
             `;
           }).join('')}
 
           <div style="margin-left:auto; display:flex; align-items:center; gap:0.6rem;">
-            <button type="button" onclick="event.stopPropagation(); window.db.exportDatabaseToJson()" style="padding:0.45rem 0.95rem; font-size:0.84rem; font-weight:800; border-radius:20px; border:1.5px solid #10b981; background:#ecfdf5; color:#047857; cursor:pointer; display:flex; align-items:center; gap:0.4rem; box-shadow:0 2px 6px rgba(16,185,129,0.15);" title="현재 작성된 모든 데이터와 사진을 내 컴퓨터에 안전하게 파일로 저장합니다.">
-              <i class="fa-solid fa-download"></i> 💾 백업 다운로드 (.json)
+            <button type="button" onclick="event.stopPropagation(); window.db.exportDatabaseToJson()" style="padding:0.45rem 0.95rem; font-size:0.84rem; font-weight:800; border-radius:20px; border:1.5px solid #10b981; background:#ecfdf5; color:#047857; cursor:pointer; display:flex; align-items:center; gap:0.4rem; box-shadow:0 2px 6px rgba(16,185,129,0.15);" title="Export backup">
+              <i class="fa-solid fa-download"></i> 💾 ${isEn ? 'Export Backup (.json)' : '백업 다운로드 (.json)'}
             </button>
-            <button type="button" onclick="event.stopPropagation(); window.db.triggerImportDatabase()" style="padding:0.45rem 0.95rem; font-size:0.84rem; font-weight:800; border-radius:20px; border:1.5px solid #0284c7; background:#f0f9ff; color:#0369a1; cursor:pointer; display:flex; align-items:center; gap:0.4rem; box-shadow:0 2px 6px rgba(2,132,199,0.15);" title="이전에 저장해둔 백업 파일을 선택하여 데이터를 즉시 복원합니다.">
-              <i class="fa-solid fa-upload"></i> 📂 백업 파일 복원
+            <button type="button" onclick="event.stopPropagation(); window.db.triggerImportDatabase()" style="padding:0.45rem 0.95rem; font-size:0.84rem; font-weight:800; border-radius:20px; border:1.5px solid #0284c7; background:#f0f9ff; color:#0369a1; cursor:pointer; display:flex; align-items:center; gap:0.4rem; box-shadow:0 2px 6px rgba(2,132,199,0.15);" title="Restore backup">
+              <i class="fa-solid fa-upload"></i> 📂 ${isEn ? 'Restore Backup (.json)' : '백업 파일 복원'}
             </button>
           </div>
         </div>
@@ -980,14 +985,9 @@ class TimelineComponent {
     if (!activeItem || !activeItem.title) return '';
 
     // Must be related to an assembly/gospel event ('집회' or '전도' or '모임') and not a non-assembly visit/entry
-    const title = activeItem.title;
-    const isAssemblyEvent = (title.includes("집회") || title.includes("전도") || title.includes("모임")) && !title.includes("입국") && !title.includes("방문");
-    if (!isAssemblyEvent) {
-      return '';
-    }
-
     const savedMembers = this.getSavedMembersForHistory(activeItem);
     const count = savedMembers.length;
+    const isEn = window.i18n && window.i18n.getLang() === "en";
 
     // Do not show button if count is 0
     if (count === 0) {
@@ -998,7 +998,7 @@ class TimelineComponent {
       <div class="assembly-testimony-btn-wrapper" style="margin: 1.2rem 0;">
         <button type="button" class="btn btn-primary" onclick="event.stopPropagation(); window.timelineComponent.openAssemblyMembersModal('${activeItem.id}')" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #ffffff; padding: 0.75rem 1.4rem; border-radius: 14px; font-size: 0.98rem; font-weight: 800; border: none; box-shadow: 0 4px 15px rgba(2, 132, 199, 0.35); cursor: pointer; display: inline-flex; align-items: center; gap: 0.6rem; transition: transform 0.2s, box-shadow 0.2s;">
           <i class="fa-solid fa-users-rectangle" style="font-size: 1.2rem; color: #fbbf24;"></i>
-          <span>🍇 이 집회를 통해 구원받은 식구 간증 보러가기 (${count}명)</span>
+          <span>🍇 ${isEn ? `Members Saved Through This Seminar (${count})` : `이 집회를 통해 구원받은 식구 간증 보러가기 (${count}명)`}</span>
         </button>
       </div>
     `;
@@ -1006,10 +1006,13 @@ class TimelineComponent {
 
   openAssemblyMembersModal(historyId) {
     const historyList = this.getFilteredAndSortedHistory();
-    const item = historyList.find(h => h && String(h.id) === String(historyId));
-    if (!item) return;
+    const rawItem = historyList.find(h => h && String(h.id) === String(historyId));
+    if (!rawItem) return;
 
-    const savedMembers = this.getSavedMembersForHistory(item);
+    const item = (window.i18n && typeof window.i18n.getTranslatedHistory === "function") ? window.i18n.getTranslatedHistory(rawItem) : rawItem;
+    const isEn = window.i18n && window.i18n.getLang() === "en";
+
+    const savedMembers = this.getSavedMembersForHistory(rawItem);
     const modal = document.getElementById("assemblyMembersModal");
     const body = document.getElementById("assemblyMembersModalBody");
     if (!modal || !body) return;
@@ -1019,17 +1022,18 @@ class TimelineComponent {
         <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom:0.4rem; flex-wrap:wrap;">
           <i class="fa-solid fa-users-rectangle" style="font-size:1.8rem; color:#0284c7;"></i>
           <h2 style="font-size:1.45rem; font-weight:800; margin:0; color:var(--text-primary);">
-            🍇 ${item.date} ${item.title} 구원받은 식구 (${savedMembers.length}명)
+            🍇 ${item.date} ${item.title} ${isEn ? `Saved Members (${savedMembers.length})` : `구원받은 식구 (${savedMembers.length}명)`}
           </h2>
         </div>
         <p style="margin:0.2rem 0 0 0; font-size:0.95rem; color:var(--text-secondary);">
-          이 집회를 통해 은혜롭게 복음을 깨닫고 구원받은 식구한 구원받은 식구들의 프로필과 간증입니다.
+          ${isEn ? 'Profiles and testimonies of saved members who received the Gospel through this seminar.' : '이 집회를 통해 은혜롭게 복음을 깨닫고 구원받은 식구들의 프로필과 간증입니다.'}
         </p>
       </div>
 
       ${savedMembers.length > 0 ? `
         <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:1.2rem;">
-          ${savedMembers.map(m => {
+          ${savedMembers.map(rawM => {
+            const m = (window.i18n && typeof window.i18n.getTranslatedMember === "function") ? window.i18n.getTranslatedMember(rawM) : rawM;
             const photoUrl = m.photo || 'images/members/mem_shambel.png';
             const testimonyUrl = (m.testimony || m.youtube || "").trim();
             const ageDisplay = (window.directoryComponent && typeof window.directoryComponent.getCalculatedAge === 'function') ? window.directoryComponent.getCalculatedAge(m) : (m.age || '');
@@ -1044,27 +1048,27 @@ class TimelineComponent {
                     <div style="overflow:hidden;">
                       <h4 style="font-size:1.15rem; font-weight:800; margin:0 0 0.2rem 0; color:var(--text-primary); text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${m.name}</h4>
                       <div style="font-size:0.85rem; color:var(--text-secondary); display:flex; gap:0.4rem; flex-wrap:wrap;">
-                        <span>📍 ${m.region || '에티오피아'}</span>
+                        <span>📍 ${m.region || (isEn ? 'Ethiopia' : '에티오피아')}</span>
                         <span>• ${ageDisplay}</span>
                       </div>
-                      <div style="font-size:0.82rem; color:var(--text-muted); margin-top:0.15rem;">💼 ${m.job || '직업 미기재'}</div>
+                      <div style="font-size:0.82rem; color:var(--text-muted); margin-top:0.15rem;">💼 ${m.job || (isEn ? 'No occupation listed' : '직업 미기재')}</div>
                     </div>
                   </div>
 
                   <div style="font-size:0.85rem; background:rgba(2,132,199,0.06); padding:0.6rem 0.8rem; border-radius:10px; margin-bottom:0.8rem; border:1px solid rgba(2,132,199,0.12);">
-                    <div style="color:var(--text-muted); font-size:0.78rem;">초대자 정보:</div>
+                    <div style="color:var(--text-muted); font-size:0.78rem;">${isEn ? 'Inviter Info:' : '초대자 정보:'}</div>
                     <div style="font-weight:700; color:var(--text-primary);">
-                      ${m.inviter ? `<span data-action="open-inviter-network" data-id="${m.inviter}" style="cursor:pointer; color:#0284c7; text-decoration:underline;">${m.inviter}</span>` : '자발적 참석'} ${m.inviterRelation ? `(${m.inviterRelation})` : ''}
+                      ${m.inviter ? `<span data-action="open-inviter-network" data-id="${m.inviter}" style="cursor:pointer; color:#0284c7; text-decoration:underline;">${m.inviter}</span>` : (isEn ? 'Self-attended' : '자발적 참석')} ${m.inviterRelation ? `(${m.inviterRelation})` : ''}
                     </div>
                   </div>
                 </div>
 
                 ${testimonyUrl ? `
                   <button type="button" class="btn btn-primary btn-sm" onclick="event.stopPropagation(); if (window.directoryComponent) { window.directoryComponent.openVideoModal('${testimonyUrl}', '${m.name}'); } else { window.open('${testimonyUrl}', '_blank'); }" style="width:100%; background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color:#fff; border-radius:12px; font-weight:800; padding:0.6rem; font-size:0.9rem; cursor:pointer;">
-                    <i class="fa-solid fa-circle-play" style="color:#fbbf24; margin-right:6px; font-size:1.05rem;"></i> 구원 간증 보기
+                    <i class="fa-solid fa-circle-play" style="color:#fbbf24; margin-right:6px; font-size:1.05rem;"></i> ${isEn ? 'Watch Testimony' : '구원 간증 보기'}
                   </button>
                 ` : `
-                  <div style="text-align:center; font-size:0.82rem; color:var(--text-muted); padding:0.4rem;">간증 링크 준비 중</div>
+                  <div style="text-align:center; font-size:0.82rem; color:var(--text-muted); padding:0.4rem;">${isEn ? 'No testimony link registered yet' : '간증 링크 준비 중'}</div>
                 `}
               </div>
             `;
@@ -1073,7 +1077,7 @@ class TimelineComponent {
       ` : `
         <div style="text-align:center; padding:3rem 1rem; color:var(--text-muted);">
           <i class="fa-solid fa-users-slash" style="font-size:2.5rem; margin-bottom:0.8rem; color:#cbd5e1;"></i>
-          <p style="font-size:1rem; margin:0;">해당 집회에 등록된 구원받은 식구 프로필이 준비 중입니다.</p>
+          <p style="font-size:1rem; margin:0;">${isEn ? 'Saved member profiles for this seminar are coming soon.' : '해당 집회에 등록된 구원받은 식구 프로필이 준비 중입니다.'}</p>
         </div>
       `}
     `;
