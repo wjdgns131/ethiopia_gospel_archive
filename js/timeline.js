@@ -17,10 +17,21 @@ class TimelineComponent {
 
   getImageSrc(src) {
     if (!src) return '';
+    // Priority A: In-memory Blob ObjectURL during current session
     if (this.inMemoryBlobMap && this.inMemoryBlobMap[src]) {
       return this.inMemoryBlobMap[src];
     }
+    // Priority B/C: Return relative path (onerror fallback handles Raw GitHub URL if Pages is 404)
     return src;
+  }
+
+  getRawGitHubFallbackUrl(src) {
+    if (!src) return '';
+    if (src.startsWith('http://') || src.startsWith('https://') || src.startsWith('blob:') || src.startsWith('data:')) {
+      return src;
+    }
+    const cleanPath = src.replace(/^\/+/, '');
+    return `https://raw.githubusercontent.com/wjdgns131/ethiopia_gospel_archive/main/${cleanPath}`;
   }
 
   migrateLegacyStorageIfNeeded() {
@@ -608,6 +619,7 @@ class TimelineComponent {
 
     const resolvedImages = (images || []).map(img => this.getImageSrc(img));
     this.lightboxImages = resolvedImages;
+    this.rawLightboxImages = (images || []);
     this.lightboxIndex = initialIndex;
     this.updateLightboxState();
 
@@ -621,7 +633,20 @@ class TimelineComponent {
     const prevBtn = document.getElementById("lightboxPrevBtn");
     const nextBtn = document.getElementById("lightboxNextBtn");
 
-    if (imgEl) imgEl.src = this.lightboxImages[this.lightboxIndex];
+    if (imgEl) {
+      const src = this.lightboxImages[this.lightboxIndex];
+      const rawSrc = this.rawLightboxImages ? this.rawLightboxImages[this.lightboxIndex] : src;
+      const fallbackSrc = this.getRawGitHubFallbackUrl(rawSrc);
+
+      imgEl.removeAttribute('data-fallback');
+      imgEl.onerror = function() {
+        if (!this.getAttribute('data-fallback')) {
+          this.setAttribute('data-fallback', 'true');
+          this.src = fallbackSrc;
+        }
+      };
+      imgEl.src = src;
+    }
     if (counterEl) counterEl.innerText = `📷 ${this.lightboxIndex + 1} / ${this.lightboxImages.length}`;
 
     if (this.lightboxImages.length <= 1) {
@@ -971,14 +996,20 @@ class TimelineComponent {
           </div>
 
           <div class="timeline-gallery-grid ${activeItem.images.length <= 2 ? 'single-col' : ''}" id="hzGalleryScroll_${activeItem.id}" onmousedown="window.timelineComponent.handleGalleryDragStart(event, this)" style="display:grid !important; grid-template-rows:${activeItem.images.length === 1 ? '380px' : 'repeat(2, 250px)'} !important; grid-auto-columns:${activeItem.images.length <= 2 ? '100%' : 'min(420px, 78vw)'} !important; grid-auto-flow:column !important; overflow-x:auto !important; overflow-y:hidden !important; gap:1.0rem !important; margin-top:0.5rem !important; padding:0.4rem 0.2rem 0.8rem 0.2rem !important; scroll-snap-type:x mandatory !important; scroll-behavior:smooth !important; -webkit-overflow-scrolling:touch !important; cursor:grab;">
-            ${activeItem.images.map((img, imgIdx) => `
-              <div class="gallery-image-box" onclick="window.timelineComponent.openPhotoLightboxById('${activeItem.id}', ${imgIdx})" style="width:100% !important; height:100% !important; border-radius:16px !important; overflow:hidden !important; position:relative !important; cursor:pointer !important; background:#ffffff !important; border:1px solid var(--border-color) !important; box-shadow:0 4px 14px rgba(0,0,0,0.08) !important; scroll-snap-align:start !important;">
-                <img src="${img}" alt="${activeItem.title}" loading="lazy" style="width:100% !important; height:100% !important; object-fit:cover !important; object-position:center 20% !important; border-radius:16px !important; display:block !important; transition:transform 0.3s ease !important;" class="insta-hover-img" />
-                <div class="image-hover-overlay" style="position:absolute; bottom:8px; right:8px; background:rgba(15,23,42,0.85); color:#fff; padding:5px 12px; border-radius:14px; font-size:12px; font-weight:700; pointer-events:none; display:flex; align-items:center; gap:5px; box-shadow:0 3px 10px rgba(0,0,0,0.25);">
-                  <i class="fa-solid fa-magnifying-glass-plus" style="color:var(--accent-gold);"></i> <span>${isEn ? 'Enlarge' : '확대보기'}</span>
+            ${activeItem.images.map((img, imgIdx) => {
+              const resolvedSrc = this.getImageSrc(img);
+              const fallbackSrc = this.getRawGitHubFallbackUrl(img);
+              return `
+                <div class="gallery-image-box" onclick="window.timelineComponent.openPhotoLightboxById('${activeItem.id}', ${imgIdx})" style="width:100% !important; height:100% !important; border-radius:16px !important; overflow:hidden !important; position:relative !important; cursor:pointer !important; background:#ffffff !important; border:1px solid var(--border-color) !important; box-shadow:0 4px 14px rgba(0,0,0,0.08) !important; scroll-snap-align:start !important;">
+                  <img src="${resolvedSrc}" alt="${activeItem.title}" loading="lazy"
+                       onerror="if(!this.getAttribute('data-fallback')){this.setAttribute('data-fallback','true');this.src='${fallbackSrc}';}"
+                       style="width:100% !important; height:100% !important; object-fit:cover !important; object-position:center 20% !important; border-radius:16px !important; display:block !important; transition:transform 0.3s ease !important;" class="insta-hover-img" />
+                  <div class="image-hover-overlay" style="position:absolute; bottom:8px; right:8px; background:rgba(15,23,42,0.85); color:#fff; padding:5px 12px; border-radius:14px; font-size:12px; font-weight:700; pointer-events:none; display:flex; align-items:center; gap:5px; box-shadow:0 3px 10px rgba(0,0,0,0.25);">
+                    <i class="fa-solid fa-magnifying-glass-plus" style="color:var(--accent-gold);"></i> <span>${isEn ? 'Enlarge' : '확대보기'}</span>
+                  </div>
                 </div>
-              </div>
-            `).join('')}
+              `;
+            }).join('')}
           </div>
         </div>
       ` : ''}
