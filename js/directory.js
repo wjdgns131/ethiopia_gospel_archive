@@ -210,7 +210,7 @@ class DirectoryComponent {
   filterMembers() {
     let members = window.db ? window.db.getMembers() : [];
     if (!members || members.length === 0) {
-      members = (typeof DEFAULT_MEMBERS !== 'undefined') ? DEFAULT_MEMBERS : [];
+      members = (typeof (window.DEFAULT_MEMBERS || []) !== 'undefined') ? (window.DEFAULT_MEMBERS || []) : [];
     }
 
     let filtered = members.filter(m => {
@@ -249,7 +249,7 @@ class DirectoryComponent {
 
     let filtered = this.filterMembers();
     if (!filtered || filtered.length === 0) {
-      filtered = (typeof DEFAULT_MEMBERS !== 'undefined') ? DEFAULT_MEMBERS : [];
+      filtered = (typeof (window.DEFAULT_MEMBERS || []) !== 'undefined') ? (window.DEFAULT_MEMBERS || []) : [];
     }
 
     this.container.className = "member-grid mockup-member-grid";

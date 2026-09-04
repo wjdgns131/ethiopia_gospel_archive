@@ -17,7 +17,7 @@ class TimelineComponent {
   filterByYear(year) {
     this.activeYear = year;
     let historyList = window.db ? window.db.getHistory() : [];
-    if (!historyList || historyList.length === 0) historyList = DEFAULT_HISTORY;
+    if (!historyList || historyList.length === 0) historyList = window.DEFAULT_HISTORY || [];
 
     const filteredList = this.activeYear 
       ? historyList.filter(item => item && item.date && item.date.includes(this.activeYear))
@@ -769,7 +769,7 @@ class TimelineComponent {
     }
 
     if (!historyList || !Array.isArray(historyList) || historyList.length === 0) {
-      historyList = DEFAULT_HISTORY;
+      historyList = window.DEFAULT_HISTORY || [];
     }
 
     historyList = historyList.filter(h => h && typeof h === 'object');

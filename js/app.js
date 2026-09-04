@@ -75,7 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const currentHistory = localStorage.getItem("ethiopia_history");
       if (!currentHistory || JSON.parse(currentHistory).length === 0) {
-        localStorage.setItem("ethiopia_history", JSON.stringify(DEFAULT_HISTORY));
+        localStorage.setItem("ethiopia_history", JSON.stringify(window.DEFAULT_HISTORY || []));
       }
     } catch(e) { console.error("DB force sync error:", e); }
   }

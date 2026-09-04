@@ -1,5 +1,5 @@
 // Ethiopia Gospel Mission Database (Optimized for GitHub Server Hosting v39000)
-const DEFAULT_MEMBERS = [
+var DEFAULT_MEMBERS = window.DEFAULT_MEMBERS = [
   {
     "id": "pdf-mem-1",
     "name": "Nathinael",
@@ -1614,7 +1614,7 @@ const DEFAULT_MEMBERS = [
   }
 ];
 
-const DEFAULT_HISTORY = [
+var DEFAULT_HISTORY = window.DEFAULT_HISTORY = [
   {
     "id": "hist-202308",
     "date": "2023년 8월",
@@ -1962,9 +1962,9 @@ const DEFAULT_HISTORY = [
   }
 ];
 
-const DEFAULT_ASSEMBLIES = [];
+var DEFAULT_ASSEMBLIES = window.DEFAULT_ASSEMBLIES = [];
 
-const DEFAULT_EVENTS = [
+var DEFAULT_EVENTS = window.DEFAULT_EVENTS = [
   { id: "evt-1", date: "2026-02-06", endDate: "2026-02-08", title: "구디나 툼사 수양관 전도집회", category: "seminar", location: "아디스아바바" },
   { id: "evt-2", date: "2026-03-13", endDate: "2026-03-16", title: "복음 전도집회", category: "seminar", location: "아디스아바바" },
   { id: "evt-3", date: "2026-04-24", endDate: "2026-04-27", title: "4월 복음 전도집회", category: "seminar", location: "아디스아바바" }
