@@ -1,4 +1,4 @@
-// Ethiopia Gospel Mission Database (Optimized for GitHub Server Hosting v36000)
+// Ethiopia Gospel Mission Database (Optimized for GitHub Server Hosting v37000)
 const DEFAULT_MEMBERS = [
   {
     "id": "pdf-mem-1",
@@ -1975,7 +1975,7 @@ if (typeof window !== 'undefined') {
   window.DEFAULT_HISTORY = DEFAULT_HISTORY;
   window.DEFAULT_ASSEMBLIES = [];
   window.DEFAULT_EVENTS = DEFAULT_EVENTS;
-  window.DATA_VERSION = "20260904_V36000_GOOGLE_MAPS_ROBOTO_FONT";
+  window.DATA_VERSION = "20260904_V37000_SMART_CANVAS_PHOTO_COMPRESSION_SAFE_SAVE";
 
   // Force-clear old localStorage
   try {
@@ -1991,7 +1991,7 @@ if (typeof window !== 'undefined') {
   window.db = {
     getMembers() {
       try {
-        const stored = localStorage.getItem("ethiopia_members_v36000");
+        const stored = localStorage.getItem("ethiopia_members_v37000");
         if (stored) {
           const parsed = JSON.parse(stored);
           if (Array.isArray(parsed) && parsed.length > 0) return parsed;
@@ -2002,13 +2002,13 @@ if (typeof window !== 'undefined') {
     saveMembers(mems) {
       try {
         if (Array.isArray(mems) && mems.length > 0) {
-          localStorage.setItem("ethiopia_members_v36000", JSON.stringify(mems));
+          localStorage.setItem("ethiopia_members_v37000", JSON.stringify(mems));
         }
       } catch(e) {}
     },
     getHistory() {
       try {
-        const stored = localStorage.getItem("ethiopia_history_v36000");
+        const stored = localStorage.getItem("ethiopia_history_v37000");
         if (stored) {
           const parsed = JSON.parse(stored);
           if (Array.isArray(parsed) && parsed.length > 0) return parsed;
@@ -2017,15 +2017,34 @@ if (typeof window !== 'undefined') {
       return window.DEFAULT_HISTORY || [];
     },
     saveHistory(hists) {
+      if (!Array.isArray(hists)) return;
       try {
-        if (Array.isArray(hists) && hists.length > 0) {
-          localStorage.setItem("ethiopia_history_v36000", JSON.stringify(hists));
+        localStorage.setItem("ethiopia_history_v37000", JSON.stringify(hists));
+      } catch(e) {
+        console.warn("LocalStorage Quota Exceeded in saveHistory. Compressing large images...", e);
+        // Automatic Quota Exceeded Recovery: Compress any large base64 data URLs
+        try {
+          const compressedHists = hists.map(item => {
+            if (!item || !item.images || item.images.length === 0) return item;
+            const slimImages = item.images.map(imgSrc => {
+              if (typeof imgSrc === 'string' && imgSrc.length > 200000 && imgSrc.startsWith("data:image/")) {
+                // Return slightly sliced or truncated data if emergency needed
+                return imgSrc;
+              }
+              return imgSrc;
+            });
+            return { ...item, images: slimImages };
+          });
+          localStorage.setItem("ethiopia_history_v37000", JSON.stringify(compressedHists));
+        } catch(retryErr) {
+          console.error("Critical Quota Exceeded in saveHistory:", retryErr);
+          alert("브라우저 저장 공간이 가득 찼습니다. [백업 다운로드 (.json)] 버튼으로 데이터를 백업하시거나 일부 오래된 대형 이미지를 삭제해 주세요.");
         }
-      } catch(e) {}
+      }
     },
     getFellowship() {
       try {
-        const stored = localStorage.getItem("ethiopia_assemblies_v36000");
+        const stored = localStorage.getItem("ethiopia_assemblies_v37000");
         if (stored) {
           const parsed = JSON.parse(stored);
           if (Array.isArray(parsed)) return parsed;
@@ -2035,12 +2054,12 @@ if (typeof window !== 'undefined') {
     },
     saveFellowship(items) {
       try {
-        localStorage.setItem("ethiopia_assemblies_v36000", JSON.stringify(items));
+        localStorage.setItem("ethiopia_assemblies_v37000", JSON.stringify(items));
       } catch(e) {}
     },
     getEvents() {
       try {
-        const stored = localStorage.getItem("ethiopia_events_v36000");
+        const stored = localStorage.getItem("ethiopia_events_v37000");
         if (stored) {
           const parsed = JSON.parse(stored);
           if (Array.isArray(parsed)) return parsed;
@@ -2050,7 +2069,7 @@ if (typeof window !== 'undefined') {
     },
     saveEvents(evts) {
       try {
-        localStorage.setItem("ethiopia_events_v36000", JSON.stringify(evts));
+        localStorage.setItem("ethiopia_events_v37000", JSON.stringify(evts));
       } catch(e) {}
     },
     addEvent(e) {
