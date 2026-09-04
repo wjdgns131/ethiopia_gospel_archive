@@ -75,6 +75,7 @@ class CalendarComponent {
     }
 
     const newEvt = {
+      id: "evt_" + Date.now() + "_" + Math.random().toString(36).substring(2, 7),
       date: startVal,
       endDate: endVal,
       title: titleVal,
@@ -83,7 +84,19 @@ class CalendarComponent {
       desc: descVal
     };
 
-    window.db.addEvent(newEvt);
+    if (window.db && typeof window.db.addEvent === 'function') {
+      window.db.addEvent(newEvt);
+    } else {
+      let events = [];
+      try {
+        const local = localStorage.getItem("ethiopia_events");
+        events = local ? JSON.parse(local) : (window.DEFAULT_EVENTS ? [...window.DEFAULT_EVENTS] : []);
+      } catch(e) { events = []; }
+      events.push(newEvt);
+      localStorage.setItem("ethiopia_events", JSON.stringify(events));
+      window.DEFAULT_EVENTS = events;
+    }
+
     document.getElementById("calendarEventModal").classList.add("hidden");
     if (window.showToast) window.showToast("✨ 일정이 성공적으로 등록되었습니다!");
     else alert("일정이 달력에 등록되었습니다!");
@@ -99,6 +112,7 @@ class CalendarComponent {
         let events = JSON.parse(localStorage.getItem("ethiopia_events") || "[]");
         events = events.filter(e => e.id !== id);
         localStorage.setItem("ethiopia_events", JSON.stringify(events));
+        window.DEFAULT_EVENTS = events;
       }
       this.render();
     }
@@ -126,7 +140,15 @@ class CalendarComponent {
     const currentMonthHolidays = ETHIOPIAN_HOLIDAYS.filter(h => h.month === (month + 1));
 
     // Custom Mission Events in current month (including multi-day date range matches!)
-    let allEvents = []; try { allEvents = (window.db && typeof window.db.getEvents === 'function') ? window.db.getEvents() : (window.DEFAULT_EVENTS || []); } catch(e) { console.error('getEvents error:', e); }
+    let allEvents = [];
+    try {
+      if (window.db && typeof window.db.getEvents === 'function') {
+        allEvents = window.db.getEvents();
+      } else {
+        const local = localStorage.getItem("ethiopia_events");
+        allEvents = local ? JSON.parse(local) : (window.DEFAULT_EVENTS || []);
+      }
+    } catch(e) { console.error('getEvents error:', e); }
     const currentMonthStr = `${year}-${String(month + 1).padStart(2, '0')}`;
     const currentMonthEvents = allEvents.filter(e => {
       const s = e.date;

@@ -466,7 +466,13 @@ class TimelineComponent {
     if (!modal) return;
 
     const titleEl = document.getElementById("historyEditModalTitle");
-    const historyList = window.db ? window.db.getHistory() : [];
+    let historyList = [];
+    if (window.db && typeof window.db.getHistory === 'function') {
+      historyList = window.db.getHistory();
+    } else {
+      const local = localStorage.getItem("ethiopia_history");
+      historyList = local ? JSON.parse(local) : (window.DEFAULT_HISTORY || []);
+    }
     const item = historyId ? historyList.find(h => h && h.id === historyId) : null;
 
     document.getElementById("historyId").value = item ? item.id : "";
@@ -503,16 +509,32 @@ class TimelineComponent {
     };
 
     try {
+      let currentList = [];
+      if (window.db && typeof window.db.getHistory === 'function') {
+        currentList = window.db.getHistory();
+      } else {
+        const local = localStorage.getItem("ethiopia_history");
+        currentList = local ? JSON.parse(local) : (window.DEFAULT_HISTORY || []);
+      }
+
       if (id) {
         historyData.id = id;
-        const currentList = window.db ? window.db.getHistory() : [];
         const updatedList = currentList.map(h => h && String(h.id) === String(id) ? { ...h, ...historyData } : h);
-        window.db.saveHistory(updatedList);
+        if (window.db && typeof window.db.saveHistory === 'function') {
+          window.db.saveHistory(updatedList);
+        } else {
+          localStorage.setItem("ethiopia_history", JSON.stringify(updatedList));
+          window.DEFAULT_HISTORY = updatedList;
+        }
         this.activeId = id;
       } else {
         historyData.id = "hist-" + Date.now();
-        if (window.db) {
+        if (window.db && typeof window.db.addHistory === 'function') {
           window.db.addHistory(historyData);
+        } else {
+          const updatedList = [historyData, ...currentList];
+          localStorage.setItem("ethiopia_history", JSON.stringify(updatedList));
+          window.DEFAULT_HISTORY = updatedList;
         }
         this.activeId = historyData.id;
       }
@@ -539,8 +561,20 @@ class TimelineComponent {
   deleteHistory(id) {
     if (window.checkAdminPermission && !window.checkAdminPermission()) return;
     if (confirm("정말로 이 역사 기록을 삭제하시겠습니까?")) {
-      const historyList = window.db.getHistory().filter(h => h && h.id !== id);
-      window.db.saveHistory(historyList);
+      let currentList = [];
+      if (window.db && typeof window.db.getHistory === 'function') {
+        currentList = window.db.getHistory();
+      } else {
+        const local = localStorage.getItem("ethiopia_history");
+        currentList = local ? JSON.parse(local) : (window.DEFAULT_HISTORY || []);
+      }
+      const historyList = currentList.filter(h => h && h.id !== id);
+      if (window.db && typeof window.db.saveHistory === 'function') {
+        window.db.saveHistory(historyList);
+      } else {
+        localStorage.setItem("ethiopia_history", JSON.stringify(historyList));
+        window.DEFAULT_HISTORY = historyList;
+      }
       this.render();
     }
   }
@@ -834,15 +868,6 @@ class TimelineComponent {
               </button>
             `;
           }).join('')}
-
-          <div style="margin-left:auto; display:flex; align-items:center; gap:0.6rem;">
-            <button type="button" onclick="event.stopPropagation(); window.db.exportDatabaseToJson()" style="padding:0.45rem 0.95rem; font-size:0.84rem; font-weight:800; border-radius:20px; border:1.5px solid #10b981; background:#ecfdf5; color:#047857; cursor:pointer; display:flex; align-items:center; gap:0.4rem; box-shadow:0 2px 6px rgba(16,185,129,0.15);" title="Export backup">
-              <i class="fa-solid fa-download"></i> 💾 ${isEn ? 'Export Backup (.json)' : '백업 다운로드 (.json)'}
-            </button>
-            <button type="button" onclick="event.stopPropagation(); window.db.triggerImportDatabase()" style="padding:0.45rem 0.95rem; font-size:0.84rem; font-weight:800; border-radius:20px; border:1.5px solid #0284c7; background:#f0f9ff; color:#0369a1; cursor:pointer; display:flex; align-items:center; gap:0.4rem; box-shadow:0 2px 6px rgba(2,132,199,0.15);" title="Restore backup">
-              <i class="fa-solid fa-upload"></i> 📂 ${isEn ? 'Restore Backup (.json)' : '백업 파일 복원'}
-            </button>
-          </div>
         </div>
         
         <!-- Track Container with Edge Gradient Fade -->
