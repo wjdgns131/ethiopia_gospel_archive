@@ -990,7 +990,7 @@ class TimelineComponent {
               const resolvedSrc = this.getImageSrc(img);
               return `
                 <div class="gallery-image-box" onclick="window.timelineComponent.openPhotoLightboxById('${activeItem.id}', ${imgIdx})" style="width:100% !important; height:100% !important; border-radius:16px !important; overflow:hidden !important; position:relative !important; cursor:pointer !important; background:#ffffff !important; border:1px solid var(--border-color) !important; box-shadow:0 4px 14px rgba(0,0,0,0.08) !important; scroll-snap-align:start !important;">
-                  <img src="${resolvedSrc}" alt="${activeItem.title}" loading="lazy"
+                  <img src="${resolvedSrc}" alt="${activeItem.title}"
                        style="width:100% !important; height:100% !important; object-fit:cover !important; object-position:center 20% !important; border-radius:16px !important; display:block !important; transition:transform 0.3s ease !important;" class="insta-hover-img" />
                   <div class="image-hover-overlay" style="position:absolute; bottom:8px; right:8px; background:rgba(15,23,42,0.85); color:#fff; padding:5px 12px; border-radius:14px; font-size:12px; font-weight:700; pointer-events:none; display:flex; align-items:center; gap:5px; box-shadow:0 3px 10px rgba(0,0,0,0.25);">
                     <i class="fa-solid fa-magnifying-glass-plus" style="color:var(--accent-gold);"></i> <span>${isEn ? 'Enlarge' : '확대보기'}</span>
