@@ -210,7 +210,7 @@ class DirectoryComponent {
   filterMembers() {
     let members = window.db ? window.db.getMembers() : [];
     if (!members || !Array.isArray(members) || members.length === 0) {
-      members = (window.DEFAULT_MEMBERS && window.DEFAULT_MEMBERS.length > 0) ? window.DEFAULT_MEMBERS : [];
+      members = (window.DEFAULT_MEMBERS && window.DEFAULT_MEMBERS.length > 0) ? window.DEFAULT_MEMBERS : (typeof DEFAULT_MEMBERS !== 'undefined' ? DEFAULT_MEMBERS : []);
     }
 
     let filtered = members.filter(m => {
@@ -221,7 +221,7 @@ class DirectoryComponent {
         return false;
       }
 
-      // Region Filter Guard
+      // Region Filter Guard: Skip filtering if activeRegion is null, 'all', 'undefined', 'null', or empty
       if (this.activeRegion) {
         const regStr = String(this.activeRegion).toLowerCase().trim();
         if (regStr && regStr !== "all" && regStr !== "undefined" && regStr !== "null" && !regStr.includes("전체") && !regStr.includes("all")) {

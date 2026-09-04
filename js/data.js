@@ -1,5 +1,5 @@
-// Ethiopia Gospel Mission Database (Optimized for GitHub Server Hosting v38000)
-var DEFAULT_MEMBERS = window.DEFAULT_MEMBERS = [
+// Ethiopia Gospel Mission Database (Optimized for GitHub Server Hosting v36000)
+const DEFAULT_MEMBERS = [
   {
     "id": "pdf-mem-1",
     "name": "Nathinael",
@@ -1614,7 +1614,7 @@ var DEFAULT_MEMBERS = window.DEFAULT_MEMBERS = [
   }
 ];
 
-var DEFAULT_HISTORY = window.DEFAULT_HISTORY = [
+const DEFAULT_HISTORY = [
   {
     "id": "hist-202308",
     "date": "2023년 8월",
@@ -1962,157 +1962,81 @@ var DEFAULT_HISTORY = window.DEFAULT_HISTORY = [
   }
 ];
 
-var DEFAULT_ASSEMBLIES = window.DEFAULT_ASSEMBLIES = [];
+const DEFAULT_ASSEMBLIES = [];
 
-var DEFAULT_EVENTS = window.DEFAULT_EVENTS = [
+const DEFAULT_EVENTS = [
   { id: "evt-1", date: "2026-02-06", endDate: "2026-02-08", title: "구디나 툼사 수양관 전도집회", category: "seminar", location: "아디스아바바" },
   { id: "evt-2", date: "2026-03-13", endDate: "2026-03-16", title: "복음 전도집회", category: "seminar", location: "아디스아바바" },
   { id: "evt-3", date: "2026-04-24", endDate: "2026-04-27", title: "4월 복음 전도집회", category: "seminar", location: "아디스아바바" }
 ];
 
 if (typeof window !== 'undefined') {
-  // PERMANENT STABLE STORAGE KEYS (Concrete Architecture v50000)
-  var HISTORY_KEY = window.HISTORY_KEY = "ethiopia_gospel_history_permanent_v1";
-  var MEMBERS_KEY = window.MEMBERS_KEY = "ethiopia_gospel_members_permanent_v1";
-  var EVENTS_KEY = window.EVENTS_KEY = "ethiopia_gospel_events_permanent_v1";
-  var ASSEMBLIES_KEY = window.ASSEMBLIES_KEY = "ethiopia_gospel_assemblies_permanent_v1";
-
-  function normalizeRegionId(rawRegion) {
-    if (!rawRegion) return "기타";
-    const str = String(rawRegion).toLowerCase().trim();
-    if (str.includes("아디스아바바") || str.includes("addis")) return "아디스아바바";
-    if (str.includes("비쇼프투") || str.includes("bishoftu")) return "비쇼프투";
-    if (str.includes("아다마") || str.includes("adama")) return "아다마";
-    if (str.includes("세베타") || str.includes("sebeta")) return "세베타";
-    if (str.includes("모조") || str.includes("mojo") || str.includes("modjo")) return "모조";
-    if (str.includes("네켐테") || str.includes("nekemte")) return "네켐테";
-    if (str.includes("하와사") || str.includes("hawassa") || str.includes("아와사") || str.includes("awassa")) return "하와사";
-    if (str.includes("아르바민치") || str.includes("아르바 민치") || str.includes("arba minch") || str.includes("arbaminch")) return "아르바민치";
-    if (str.includes("알렘테나") || str.includes("alem tena") || str.includes("alemtena")) return "알렘테나";
-    if (str.includes("아사사") || str.includes("asasa") || str.includes("아르시") || str.includes("arsi")) return "아사사";
-    if (str.includes("바히르다르") || str.includes("bahir")) return "바히르다르";
-    if (str.includes("디레다와") || str.includes("dire")) return "디레다와";
-    if (str.includes("곤다르") || str.includes("gondar")) return "곤다르";
-    if (str.includes("지마") || str.includes("jimma")) return "지마";
-    return "기타";
-  }
-  if (typeof window !== 'undefined') window.normalizeRegionId = normalizeRegionId;
-
-  function getMigratedStorageItem(primaryKey, fallbackKeys) {
-    try {
-      let data = localStorage.getItem(primaryKey);
-      if (data) return data;
-      if (Array.isArray(fallbackKeys)) {
-        for (const oldKey of fallbackKeys) {
-          data = localStorage.getItem(oldKey);
-          if (data) {
-            localStorage.setItem(primaryKey, data);
-            return data;
-          }
-        }
-      }
-    } catch(e) {
-      console.error("Storage migration error:", e);
-    }
-    return null;
-  }
   window.DEFAULT_MEMBERS = DEFAULT_MEMBERS;
   window.DEFAULT_HISTORY = DEFAULT_HISTORY;
-  window.DEFAULT_ASSEMBLIES = [];
+  window.DEFAULT_ASSEMBLIES = DEFAULT_ASSEMBLIES;
   window.DEFAULT_EVENTS = DEFAULT_EVENTS;
-  window.DATA_VERSION = "20260904_V38000_PERMANENT_STATIC_STORAGE_KEYS_NO_RESET_EVER";
+  window.DATA_VERSION = "20260904_V70000_STABLE_PRESERVED_V36000";
 
-  const MEMBERS_KEY = "ethiopia_members";
-  const HISTORY_KEY = "ethiopia_history";
-  const ASSEMBLIES_KEY = "ethiopia_assemblies";
-  const EVENTS_KEY = "ethiopia_events";
-
-  function getMigratedStorageItem(primaryKey, fallbackKeys) {
-    let val = localStorage.getItem(primaryKey);
-    if (val) return val;
-    for (let key of fallbackKeys) {
-      val = localStorage.getItem(key);
-      if (val) {
-        localStorage.setItem(primaryKey, val); // Migrate to new primary key
-        return val;
-      }
-    }
-    return null;
-  }
-
-  // Safe Version Check without Data Destruction
+  // Safe localStorage purge check if empty or stale
   try {
     const currentVer = localStorage.getItem("ethiopia_archive_data_ver");
     if (currentVer !== window.DATA_VERSION) {
+      localStorage.removeItem("ethiopia_members_v36000");
+      localStorage.removeItem("ethiopia_history_v36000");
       localStorage.setItem("ethiopia_archive_data_ver", window.DATA_VERSION);
     }
   } catch(e) {
-    console.error("Cache flush check error:", e);
+    console.error("Cache check error:", e);
   }
 
   window.db = {
     getMembers() {
       try {
-        let stored = localStorage.getItem("ethiopia_members");
-        if (!stored) stored = localStorage.getItem("ethiopia_members_v39000") || localStorage.getItem("ethiopia_gospel_members_permanent_v1");
+        let stored = localStorage.getItem("ethiopia_members_v36000") || localStorage.getItem("ethiopia_members");
         if (stored) {
-          try {
-            const parsed = JSON.parse(stored);
-            if (Array.isArray(parsed)) {
-              const valid = parsed.filter(m => m && typeof m === 'object' && m.name && m.id);
-              if (valid.length > 0) return valid;
-            }
-          } catch(e) {}
-          // Stale or empty storage in user browser detected! Purge it immediately!
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed)) {
+            const valid = parsed.filter(m => m && typeof m === 'object' && m.name && m.id);
+            if (valid.length > 0) return valid;
+          }
+          localStorage.removeItem("ethiopia_members_v36000");
           localStorage.removeItem("ethiopia_members");
-          localStorage.removeItem("ethiopia_gospel_members_permanent_v1");
         }
       } catch(e) {}
-      
-      return (typeof DEFAULT_MEMBERS !== 'undefined' && Array.isArray(DEFAULT_MEMBERS) && DEFAULT_MEMBERS.length > 0) 
-        ? DEFAULT_MEMBERS 
-        : (window.DEFAULT_MEMBERS || []);
+      return (window.DEFAULT_MEMBERS && Array.isArray(window.DEFAULT_MEMBERS) && window.DEFAULT_MEMBERS.length > 0) ? window.DEFAULT_MEMBERS : (typeof DEFAULT_MEMBERS !== 'undefined' ? DEFAULT_MEMBERS : []);
     },
     saveMembers(mems) {
       try {
         if (Array.isArray(mems) && mems.length > 0) {
-          localStorage.setItem("ethiopia_members", JSON.stringify(mems));
+          localStorage.setItem("ethiopia_members_v36000", JSON.stringify(mems));
         }
       } catch(e) {}
     },
     getHistory() {
       try {
-        let stored = localStorage.getItem("ethiopia_history");
-        if (!stored) stored = localStorage.getItem("ethiopia_history_v39000") || localStorage.getItem("ethiopia_gospel_history_permanent_v1");
+        let stored = localStorage.getItem("ethiopia_history_v36000") || localStorage.getItem("ethiopia_history");
         if (stored) {
-          try {
-            const parsed = JSON.parse(stored);
-            if (Array.isArray(parsed)) {
-              const valid = parsed.filter(h => h && typeof h === 'object' && h.title && h.id);
-              if (valid.length > 0) return valid;
-            }
-          } catch(e) {}
-          // Stale or empty storage in user browser detected! Purge it immediately!
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed)) {
+            const valid = parsed.filter(h => h && typeof h === 'object' && h.title && h.id);
+            if (valid.length > 0) return valid;
+          }
+          localStorage.removeItem("ethiopia_history_v36000");
           localStorage.removeItem("ethiopia_history");
-          localStorage.removeItem("ethiopia_gospel_history_permanent_v1");
         }
       } catch(e) {}
-
-      return (typeof DEFAULT_HISTORY !== 'undefined' && Array.isArray(DEFAULT_HISTORY) && DEFAULT_HISTORY.length > 0) 
-        ? DEFAULT_HISTORY 
-        : (window.DEFAULT_HISTORY || []);
+      return (window.DEFAULT_HISTORY && Array.isArray(window.DEFAULT_HISTORY) && window.DEFAULT_HISTORY.length > 0) ? window.DEFAULT_HISTORY : (typeof DEFAULT_HISTORY !== 'undefined' ? DEFAULT_HISTORY : []);
     },
     saveHistory(hists) {
-      if (!Array.isArray(hists)) return;
       try {
-        localStorage.setItem("ethiopia_history", JSON.stringify(hists));
-      } catch(e) {
-        console.warn("LocalStorage Quota in saveHistory:", e);
-      }
+        if (Array.isArray(hists) && hists.length > 0) {
+          localStorage.setItem("ethiopia_history_v36000", JSON.stringify(hists));
+        }
+      } catch(e) {}
     },
     getFellowship() {
       try {
-        const stored = getMigratedStorageItem(ASSEMBLIES_KEY, ["ethiopia_assemblies_v38000", "ethiopia_assemblies_v36000", "ethiopia_assemblies"]);
+        const stored = localStorage.getItem("ethiopia_assemblies_v36000");
         if (stored) {
           const parsed = JSON.parse(stored);
           if (Array.isArray(parsed)) return parsed;
@@ -2122,12 +2046,12 @@ if (typeof window !== 'undefined') {
     },
     saveFellowship(items) {
       try {
-        localStorage\.setItem(ASSEMBLIES_KEY, JSON.stringify(items));
+        localStorage.setItem("ethiopia_assemblies_v36000", JSON.stringify(items));
       } catch(e) {}
     },
     getEvents() {
       try {
-        const stored = getMigratedStorageItem(EVENTS_KEY, ["ethiopia_events_v38000", "ethiopia_events_v36000", "ethiopia_events"]);
+        const stored = localStorage.getItem("ethiopia_events_v36000");
         if (stored) {
           const parsed = JSON.parse(stored);
           if (Array.isArray(parsed)) return parsed;
@@ -2137,7 +2061,7 @@ if (typeof window !== 'undefined') {
     },
     saveEvents(evts) {
       try {
-        localStorage\.setItem(EVENTS_KEY, JSON.stringify(evts));
+        localStorage.setItem("ethiopia_events_v36000", JSON.stringify(evts));
       } catch(e) {}
     },
     addEvent(e) {
