@@ -242,11 +242,22 @@ class DirectoryComponent {
     return "기타";
   }
 
-  filterMembers() {
-    let members = window.db ? window.db.getMembers() : [];
-    if (!members || members.length === 0) {
-      members = (typeof DEFAULT_MEMBERS !== 'undefined') ? DEFAULT_MEMBERS : [];
+  getStoredMembers() {
+    if (window.db && typeof window.db.getMembers === 'function') {
+      return window.db.getMembers();
     }
+    try {
+      const local = localStorage.getItem("ethiopia_members");
+      if (local) {
+        const parsed = JSON.parse(local);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch(e) {}
+    return (window.DEFAULT_MEMBERS && Array.isArray(window.DEFAULT_MEMBERS)) ? window.DEFAULT_MEMBERS : ((typeof DEFAULT_MEMBERS !== 'undefined') ? DEFAULT_MEMBERS : []);
+  }
+
+  filterMembers() {
+    let members = this.getStoredMembers();
 
     let filtered = members.filter(m => {
       if (!m) return false;
@@ -428,25 +439,27 @@ class DirectoryComponent {
     const jobInput = document.getElementById("fieldJob");
     const asmInput = document.getElementById("fieldAssemblyMonth");
     const inviterInput = document.getElementById("fieldInviter");
+    const relationInput = document.getElementById("fieldInviterRelation");
     const youtubeInput = document.getElementById("fieldYoutube");
     const testimonyInput = document.getElementById("fieldTestimony");
 
     if (memberId) {
-      const members = window.db ? window.db.getMembers() : [];
-      const m = members.find(x => x.id === memberId);
+      const members = this.getStoredMembers();
+      const m = members.find(x => x && String(x.id) === String(memberId));
       if (m) {
         if (titleEl) titleEl.innerText = `✏️ ${m.name} 식구 정보 수정`;
-        if (idInput) idInput.value = m.id;
+        if (idInput) idInput.value = m.id || "";
         if (nameInput) nameInput.value = m.name || "";
         if (catInput) catInput.value = m.category || "saved";
         if (ageInput) ageInput.value = m.age || "";
         if (regionInput) regionInput.value = m.region || "";
         if (jobInput) jobInput.value = m.job || "";
-        if (asmInput) asmInput.value = m.assemblyMonth || "";
+        if (asmInput) asmInput.value = m.assemblyMonth || m.savedDate || m.date || "";
         if (inviterInput) inviterInput.value = m.inviter || "";
-        if (youtubeInput) youtubeInput.value = m.youtube || "";
-        if (testimonyInput) testimonyInput.value = m.testimony || "";
-        this.tempMemberPhoto = m.photo || "";
+        if (relationInput) relationInput.value = m.inviterRelation || m.relation || "";
+        if (youtubeInput) youtubeInput.value = m.youtube || m.youtubeLink || "";
+        if (testimonyInput) testimonyInput.value = m.testimony || m.desc || "";
+        this.tempMemberPhoto = m.photo || m.image || "";
       }
     } else {
       if (titleEl) titleEl.innerText = "➕ 새로운 식구 등록하기";
@@ -458,6 +471,7 @@ class DirectoryComponent {
       if (jobInput) jobInput.value = "";
       if (asmInput) asmInput.value = "2026.02";
       if (inviterInput) inviterInput.value = "";
+      if (relationInput) relationInput.value = "";
       if (youtubeInput) youtubeInput.value = "";
       if (testimonyInput) testimonyInput.value = "";
       this.tempMemberPhoto = "";
@@ -729,24 +743,55 @@ class DirectoryComponent {
     }
 
     const idVal = document.getElementById("memberId")?.value || `mem-${Date.now()}`;
-    const memberData = {
-      id: idVal,
-      name: nameVal,
-      category: document.getElementById("fieldCategory")?.value || "saved",
-      age: document.getElementById("fieldAge")?.value || "",
-      region: document.getElementById("fieldRegion")?.value || "아디스아바바",
-      job: document.getElementById("fieldJob")?.value || "",
-      assemblyMonth: document.getElementById("fieldAssemblyMonth")?.value || "",
-      inviter: document.getElementById("fieldInviter")?.value || "",
-      photo: this.tempMemberPhoto || "images/members/mem_pdf-mem-1.jpg",
-      youtube: document.getElementById("fieldYoutube")?.value || "",
-      testimony: document.getElementById("fieldTestimony")?.value || ""
-    };
+    const relationVal = document.getElementById("fieldInviterRelation")?.value.trim() || "";
 
-    if (window.db) {
-      const existing = window.db.getMembers().find(x => x.id === idVal);
-      if (existing) window.db.updateMember(memberData);
-      else window.db.addMember(memberData);
+    const members = this.getStoredMembers();
+    const existingIdx = members.findIndex(x => x && String(x.id) === String(idVal));
+
+    let memberData;
+    if (existingIdx >= 0) {
+      const existing = members[existingIdx];
+      memberData = {
+        ...existing,
+        id: idVal,
+        name: nameVal,
+        category: document.getElementById("fieldCategory")?.value || existing.category || "saved",
+        age: document.getElementById("fieldAge")?.value.trim() || existing.age || "",
+        region: document.getElementById("fieldRegion")?.value.trim() || existing.region || "아디스아바바",
+        job: document.getElementById("fieldJob")?.value.trim() || existing.job || "",
+        assemblyMonth: document.getElementById("fieldAssemblyMonth")?.value.trim() || existing.assemblyMonth || "",
+        inviter: document.getElementById("fieldInviter")?.value.trim() || existing.inviter || "",
+        inviterRelation: relationVal || existing.inviterRelation || "",
+        photo: this.tempMemberPhoto || existing.photo || existing.image || "images/members/mem_pdf-mem-1.jpg",
+        youtube: document.getElementById("fieldYoutube")?.value.trim() || existing.youtube || "",
+        testimony: document.getElementById("fieldTestimony")?.value.trim() || existing.testimony || ""
+      };
+      members[existingIdx] = memberData;
+    } else {
+      memberData = {
+        id: idVal,
+        name: nameVal,
+        category: document.getElementById("fieldCategory")?.value || "saved",
+        age: document.getElementById("fieldAge")?.value.trim() || "",
+        region: document.getElementById("fieldRegion")?.value.trim() || "아디스아바바",
+        job: document.getElementById("fieldJob")?.value.trim() || "",
+        assemblyMonth: document.getElementById("fieldAssemblyMonth")?.value.trim() || "",
+        inviter: document.getElementById("fieldInviter")?.value.trim() || "",
+        inviterRelation: relationVal,
+        photo: this.tempMemberPhoto || "images/members/mem_pdf-mem-1.jpg",
+        youtube: document.getElementById("fieldYoutube")?.value.trim() || "",
+        testimony: document.getElementById("fieldTestimony")?.value.trim() || ""
+      };
+      members.push(memberData);
+    }
+
+    if (window.db && typeof window.db.updateMember === 'function' && existingIdx >= 0) {
+      window.db.updateMember(memberData);
+    } else if (window.db && typeof window.db.addMember === 'function' && existingIdx < 0) {
+      window.db.addMember(memberData);
+    } else {
+      localStorage.setItem("ethiopia_members", JSON.stringify(members));
+      window.DEFAULT_MEMBERS = members;
     }
 
     const modal = document.getElementById("memberEditModal");
@@ -758,8 +803,8 @@ class DirectoryComponent {
   }
 
   openMemberDetailModal(memberId) {
-    const members = window.db ? window.db.getMembers() : [];
-    const rawM = members.find(x => x.id === memberId);
+    const members = this.getStoredMembers();
+    const rawM = members.find(x => x && String(x.id) === String(memberId));
     if (!rawM) return;
 
     const m = (window.i18n && typeof window.i18n.getTranslatedMember === "function") ? window.i18n.getTranslatedMember(rawM) : rawM;
@@ -829,7 +874,7 @@ class DirectoryComponent {
 
     const isEn = window.i18n && window.i18n.getLang() === "en";
 
-    const members = (window.db && typeof window.db.getMembers === 'function') ? window.db.getMembers() : (window.DEFAULT_MEMBERS || (typeof DEFAULT_MEMBERS !== 'undefined' ? DEFAULT_MEMBERS : []));
+    const members = this.getStoredMembers();
     const inviterNameClean = (inviterName || '').trim();
 
     const norm = (s) => (s || '').replace(/^:/, '').replace(/\(.*?\)/g, '').trim().toLowerCase();
