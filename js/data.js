@@ -1618,11 +1618,12 @@ const DEFAULT_HISTORY = [
   {
     "id": "hist-202308",
     "date": "2023년 8월",
-    "title": "체코에서 시작된 에티오피아 복음 전파",
-    "location": "체코",
+    "title": "체코에서의 시작 & 에티오피아 3대 언어 번역 추진",
+    "location": "체코 ELC",
     "images": [
-      "images/history/hist-202308_1.jpg",
-      "images/history_202308_czech_eden.jpg"
+      "images/history_202308_czech_zoom.png",
+      "images/history_202308_czech_eden.jpg",
+      "images/history/hist-202308_1.jpg"
     ],
     "desc": "체코 ELC에서 함께 일할 스태프를 온라인으로 모집하던 중, 당시 체코에서 유학 중이던 에티오피아인 Eden이 지원하여 온라인 면접을 거쳐 스태프로 합류하였습니다. \n\n이를 계기로 사모님께서 에티오피아에도 복음을 전하고자 「성경은 사실이다」의 암하라어 번역을 Eden에게 맡기면서 에티오피아 복음 전파를 위한 준비가 시작되었습니다.\n\n그러나 Eden의 박사논문 준비와 귀국 일정 등으로 번역 작업이 1편에 머물 만큼 진행이 더뎌지면서 기존 작업을 중단하고, 사모님의 지시에 따라 온라인을 통해 현지 번역·통역자를 새롭게 모집하여 번역을 이어가기로 하였습니다.\n\n이에 박재한 선교사와 안드레이 형제가 에티오피아의 주요 3개 언어인 암하라어·티그리냐어·오로모어별로 2~3명의 번역·통역자를 모집하였고, 이들과 함께 2024년 4월부터 「성경은 사실이다」 번역 작업을 본격적으로 진행하였습니다. 그 결과 암하라어 번역은 약 4개월 만인 2024년 8월에 완료되었습니다.",
     "titleEn": "Beginning in Czech & Spreading Gospel in 3 Main Languages of Ethiopia",
@@ -1631,9 +1632,10 @@ const DEFAULT_HISTORY = [
   {
     "id": "hist-202404",
     "date": "2024년 4월",
-    "title": "온라인 집회 진행 & 에티오피아 첫 구원 열매",
+    "title": "온라인 집회 진행 & 에티오피아 첫 구원 열매 (나티나엘 형제)",
     "location": "온라인 (BIT channel)",
     "images": [
+      "images/history_202404_online_assembly.png",
       "images/history/hist-202404_1.jpg"
     ],
     "desc": "에티오피아의 공용어인 암하라어로 「성경은 사실이다」를 번역하기에 앞서, 온라인 플랫폼을 통해 모집한 통역자들이 말씀의 내용을 먼저 충분히 숙지할 수 있도록 이들과 그 지인들을 대상으로 2024년 4월 영어 온라인 전도집회를 진행하였습니다.\n\n이 집회를 통해 마취과 의사인 나티나엘 형제(Nathinael)가 처음으로 분명한 구원의 고백과 간증을 하며, 에티오피아에서 첫 번째로 구원받은 식구가 되었습니다.",
@@ -1643,9 +1645,10 @@ const DEFAULT_HISTORY = [
   {
     "id": "hist-202408",
     "date": "2024년 8월",
-    "title": "암하라어 더빙 완성 후 첫 온라인 집회",
+    "title": "암하라어 더빙 완성 후 제2차 온라인 집회 & 피크루 형제 구원",
     "location": "온라인 (BIT channel)",
     "images": [
+      "images/history_202408_amharic_online.png",
       "images/history/hist-202408_1.jpg"
     ],
     "desc": "'성경은 사실이다' 암하라어 번역 완료 후 2024년 8월 암하라어 음성 더빙으로 진행되는 온라인 집회를 개최했습니다.\n\n이 2차 집회 중 티그리냐어 더빙을 담당하던 나티나엘 형제가 초청한 병동 의사 동료 피크루(Fikru) 형제가 집회 말씀을 들은 후 구원을 받았습니다.",
@@ -1655,12 +1658,12 @@ const DEFAULT_HISTORY = [
   {
     "id": "hist-202410",
     "date": "2024년 10월",
-    "title": "서아프리카팀 방문",
+    "title": "서아프리카팀 방문 & 예수님의 보혈 말씀 교제",
     "location": "에티오피아 (아디스아바바)",
     "images": [
       "images/history_202410_west_africa_team.jpg"
     ],
-    "desc": "2024년 10월 말, 사모님께서 에티오피아에서 구원받은 식구들에게 예수님의 보혈에 대해 자세히 설명해 주었으면 좋겠다는 말씀을 하셨고, 서아프리카팀 이은우 형제 부부와 김재원 형제가 탄자니아·콩고 집회 일정을 마치고 귀국하는 길에 에티오피아에 들렀습니다.\n\n이 방문을 통해 피크루 형제 부부와 마취과 의사 나티나엘, 마크에게 『성경은 사실이다』 말씀을 다시 한번 들려주고 예수님의 보혈에 대해 설명하는 시간을 가졌습니다.",
+    "desc": "2024년 10월 말, 사모님께서 에티오피아에서 구원받은 식구들에게 예수님의 보혈에 대해 자세히 설명해 주었으면 좋겠다는 말씀을 하셨고, 서아프리카팀 이은우 형제 부부와 김재원 형제가 탄자니아·콩고 집회 일정을 마치고 귀국하는 길에 에티오피아에 들렀습니다.\n\n이 방문을 통해 피크루 형제 부부와 마취과 의사 나티나엘, 마크에게 『성경은 사실이다』 말씀을 다시 한번 들려주고 예수님의 보혈에 대해 자세히 설명하는 시간을 가졌습니다.",
     "titleEn": "Sebeta Visit & Establishing Foundation for Local Fellowship",
     "descEn": "Visited Sebeta to meet local contacts and establish a foundation for regular fellowship meetings and Bible study sessions."
   },
@@ -1670,6 +1673,8 @@ const DEFAULT_HISTORY = [
     "title": "이강현 형제 부부 에티오피아 방문 & 모임집 답사",
     "location": "Addis Ababa (Mekanisa Yotek compound, Nifas Silk Lafto)",
     "images": [
+      "images/history_202412_meeting_house_dinner.jpg",
+      "images/history_202412_meeting_house_compound.jpg",
       "images/history/hist-202412_1.jpg",
       "images/history/hist-202412_2.jpg",
       "images/history/hist-202412_3.jpg",
