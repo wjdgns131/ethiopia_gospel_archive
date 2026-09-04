@@ -1975,7 +1975,33 @@ if (typeof window !== 'undefined') {
   window.DEFAULT_HISTORY = DEFAULT_HISTORY;
   window.DEFAULT_ASSEMBLIES = [];
   window.DEFAULT_EVENTS = DEFAULT_EVENTS;
-  window.DATA_VERSION = "20260904_V39000_REMOVED_LOCALSTORAGE_CLEAR_BUG";
+  window.DATA_VERSION = "20260904_V40000_ATTACH_DEFAULT_MEMBERS_FIX_UNDEFINED_KEYS";
+
+  // PERMANENT STABLE STORAGE KEYS (Fixes data reset bug forever!)
+  const HISTORY_KEY = "ethiopia_gospel_history_permanent_v1";
+  const MEMBERS_KEY = "ethiopia_gospel_members_permanent_v1";
+  const EVENTS_KEY = "ethiopia_gospel_events_permanent_v1";
+  const ASSEMBLIES_KEY = "ethiopia_gospel_assemblies_permanent_v1";
+
+  // Automatic Migration from legacy version keys (v39000, v38000, v36000, etc.)
+  function getMigratedStorageItem(primaryKey, fallbackKeys) {
+    try {
+      let data = localStorage.getItem(primaryKey);
+      if (data) return data;
+      if (Array.isArray(fallbackKeys)) {
+        for (const oldKey of fallbackKeys) {
+          data = localStorage.getItem(oldKey);
+          if (data) {
+            localStorage.setItem(primaryKey, data);
+            return data;
+          }
+        }
+      }
+    } catch(e) {
+      console.error("Storage migration error:", e);
+    }
+    return null;
+  }
 
   // Force-clear old localStorage
   try {
