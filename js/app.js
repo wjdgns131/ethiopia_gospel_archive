@@ -60,6 +60,9 @@ document.addEventListener("DOMContentLoaded", () => {
         tabPages.forEach(page => {
           if (page.id === `tab-${target}`) {
             page.classList.add("active");
+            if (target === "directory" && window.mapComponent && window.mapComponent.leafletMap) {
+              setTimeout(() => window.mapComponent.leafletMap.invalidateSize(), 150);
+            }
           } else {
             page.classList.remove("active");
           }
