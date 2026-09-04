@@ -108,16 +108,41 @@ class EthiopiaMapComponent {
     const pinsContainer = document.getElementById("googleMapOverlayPins");
     if (!pinsContainer) return;
 
+    const geoPos = {
+      "아디스아바바": { top: "25%", left: "46%" },
+      "세베타": { top: "29%", left: "36%" },
+      "비쇼프투": { top: "34%", left: "54%" },
+      "모조": { top: "39%", left: "59%" },
+      "아다마": { top: "43%", left: "67%" },
+      "네켐테": { top: "25%", left: "18%" },
+      "알렘테나": { top: "49%", left: "52%" },
+      "하와사": { top: "68%", left: "45%" },
+      "아사사": { top: "68%", left: "62%" },
+      "아르바민치": { top: "82%", left: "32%" },
+      "바히르다르": { top: "10%", left: "32%" },
+      "곤다르": { top: "6%", left: "32%" },
+      "디레다와": { top: "20%", left: "78%" },
+      "지마": { top: "52%", left: "22%" },
+      "기타": { top: "50%", left: "50%" }
+    };
+
     let pinsHtml = "";
     ETHIOPIA_REGIONS.forEach(reg => {
       const cnt = counts[reg.id] || 0;
       if (cnt === 0) return;
 
       const isActive = this.activeRegion === reg.id;
+      const pos = geoPos[reg.id] || { top: "50%", left: "50%" };
+
       pinsHtml += `
-        <button type="button" onclick="if(window.mapComponent) window.mapComponent.selectRegion('${reg.id}')" style="background:${isActive ? '#2563eb' : '#d97706'}; color:#ffffff; font-weight:900; font-size:11.5px; padding:4px 10px; border-radius:14px; border:2px solid #ffffff; box-shadow:0 4px 15px rgba(0,0,0,0.5); cursor:pointer; display:inline-flex; align-items:center; gap:4px; transform:${isActive ? 'scale(1.12)' : 'scale(1)'}; transition:all 0.2s;">
-          <i class="fa-solid fa-location-dot" style="color:#fbbf24;"></i> 📍 ${reg.id} (${cnt}명)
-        </button>
+        <div onclick="if(window.mapComponent) window.mapComponent.selectRegion('${reg.id}')" style="position:absolute; top:${pos.top}; left:${pos.left}; transform:translate(-50%, -50%); z-index:20; cursor:pointer; display:flex; flex-direction:column; align-items:center;">
+          <div style="background:${isActive ? '#1d4ed8' : '#d97706'}; color:#ffffff; font-weight:900; font-size:11px; padding:3px 8px; border-radius:14px; border:2px solid #ffffff; box-shadow:0 4px 15px rgba(0,0,0,0.6); display:inline-flex; align-items:center; gap:4px; transform:${isActive ? 'scale(1.2)' : 'scale(1)'}; transition:all 0.2s ease; white-space:nowrap;">
+            <i class="fa-solid fa-location-dot" style="color:#fbbf24; font-size:12px;"></i>
+            <span>${reg.id}</span>
+            <span style="background:rgba(255,255,255,0.3); padding:1px 5px; border-radius:10px; font-size:9.5px;">${cnt}명</span>
+          </div>
+          <div style="width:0; height:0; border-left:5px solid transparent; border-right:5px solid transparent; border-top:6px solid ${isActive ? '#1d4ed8' : '#d97706'};"></div>
+        </div>
       `;
     });
 
