@@ -222,6 +222,26 @@ class DirectoryComponent {
     return `${year}.${month}.${day}`;
   }
 
+  getCanonicalRegionKey(rawRegion) {
+    if (!rawRegion) return "기타";
+    const str = String(rawRegion).toLowerCase().trim();
+    if (str.includes("아디스아바바") || str.includes("addis")) return "아디스아바바";
+    if (str.includes("비쇼프투") || str.includes("bishoftu")) return "비쇼프투";
+    if (str.includes("아다마") || str.includes("adama")) return "아다마";
+    if (str.includes("세베타") || str.includes("sebeta")) return "세베타";
+    if (str.includes("모조") || str.includes("mojo") || str.includes("modjo")) return "모조";
+    if (str.includes("네켐테") || str.includes("nekemte")) return "네켐테";
+    if (str.includes("하와사") || str.includes("hawassa") || str.includes("아와사") || str.includes("awassa")) return "하와사";
+    if (str.includes("아르바민치") || str.includes("아르바 민치") || str.includes("arba minch") || str.includes("arbaminch")) return "아르바민치";
+    if (str.includes("알렘테나") || str.includes("alem tena") || str.includes("alemtena")) return "알렘테나";
+    if (str.includes("아사사") || str.includes("asasa") || str.includes("아르시") || str.includes("arsi")) return "아사사";
+    if (str.includes("바히르다르") || str.includes("bahir")) return "바히르다르";
+    if (str.includes("디레다와") || str.includes("dire")) return "디레다와";
+    if (str.includes("곤다르") || str.includes("gondar")) return "곤다르";
+    if (str.includes("지마") || str.includes("jimma")) return "지마";
+    return "기타";
+  }
+
   filterMembers() {
     let members = window.db ? window.db.getMembers() : [];
     if (!members || members.length === 0) {
@@ -234,10 +254,10 @@ class DirectoryComponent {
       if (this.activeCategory !== "all" && m.category !== this.activeCategory) return false;
 
       // Region Filter
-      if (this.activeRegion && !this.activeRegion.toLowerCase().includes("전체") && !this.activeRegion.toLowerCase().includes("all")) {
-        const mRegion = (m.region || '').toLowerCase();
-        const aRegion = this.activeRegion.toLowerCase();
-        if (!mRegion.includes(aRegion) && !aRegion.includes(mRegion)) return false;
+      if (this.activeRegion && this.activeRegion !== "all" && !this.activeRegion.toLowerCase().includes("전체") && !this.activeRegion.toLowerCase().includes("all")) {
+        const targetCanonical = this.getCanonicalRegionKey(this.activeRegion);
+        const memberCanonical = this.getCanonicalRegionKey(m.region);
+        if (targetCanonical !== memberCanonical) return false;
       }
 
       // Search Query Filter
@@ -263,12 +283,18 @@ class DirectoryComponent {
     if (!this.container) return;
 
     let filtered = this.filterMembers();
-    if (!filtered || filtered.length === 0) {
-      filtered = (typeof DEFAULT_MEMBERS !== 'undefined') ? DEFAULT_MEMBERS : [];
-    }
 
     this.container.className = "member-grid mockup-member-grid";
     this.container.innerHTML = ""; // Clear
+
+    if (!filtered || filtered.length === 0) {
+      const isEn = window.i18n && window.i18n.getLang() === "en";
+      const emptyDiv = document.createElement("div");
+      emptyDiv.style.cssText = "grid-column:1/-1; text-align:center; padding:3rem 1rem; color:var(--text-muted); font-weight:600;";
+      emptyDiv.innerText = isEn ? "No members found for this filter." : "조건에 맞는 식구가 없습니다.";
+      this.container.appendChild(emptyDiv);
+      return;
+    }
 
     // Safe DOM Element Construction (No string concatenation bugs!)
     filtered.forEach(m => {
