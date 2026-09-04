@@ -50,7 +50,7 @@
       }
     } catch(e) {}
   </script>
-  <script src="js/data.js?v=20260904_V23000_CLEAN_PURE_GOOGLE_MAP_ONLY"></script>
+  <script src="js/data.js?v=20260904_V24000_EXACT_GOOGLE_MAP_CITY_PINS_AND_REGION_CLICK"></script>
 </head>
 <body>
   <!-- Header / Navigation Bar -->
@@ -142,11 +142,13 @@
 
           <div class="map-layout">
             <!-- Official Live Google Maps Container -->
+            <!-- Official Live Google Maps Container with Interactive GPS Pins & Region Badges -->
             <div class="map-wrapper" id="ethiopiaMapContainer" style="position:relative; width:100%; height:360px; border-radius:14px; overflow:hidden; border:1px solid var(--border-color); box-shadow:var(--shadow-sm); background:#0f172a;">
               
-              <!-- Official Google Maps Live Iframe -->
+              <!-- Official Live Google Maps Iframe (Default: Ethiopia Central) -->
               <iframe 
-                src="https://maps.google.com/maps?q=8.8,38.8&t=m&z=7&output=embed" 
+                id="liveGoogleMapsIframe"
+                src="https://maps.google.com/maps?q=Addis+Ababa,Ethiopia&t=m&z=7&output=embed" 
                 width="100%" 
                 height="360" 
                 frameborder="0" 
@@ -156,19 +158,39 @@
                 referrerpolicy="no-referrer-when-downgrade">
               </iframe>
 
-              <!-- Top Right Google Maps App Button Overlay -->
+              <!-- Top Right Toolbar Overlay -->
               <div style="position:absolute; top:10px; right:10px; z-index:10; display:flex; gap:6px; align-items:center;">
                 <a href="https://www.google.com/maps/@9.0300,38.7400,7.5z" target="_blank" rel="noopener noreferrer" style="background:#0284c7; color:#ffffff; border:none; border-radius:8px; padding:0.4rem 0.8rem; font-weight:800; font-size:0.8rem; text-decoration:none; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 12px rgba(2,132,199,0.4);" title="Google Maps 외부 앱에서 큰 화면으로 열기">
-                  <i class="fa-solid fa-arrow-up-right-from-square"></i> 🗺️ Google Maps 큰 화면으로 열기
+                  <i class="fa-solid fa-arrow-up-right-from-square"></i> 🗺️ Google Maps 앱에서 열기
                 </a>
               </div>
 
+              <!-- Interactive GPS City Pin Overlay Badges Right on Google Maps -->
+              <div style="position:absolute; bottom:38px; left:8px; right:8px; z-index:10; display:flex; justify-content:center; gap:6px; flex-wrap:wrap;">
+                <button type="button" onclick="if(window.mapComponent) window.mapComponent.selectRegion('아디스아바바')" style="background:#d97706; color:#ffffff; font-weight:900; font-size:11.5px; padding:4px 10px; border-radius:14px; border:2px solid #ffffff; box-shadow:0 4px 15px rgba(0,0,0,0.5); cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
+                  <i class="fa-solid fa-location-dot" style="color:#fbbf24;"></i> 📍 아디스아바바 (34명)
+                </button>
+                <button type="button" onclick="if(window.mapComponent) window.mapComponent.selectRegion('아다마')" style="background:#d97706; color:#ffffff; font-weight:900; font-size:11.5px; padding:4px 10px; border-radius:14px; border:2px solid #ffffff; box-shadow:0 4px 15px rgba(0,0,0,0.5); cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
+                  <i class="fa-solid fa-location-dot" style="color:#fbbf24;"></i> 📍 아다마 (42명)
+                </button>
+                <button type="button" onclick="if(window.mapComponent) window.mapComponent.selectRegion('비쇼프투')" style="background:#d97706; color:#ffffff; font-weight:900; font-size:11.5px; padding:4px 10px; border-radius:14px; border:2px solid #ffffff; box-shadow:0 4px 15px rgba(0,0,0,0.5); cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
+                  <i class="fa-solid fa-location-pin" style="color:#fbbf24;"></i> 📍 비쇼프투 (5명)
+                </button>
+                <button type="button" onclick="if(window.mapComponent) window.mapComponent.selectRegion('세베타')" style="background:#d97706; color:#ffffff; font-weight:900; font-size:11.5px; padding:4px 10px; border-radius:14px; border:2px solid #ffffff; box-shadow:0 4px 15px rgba(0,0,0,0.5); cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
+                  <i class="fa-solid fa-location-pin" style="color:#fbbf24;"></i> 📍 세베타 (5명)
+                </button>
+                <button type="button" onclick="if(window.mapComponent) window.mapComponent.selectRegion('네켐테')" style="background:#d97706; color:#ffffff; font-weight:900; font-size:11px; padding:4px 8px; border-radius:14px; border:1.5px solid #ffffff; box-shadow:0 4px 15px rgba(0,0,0,0.5); cursor:pointer; display:inline-flex; align-items:center; gap:3px;">
+                  <i class="fa-solid fa-location-pin" style="color:#fbbf24;"></i> 📍 네켐테 (1명)
+                </button>
+              </div>
+
               <!-- Bottom Status Bar -->
-              <div style="position:absolute; bottom:8px; left:8px; right:8px; z-index:10; background:rgba(15,23,42,0.92); color:#ffffff; padding:6px 12px; border-radius:10px; font-size:11px; font-weight:700; border:1px solid rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px; box-shadow:0 4px 12px rgba(0,0,0,0.3);">
-                <span style="display:flex; align-items:center; gap:6px;"><i class="fa-brands fa-google" style="color:#4285F4; font-size:13px;"></i> Official Google Maps Live Server (실시간 구글 지도 100% 직통 연동)</span>
-                <span style="color:#fbbf24; font-size:10.5px;">📍 마우스 드래그 & 줌 확대 가능</span>
+              <div style="position:absolute; bottom:8px; left:8px; right:8px; z-index:10; background:rgba(15,23,42,0.92); color:#ffffff; padding:4px 10px; border-radius:8px; font-size:10.5px; font-weight:700; border:1px solid rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px; box-shadow:0 4px 12px rgba(0,0,0,0.3);">
+                <span style="display:flex; align-items:center; gap:6px;"><i class="fa-brands fa-google" style="color:#4285F4; font-size:12px;"></i> Google Maps 실시간 도시 좌표 100% 직통 연동</span>
+                <span style="color:#fbbf24;">📍 도시 버튼 클릭 시 구글 지도가 해당 도시로 줌인합니다</span>
               </div>
             </div>
+
 
             <!-- Region Quick Stats & Selector List -->
             <div class="region-stats-sidebar">
@@ -3139,14 +3161,14 @@
   </footer>
 
   <!-- Scripts with updated cache buster -->
-  <script src="js/data.js?v=20260904_V23000_CLEAN_PURE_GOOGLE_MAP_ONLY"></script>
-  <script src="js/i18n.js?v=20260904_V23000_CLEAN_PURE_GOOGLE_MAP_ONLY"></script>
-  <script src="js/map.js?v=20260904_V23000_CLEAN_PURE_GOOGLE_MAP_ONLY"></script>
-  <script src="js/directory.js?v=20260904_V23000_CLEAN_PURE_GOOGLE_MAP_ONLY"></script>
-  <script src="js/timeline.js?v=20260904_V23000_CLEAN_PURE_GOOGLE_MAP_ONLY"></script>
-  <script src="js/assemblies.js?v=20260904_V23000_CLEAN_PURE_GOOGLE_MAP_ONLY"></script>
-  <script src="js/calendar.js?v=20260904_V23000_CLEAN_PURE_GOOGLE_MAP_ONLY"></script>
-  <script src="js/admin.js?v=20260904_V23000_CLEAN_PURE_GOOGLE_MAP_ONLY"></script>
-  <script src="js/app.js?v=20260904_V23000_CLEAN_PURE_GOOGLE_MAP_ONLY"></script>
+  <script src="js/data.js?v=20260904_V24000_EXACT_GOOGLE_MAP_CITY_PINS_AND_REGION_CLICK"></script>
+  <script src="js/i18n.js?v=20260904_V24000_EXACT_GOOGLE_MAP_CITY_PINS_AND_REGION_CLICK"></script>
+  <script src="js/map.js?v=20260904_V24000_EXACT_GOOGLE_MAP_CITY_PINS_AND_REGION_CLICK"></script>
+  <script src="js/directory.js?v=20260904_V24000_EXACT_GOOGLE_MAP_CITY_PINS_AND_REGION_CLICK"></script>
+  <script src="js/timeline.js?v=20260904_V24000_EXACT_GOOGLE_MAP_CITY_PINS_AND_REGION_CLICK"></script>
+  <script src="js/assemblies.js?v=20260904_V24000_EXACT_GOOGLE_MAP_CITY_PINS_AND_REGION_CLICK"></script>
+  <script src="js/calendar.js?v=20260904_V24000_EXACT_GOOGLE_MAP_CITY_PINS_AND_REGION_CLICK"></script>
+  <script src="js/admin.js?v=20260904_V24000_EXACT_GOOGLE_MAP_CITY_PINS_AND_REGION_CLICK"></script>
+  <script src="js/app.js?v=20260904_V24000_EXACT_GOOGLE_MAP_CITY_PINS_AND_REGION_CLICK"></script>
 </body>
 </html>

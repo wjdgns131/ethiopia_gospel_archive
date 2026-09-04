@@ -22,6 +22,24 @@ class DirectoryComponent {
   // 1. Centralized Safe Event Delegation (DOM 클릭 이벤트 통일 수신기)
   // 1. Centralized Safe Event Delegation (DOM 클릭 이벤트 통일 수신기)
   initGlobalEventDelegation() {
+// Region Pill Click Handler (지도 아래 하단 지역 알약 클릭 시 즉시 필터링 및 구글 지도 위치 이동)
+    document.addEventListener("click", (e) => {
+      const pill = e.target.closest(".region-pill");
+      if (!pill) return;
+
+      const reg = pill.getAttribute("data-region");
+      const targetRegion = (reg === "all" || !reg) ? null : reg;
+
+      document.querySelectorAll(".region-pill").forEach(p => p.classList.remove("active"));
+      pill.classList.add("active");
+
+      this.activeRegion = targetRegion;
+      this.render();
+
+      if (window.mapComponent) {
+        window.mapComponent.selectRegion(targetRegion);
+      }
+    });
     // A. Card Click & Action Event Delegation
     document.body.addEventListener("click", (e) => {
       const target = e.target.closest("[data-action]");
