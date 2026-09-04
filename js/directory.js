@@ -209,55 +209,36 @@ class DirectoryComponent {
 
   filterMembers() {
     let members = window.db ? window.db.getMembers() : [];
-    if (!members || !Array.isArray(members) || members.length === 0) {
-      members = (window.DEFAULT_MEMBERS && window.DEFAULT_MEMBERS.length > 0) ? window.DEFAULT_MEMBERS : (typeof DEFAULT_MEMBERS !== 'undefined' ? DEFAULT_MEMBERS : []);
+    if (!members || members.length === 0) {
+      members = (typeof DEFAULT_MEMBERS !== 'undefined') ? DEFAULT_MEMBERS : [];
     }
 
     let filtered = members.filter(m => {
       if (!m) return false;
-
       // Category Filter
-      if (this.activeCategory && this.activeCategory !== "all" && m.category !== this.activeCategory) {
-        return false;
-      }
+      if (this.activeCategory !== "all" && m.category !== this.activeCategory) return false;
 
-      // Region Filter Guard: Skip filtering if activeRegion is null, 'all', 'undefined', 'null', or empty
-      if (this.activeRegion) {
-        const regStr = String(this.activeRegion).toLowerCase().trim();
-        if (regStr && regStr !== "all" && regStr !== "undefined" && regStr !== "null" && !regStr.includes("전체") && !regStr.includes("all")) {
-          const normFunc = (typeof normalizeRegionId === 'function') ? normalizeRegionId : (window.normalizeRegionId || (x => x));
-          const mNorm = normFunc(m.region);
-          const aNorm = normFunc(this.activeRegion);
-          const mRaw = String(m.region || '').toLowerCase();
-          const aRaw = String(this.activeRegion || '').toLowerCase();
-
-          if (mNorm !== aNorm && !mRaw.includes(aRaw) && !aRaw.includes(mRaw)) {
-            return false;
-          }
-        }
+      // Region Filter
+      if (this.activeRegion && !this.activeRegion.toLowerCase().includes("전체") && !this.activeRegion.toLowerCase().includes("all")) {
+        const mRegion = (m.region || '').toLowerCase();
+        const aRegion = this.activeRegion.toLowerCase();
+        if (!mRegion.includes(aRegion) && !aRegion.includes(mRegion)) return false;
       }
 
       // Search Query Filter
       if (this.searchQuery) {
-        const q = String(this.searchQuery).toLowerCase().trim();
-        if (q) {
-          const name = String(m.name || '').toLowerCase();
-          const region = String(m.region || '').toLowerCase();
-          const job = String(m.job || '').toLowerCase();
-          const inviter = String(m.inviter || '').toLowerCase();
-          if (!name.includes(q) && !region.includes(q) && !job.includes(q) && !inviter.includes(q)) return false;
-        }
+        const q = this.searchQuery;
+        const name = (m.name || '').toLowerCase();
+        const region = (m.region || '').toLowerCase();
+        const job = (m.job || '').toLowerCase();
+        const inviter = (m.inviter || '').toLowerCase();
+        if (!name.includes(q) && !region.includes(q) && !job.includes(q) && !inviter.includes(q)) return false;
       }
 
       return true;
     });
 
-    // Zero-Loss Fallback: If filtered list is empty, default to full members list
-    if ((!filtered || filtered.length === 0) && (!this.searchQuery || this.searchQuery.trim() === "")) {
-      filtered = members;
-    }
-
-    // Sort Chronologically
+    // Chronological Earliest to Latest Sort (2023년 -> 2024년 -> 2025년 -> 2026년)
     filtered.sort((a, b) => this.parseMemberDate(a.assemblyMonth).localeCompare(this.parseMemberDate(b.assemblyMonth)));
     return filtered;
   }
@@ -293,14 +274,13 @@ class DirectoryComponent {
     card.style.cssText = "cursor:pointer; background:var(--bg-card); border:1px solid var(--border-color); border-radius:20px; overflow:hidden; box-shadow:var(--shadow-sm); transition:transform 0.25s, box-shadow 0.25s; display:flex; flex-direction:column; padding:0.4rem 0.4rem 1rem 0.4rem;";
 
     const photoFrame = document.createElement("div");
-    photoFrame.style.cssText = "position:relative; width:170px; height:170px; margin:0.8rem auto 0.6rem auto; border-radius:18px; overflow:hidden; border:1px solid var(--border-color); background:var(--bg-secondary, #1e293b); flex-shrink:0; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(0,0,0,0.06);";
+    photoFrame.style.cssText = "position:relative; width:170px; height:170px; margin:0.8rem auto 0.6rem auto; border-radius:18px; overflow:hidden; border:1px solid var(--border-color); background:#ffffff; flex-shrink:0; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(0,0,0,0.06);";
 
     const img = document.createElement("img");
     img.src = photoUrl;
     img.alt = m.name || "식구";
     img.loading = "lazy";
     img.style.cssText = "width:100%; height:100%; object-fit:cover; display:block;";
-    img.onerror = function() { this.onerror=null; this.src="images/members/mem_pdf-mem-1.jpg"; };
     photoFrame.appendChild(img);
 
     if (isDisrupter) {
@@ -478,7 +458,7 @@ class DirectoryComponent {
       modal.className = "modal-backdrop";
       modal.style.zIndex = "999999";
       modal.innerHTML = `
-        <div class="modal-card" style="max-width:480px; background:var(--bg-secondary, #1e293b); color:#0f172a; padding:1.5rem; border-radius:20px; box-shadow:0 25px 50px rgba(0,0,0,0.3); text-align:center;">
+        <div class="modal-card" style="max-width:480px; background:#ffffff; color:#0f172a; padding:1.5rem; border-radius:20px; box-shadow:0 25px 50px rgba(0,0,0,0.3); text-align:center;">
           
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid #e2e8f0; padding-bottom:0.75rem;">
             <h3 style="font-size:1.2rem; font-weight:800; margin:0; color:#1e3a8a; display:flex; align-items:center; gap:0.4rem;">
@@ -680,8 +660,8 @@ class DirectoryComponent {
 
     previewContainer.innerHTML = `
       <div style="display:flex; flex-direction:column; align-items:center; gap:0.5rem; margin-top:0.4rem;">
-        <div style="position:relative; width:120px; height:120px; border-radius:18px; overflow:hidden; border:2px solid var(--border-color); background:var(--bg-secondary, #1e293b); box-shadow:0 4px 12px rgba(0,0,0,0.15);">
-          <img src="${this.tempMemberPhoto}" style="width:100%; height:100%; object-fit:cover; background:var(--bg-secondary, #1e293b);" />
+        <div style="position:relative; width:120px; height:120px; border-radius:18px; overflow:hidden; border:2px solid var(--border-color); background:#ffffff; box-shadow:0 4px 12px rgba(0,0,0,0.15);">
+          <img src="${this.tempMemberPhoto}" style="width:100%; height:100%; object-fit:cover; background:#ffffff;" />
         </div>
       </div>
     `;
@@ -750,7 +730,7 @@ class DirectoryComponent {
       <div style="padding:0.5rem; color:var(--text-primary);">
         
         <!-- LARGE HERO PHOTO CONTAINER -->
-        <div style="position:relative; width:100%; max-width:280px; height:280px; margin:0 auto 1.25rem auto; border-radius:24px; overflow:hidden; border:3px solid ${isDisrupter ? '#ef4444' : '#0284c7'}; box-shadow:0 12px 30px rgba(0,0,0,0.18); background:var(--bg-secondary, #1e293b); display:flex; align-items:center; justify-content:center;">
+        <div style="position:relative; width:100%; max-width:280px; height:280px; margin:0 auto 1.25rem auto; border-radius:24px; overflow:hidden; border:3px solid ${isDisrupter ? '#ef4444' : '#0284c7'}; box-shadow:0 12px 30px rgba(0,0,0,0.18); background:#ffffff; display:flex; align-items:center; justify-content:center;">
           <img src="${photoUrl}" alt="${m.name}" style="width:100%; height:100%; object-fit:cover; display:block;" />
           ${isDisrupter ? '<span class="badge badge-danger" style="position:absolute; top:10px; left:10px; font-size:0.85rem; font-weight:800; padding:0.3rem 0.7rem; border-radius:12px; z-index:2;">⚠️ Disrupter</span>' : ''}
         </div>
@@ -802,123 +782,60 @@ class DirectoryComponent {
 
     const members = window.db ? window.db.getMembers() : [];
     const inviterNameClean = (inviterName || '').trim();
-    const cleanSearchStr = inviterNameClean.replace(/^:\s*/, '').replace(/\(.*?\)/g, '').trim().toLowerCase();
 
-    // 1. Find Inviter Profile Object with robust name matching
-    let inviterObj = null;
-    if (cleanSearchStr) {
-      inviterObj = members.find(m => {
-        const mClean = String(m.name || '').replace(/\(.*?\)/g, '').trim().toLowerCase();
-        return mClean === cleanSearchStr || mClean.includes(cleanSearchStr) || cleanSearchStr.includes(mClean);
-      });
-      if (!inviterObj) {
-        const firstToken = cleanSearchStr.split(/\s+/)[0];
-        if (firstToken.length >= 3) {
-          inviterObj = members.find(m => {
-            const mClean = String(m.name || '').replace(/\(.*?\)/g, '').trim().toLowerCase();
-            return mClean.includes(firstToken);
-          });
-        }
-      }
-    }
-
+    // Find Inviter Profile Object
+    const inviterObj = members.find(m => m.name.toLowerCase() === inviterNameClean.toLowerCase() || inviterNameClean.toLowerCase().includes(m.name.toLowerCase()));
     const inviterPhoto = inviterObj && inviterObj.photo ? inviterObj.photo : "images/members/mem_pdf-mem-1.jpg";
 
-    // 2. Find All Members Invited by this Inviter
-    const invitedMembers = members.filter(m => {
-      if (!m || !m.inviter) return false;
-      const mInv = String(m.inviter).replace(/^:\s*/, '').replace(/\(.*?\)/g, '').trim().toLowerCase();
-      if (!mInv || !cleanSearchStr) return false;
-      if (mInv === cleanSearchStr || mInv.includes(cleanSearchStr) || cleanSearchStr.includes(mInv)) return true;
-      const firstToken = cleanSearchStr.split(/\s+/)[0];
-      if (firstToken.length >= 3 && mInv.includes(firstToken)) return true;
-      return false;
-    });
-
-    const isEn = window.i18n && window.i18n.getLang() === 'en';
-    const ageDisp = inviterObj ? this.getCalculatedAge(inviterObj) : '';
-    const inviterTestimonyUrl = inviterObj ? (inviterObj.testimony || inviterObj.youtube || "").trim() : "";
+    // Find All Members Invited by this Inviter
+    const invitedMembers = members.filter(m => m.inviter && m.inviter.toLowerCase().includes(inviterNameClean.toLowerCase()));
 
     body.innerHTML = `
       <div style="padding:0.5rem;">
         
-        <!-- INVITER RICH PROFILE HEADER CARD -->
-        <div style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color:#ffffff; padding:1.25rem 1.5rem; border-radius:20px; margin-bottom:1.5rem; box-shadow:0 8px 25px rgba(2,132,199,0.35); display:flex; align-items:center; gap:1.25rem; flex-wrap:wrap;">
+        <!-- INVITER HEADER CARD WITH LARGE FACE -->
+        <div style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color:#ffffff; padding:1.2rem 1.4rem; border-radius:18px; margin-bottom:1.5rem; box-shadow:0 8px 25px rgba(2,132,199,0.3); display:flex; align-items:center; gap:1.2rem; flex-wrap:wrap;">
           
-          <!-- Inviter Face Photo -->
-          <div style="position:relative; width:95px; height:95px; border-radius:18px; overflow:hidden; border:3px solid #ffffff; box-shadow:0 4px 14px rgba(0,0,0,0.25); flex-shrink:0; background:#1e293b;">
+          <!-- Inviter Face Photo (100px x 100px) -->
+          <div style="position:relative; width:95px; height:95px; border-radius:18px; overflow:hidden; border:3px solid #ffffff; box-shadow:0 4px 12px rgba(0,0,0,0.2); flex-shrink:0; background:#ffffff;">
             <img src="${inviterPhoto}" alt="${inviterNameClean}" style="width:100%; height:100%; object-fit:cover; display:block;" />
           </div>
 
-          <div style="flex:1; min-width:200px;">
-            <div style="display:flex; align-items:center; justify-content:space-between; gap:0.5rem; margin-bottom:0.2rem; flex-wrap:wrap;">
-              <span style="font-size:0.78rem; color:#e0f2fe; font-weight:800; letter-spacing:0.5px; text-transform:uppercase; background:rgba(255,255,255,0.18); padding:2px 8px; border-radius:10px;">
-                <i class="fa-solid fa-sitemap" style="color:#fbbf24; margin-right:4px;"></i> ${isEn ? 'Evangelism Inviter Network' : '전도 초대자 계보'}
-              </span>
-              <span style="font-size:0.88rem; color:#ffffff; font-weight:800; background:rgba(15,23,42,0.4); padding:3px 10px; border-radius:12px;">
-                ${isEn ? 'Invited: ' : '직접 초청한 식구: '} <strong style="color:#fbbf24; font-size:1.05rem;">총 ${invitedMembers.length}명</strong>
-              </span>
-            </div>
-
-            <h2 style="font-size:1.55rem; font-weight:900; margin:2px 0 6px 0; color:#ffffff;">${inviterObj ? inviterObj.name : inviterNameClean}</h2>
-            
-            ${inviterObj ? `
-              <div style="display:flex; align-items:center; gap:0.8rem; font-size:0.86rem; color:#f0f9ff; flex-wrap:wrap; margin-bottom:0.5rem;">
-                <span>📍 ${inviterObj.region || '에티오피아'}</span>
-                ${ageDisp ? `<span>• ${ageDisp}</span>` : ''}
-                <span>💼 ${inviterObj.job || '직업 미기재'}</span>
-              </div>
-            ` : ''}
-
-            ${inviterTestimonyUrl ? `
-              <button type="button" onclick="event.stopPropagation(); window.directoryComponent.openVideoModal('${inviterTestimonyUrl}', '${inviterObj ? inviterObj.name : inviterNameClean}')" style="background:#ffffff; color:#0284c7; border:none; border-radius:12px; padding:0.4rem 0.95rem; font-size:0.85rem; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:0.4rem; box-shadow:0 3px 10px rgba(0,0,0,0.15); transition:transform 0.18s;">
-                <i class="fa-solid fa-circle-play" style="color:#d97706; font-size:1rem;"></i> ${isEn ? 'Watch Inviter Testimony' : '초대자 구원 간증 보기'}
-              </button>
-            ` : ''}
+          <div>
+            <span style="font-size:0.8rem; color:#e0f2fe; font-weight:800; letter-spacing:0.5px; text-transform:uppercase;">
+              <i class="fa-solid fa-sitemap"></i> 전도 초대자 계보
+            </span>
+            <h2 style="font-size:1.5rem; font-weight:900; margin:2px 0; color:#ffffff;">${inviterNameClean}</h2>
+            <p style="font-size:0.92rem; color:#f0f9ff; margin:0; font-weight:700;">
+              직접 초청한 참석자: <strong style="color:#fbbf24; font-size:1.1rem;">총 ${invitedMembers.length}명</strong>
+            </p>
           </div>
         </div>
 
         <!-- INVITED MEMBERS GRID WITH MINI FACE AVATARS -->
-        <h3 style="font-size:1.1rem; font-weight:800; color:var(--text-primary); margin-bottom:0.9rem; display:flex; align-items:center; justify-content:space-between;">
-          <span style="display:flex; align-items:center; gap:0.4rem;">
-            <i class="fa-solid fa-users" style="color:#0284c7;"></i> ${isEn ? 'Invited Members List' : '초청받아 구원받은 식구 명단'}
-          </span>
-          <span style="font-size:0.85rem; color:var(--text-muted); font-weight:700;">(${invitedMembers.length}${isEn ? ' Members' : '명'})</span>
-        </h3>
+        <h4 style="font-size:1.05rem; font-weight:800; color:var(--text-primary); margin-bottom:0.8rem; display:flex; align-items:center; gap:0.4rem;">
+          <i class="fa-solid fa-users" style="color:#0284c7;"></i> 초청된 식구 명단 (${invitedMembers.length}명)
+        </h4>
 
         ${invitedMembers.length === 0 ? `
-          <div style="text-align:center; padding:2.5rem 1rem; color:var(--text-muted); background:var(--bg-main); border-radius:16px; border:1px solid var(--border-color);">
-            <i class="fa-solid fa-users-slash" style="font-size:2.2rem; margin-bottom:0.6rem; color:#0284c7;"></i>
-            <p style="font-size:0.98rem; font-weight:700; margin:0;">${isEn ? 'No invited members registered yet.' : '등록된 초청 식구가 없습니다.'}</p>
+          <div style="text-align:center; padding:2.5rem 1rem; color:var(--text-muted); background:var(--bg-main); border-radius:14px; border:1px solid var(--border-color);">
+            <i class="fa-solid fa-users-slash" style="font-size:2rem; margin-bottom:0.5rem; color:#0284c7;"></i>
+            <p style="font-size:0.95rem; font-weight:700; margin:0;">등록된 초청 식구가 없습니다.</p>
           </div>
         ` : `
-          <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); gap:1.0rem;">
+          <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:0.9rem;">
             ${invitedMembers.map(m => {
               const photo = m.photo || "images/members/mem_pdf-mem-1.jpg";
-              const testimony = (m.testimony || m.youtube || "").trim();
-              const memberAge = this.getCalculatedAge(m);
-
               return `
-                <div data-action="open-member-detail" data-id="${m.id}" style="cursor:pointer; background:var(--bg-card); border:1px solid var(--border-color); border-radius:18px; padding:0.85rem; display:flex; flex-direction:column; justify-content:space-between; box-shadow:var(--shadow-sm); transition:all 0.2s;" class="hover-text-primary">
-                  <div style="display:flex; align-items:center; gap:0.85rem; margin-bottom:0.6rem;">
-                    <!-- Mini Face Avatar -->
-                    <div style="width:68px; height:68px; border-radius:14px; overflow:hidden; border:2px solid #0284c7; flex-shrink:0; background:#1e293b; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
-                      <img src="${photo}" alt="${m.name}" style="width:100%; height:100%; object-fit:cover; display:block;" />
-                    </div>
-                    <div style="flex:1; overflow:hidden;">
-                      <h4 style="font-size:1.08rem; font-weight:800; margin:0 0 2px 0; color:#1e3a8a; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${m.name}</h4>
-                      <p style="font-size:0.82rem; color:var(--text-secondary); margin:0 0 2px 0; font-weight:600;">📍 ${m.region || '에티오피아'} ${memberAge ? `• ${memberAge}` : ''}</p>
-                      <span style="font-size:0.78rem; color:var(--text-muted); font-weight:600; display:block; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">💼 ${m.job || '-'}</span>
-                    </div>
+                <div data-action="open-member-detail" data-id="${m.id}" style="cursor:pointer; background:var(--bg-card); border:1px solid var(--border-color); border-radius:16px; padding:0.75rem; display:flex; align-items:center; gap:0.85rem; box-shadow:var(--shadow-sm); transition:transform 0.2s;" class="hover-text-primary">
+                  <!-- Mini Face Avatar (65px x 65px) -->
+                  <div style="width:65px; height:65px; border-radius:14px; overflow:hidden; border:2px solid #0284c7; flex-shrink:0; background:#ffffff; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+                    <img src="${photo}" alt="${m.name}" style="width:100%; height:100%; object-fit:cover; display:block;" />
                   </div>
-
-                  <div style="display:flex; align-items:center; justify-content:space-between; padding-top:0.5rem; border-top:1px solid var(--border-color); font-size:0.78rem; gap:0.4rem;">
-                    <span style="color:var(--text-muted); font-weight:600;">📅 ${m.assemblyMonth || '-'}</span>
-                    ${testimony ? `
-                      <button type="button" onclick="event.stopPropagation(); window.directoryComponent.openVideoModal('${testimony}', '${m.name}')" style="background:#f0f9ff; color:#0284c7; border:1px solid #7dd3fc; border-radius:8px; padding:0.18rem 0.5rem; font-weight:800; font-size:0.75rem; cursor:pointer; display:inline-flex; align-items:center; gap:0.25rem;">
-                        <i class="fa-solid fa-circle-play" style="color:#0284c7;"></i> 간증
-                      </button>
-                    ` : ''}
+                  <div style="flex:1; overflow:hidden;">
+                    <h4 style="font-size:1.05rem; font-weight:800; margin:0 0 2px 0; color:#1e3a8a; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${m.name}</h4>
+                    <p style="font-size:0.8rem; color:var(--text-secondary); margin:0 0 2px 0; font-weight:600;">📍 ${m.region}</p>
+                    <span style="font-size:0.75rem; color:var(--accent-gold); font-weight:700;">📅 ${m.assemblyMonth || '-'}</span>
                   </div>
                 </div>
               `;
@@ -970,7 +887,7 @@ class DirectoryComponent {
       modal.className = "modal-backdrop";
       modal.style.zIndex = "999999";
       modal.innerHTML = `
-        <div class="modal-card modal-card-lg" style="max-width:860px; background:var(--bg-secondary, #1e293b); color:#0f172a; padding:1.5rem; border-radius:20px; position:relative; box-shadow:0 25px 50px rgba(0,0,0,0.3);">
+        <div class="modal-card modal-card-lg" style="max-width:860px; background:#ffffff; color:#0f172a; padding:1.5rem; border-radius:20px; position:relative; box-shadow:0 25px 50px rgba(0,0,0,0.3);">
           <button style="position:absolute; top:14px; right:14px; background:rgba(0,0,0,0.08); color:#0f172a; border:none; border-radius:50%; width:34px; height:34px; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center;" onclick="document.getElementById('videoPlayerModal').classList.add('hidden'); document.getElementById('videoModalContainer').innerHTML='';"><i class="fa-solid fa-xmark"></i></button>
           <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:1rem;">
             <i class="fa-solid fa-circle-play" style="font-size:1.5rem; color:#0284c7;"></i>

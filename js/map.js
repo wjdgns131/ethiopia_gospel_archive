@@ -24,20 +24,20 @@ const ETHIOPIA_REGIONS = [
 function normalizeRegionId(rawRegion) {
   if (!rawRegion) return "기타";
   const str = String(rawRegion).toLowerCase().trim();
-  if (str.includes("아르바민치") || str.includes("아르바 민치") || str.includes("arba minch") || str.includes("arbaminch")) return "아르바민치";
+  if (str.includes("아디스아바바") || str.includes("addis")) return "아디스아바바";
   if (str.includes("비쇼프투") || str.includes("bishoftu")) return "비쇼프투";
-  if (str.includes("아다마") || str.includes("adama") || str.includes("nazret")) return "아다마";
+  if (str.includes("아다마") || str.includes("adama")) return "아다마";
   if (str.includes("세베타") || str.includes("sebeta")) return "세베타";
   if (str.includes("모조") || str.includes("mojo") || str.includes("modjo")) return "모조";
   if (str.includes("네켐테") || str.includes("nekemte")) return "네켐테";
   if (str.includes("하와사") || str.includes("hawassa") || str.includes("아와사") || str.includes("awassa")) return "하와사";
+  if (str.includes("아르바민치") || str.includes("아르바 민치") || str.includes("arba minch") || str.includes("arbaminch")) return "아르바민치";
   if (str.includes("알렘테나") || str.includes("alem tena") || str.includes("alemtena")) return "알렘테나";
   if (str.includes("아사사") || str.includes("asasa") || str.includes("아르시") || str.includes("arsi")) return "아사사";
   if (str.includes("바히르다르") || str.includes("bahir")) return "바히르다르";
   if (str.includes("디레다와") || str.includes("dire")) return "디레다와";
   if (str.includes("곤다르") || str.includes("gondar")) return "곤다르";
   if (str.includes("지마") || str.includes("jimma")) return "지마";
-  if (str.includes("아디스아바바") || str.includes("addis")) return "아디스아바바";
   return "기타";
 }
 
@@ -130,78 +130,70 @@ class EthiopiaMapComponent {
       mapDiv = document.getElementById("googleMapDiv");
     }
 
-    if (typeof L === 'undefined') {
-      if (!this._leafletRetryTimer) {
-        this._leafletRetryTimer = setTimeout(() => {
-          this._leafletRetryTimer = null;
-          this.renderGoogleMapEngine(counts);
-        }, 250);
+    if (typeof L !== 'undefined') {
+      try {
+        if (!this.leafletMap) {
+          this.leafletMap = L.map('googleMapDiv', {
+            center: [8.8, 38.8],
+            zoom: 7,
+            minZoom: 5,
+            maxZoom: 18,
+            zoomControl: true,
+            scrollWheelZoom: true
+          });
+
+          this.currentTileLayer = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+            attribution: '&copy; Google Maps',
+            maxZoom: 20
+          }).addTo(this.leafletMap);
+        }
+
+        setTimeout(() => {
+          if (this.leafletMap) this.leafletMap.invalidateSize();
+        }, 200);
+
+        this.markers.forEach(m => {
+          try { this.leafletMap.removeLayer(m); } catch(e) {}
+        });
+        this.markers = [];
+
+        // Render English Region Name Text for Map Pins!
+        ETHIOPIA_REGIONS.forEach(reg => {
+          const cnt = counts[reg.id] || 0;
+          if (cnt === 0) return;
+
+          const isActive = this.activeRegion === reg.id;
+          const pinImgSrc = isActive ? "images/thumbtack_blue.png?v=20260904_35" : "images/thumbtack_red.png?v=20260904_35";
+          const nameColor = isActive ? "#fbbf24" : "#ffffff";
+          const scaleTransform = isActive ? "scale(1.25)" : "scale(1)";
+          const englishRegionName = reg.nameEn || reg.id;
+
+          const customPinHtml = `
+            <div onclick="if(window.mapComponent) window.mapComponent.selectRegion('${reg.id}')" style="display:flex; flex-direction:column; align-items:center; cursor:pointer; transform-origin:bottom left; transform:${scaleTransform}; transition:all 0.2s ease;">
+              <!-- Compact Sleek 3D Pin Icon -->
+              <img src="${pinImgSrc}" alt="Pin Icon" style="width:24px; height:26px; display:block; filter:drop-shadow(0 3px 6px rgba(0,0,0,0.7));" />
+              <!-- Crisp Transparent English Region Name Text -->
+              <span style="font-family:'Roboto', -apple-system, BlinkMacSystemFont, 'Google Sans', 'Segoe UI', Arial, sans-serif; color:${nameColor}; font-size:11px; font-weight:700; background:transparent; text-shadow:-1px -1px 0 #0f172a, 1px -1px 0 #0f172a, -1px 1px 0 #0f172a, 1px 1px 0 #0f172a, 0 2px 4px rgba(0,0,0,0.8); white-space:nowrap; margin-top:1px; letter-spacing:0.02em;">${englishRegionName}</span>
+            </div>
+          `;
+
+          const pinIcon = L.divIcon({
+            className: 'custom-sleek-pin-marker',
+            html: customPinHtml,
+            iconSize: [60, 48],
+            iconAnchor: [12, 24]
+          });
+
+          const marker = L.marker([reg.lat, reg.lng], { icon: pinIcon }).addTo(this.leafletMap);
+          marker.on('click', () => {
+            this.selectRegion(reg.id);
+          });
+          this.markers.push(marker);
+        });
+
+      } catch(e) {
+        console.error("Leaflet map render error:", e);
       }
-      return;
-    }
-
-    try {
-      if (!this.leafletMap) {
-        this.leafletMap = L.map('googleMapDiv', {
-          center: [8.8, 38.8],
-          zoom: 7,
-          minZoom: 5,
-          maxZoom: 18,
-          zoomControl: true,
-          scrollWheelZoom: true
-        });
-
-        this.currentTileLayer = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
-          attribution: '&copy; Google Maps',
-          maxZoom: 20
-        }).addTo(this.leafletMap);
-      }
-
-      setTimeout(() => {
-        if (this.leafletMap) this.leafletMap.invalidateSize();
-      }, 200);
-
-      this.markers.forEach(m => {
-        try { this.leafletMap.removeLayer(m); } catch(e) {}
-      });
-      this.markers = [];
-
-      // Render Region Name & Member Count Text for Map Pins!
-      ETHIOPIA_REGIONS.forEach(reg => {
-        const cnt = counts[reg.id] || 0;
-        if (cnt === 0) return;
-
-        const isActive = this.activeRegion === reg.id;
-        const pinImgSrc = isActive ? "images/thumbtack_blue.png?v=20260904_35" : "images/thumbtack_red.png?v=20260904_35";
-        const nameColor = isActive ? "#fbbf24" : "#ffffff";
-        const scaleTransform = isActive ? "scale(1.25)" : "scale(1)";
-        const englishRegionName = reg.nameEn || reg.id;
-
-        const customPinHtml = `
-          <div onclick="if(window.mapComponent) window.mapComponent.selectRegion('${reg.id}')" style="display:flex; flex-direction:column; align-items:center; cursor:pointer; transform-origin:bottom left; transform:${scaleTransform}; transition:all 0.2s ease;">
-            <!-- Compact Sleek 3D Pin Icon -->
-            <img src="${pinImgSrc}" alt="Pin Icon" style="width:24px; height:26px; display:block; filter:drop-shadow(0 3px 6px rgba(0,0,0,0.7));" />
-            <!-- Crisp Transparent Region Name & Member Count Text -->
-            <span style="font-family:'Roboto', -apple-system, BlinkMacSystemFont, 'Google Sans', 'Segoe UI', Arial, sans-serif; color:${nameColor}; font-size:11px; font-weight:800; background:rgba(15,23,42,0.75); padding:1px 6px; border-radius:8px; border:1px solid rgba(255,255,255,0.2); text-shadow:0 1px 2px rgba(0,0,0,0.8); white-space:nowrap; margin-top:1px; letter-spacing:0.02em;">📍 ${englishRegionName} (${cnt})</span>
-          </div>
-        `;
-
-        const pinIcon = L.divIcon({
-          className: 'custom-sleek-pin-marker',
-          html: customPinHtml,
-          iconSize: [80, 48],
-          iconAnchor: [16, 24]
-        });
-
-        const marker = L.marker([reg.lat, reg.lng], { icon: pinIcon }).addTo(this.leafletMap);
-        marker.on('click', () => {
-          this.selectRegion(reg.id);
-        });
-        this.markers.push(marker);
-      });
-
-    } catch(e) {
-      console.error("Leaflet map render error:", e);
     }
   }
 
@@ -223,23 +215,6 @@ class EthiopiaMapComponent {
     if (window.directoryComponent) {
       window.directoryComponent.activeRegion = regionId;
       window.directoryComponent.render();
-    }
-
-    const regionDropdown = document.getElementById("regionDropdown");
-    if (regionDropdown) {
-      regionDropdown.value = regionId || "all";
-    }
-
-    const activeFilterBar = document.getElementById("activeFilterBar");
-    const activeFilterLabel = document.getElementById("activeFilterLabel");
-    if (activeFilterBar && activeFilterLabel) {
-      if (regionId) {
-        const regObj = ETHIOPIA_REGIONS.find(r => r.id === regionId);
-        activeFilterLabel.innerText = `📍 ${regObj ? regObj.name : regionId}`;
-        activeFilterBar.classList.remove("hidden");
-      } else {
-        activeFilterBar.classList.add("hidden");
-      }
     }
 
     if (this.onRegionSelect) {

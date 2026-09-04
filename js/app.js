@@ -1,6 +1,5 @@
 /**
  * 에티오피아 선교 아카이브 - 메인 애플리케이션 진입점
- * [Restored] Map region member linkage, Assembly testimony modal, Inviter network modal, and Gospel photo lightbox.
  */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -61,21 +60,6 @@ document.addEventListener("DOMContentLoaded", () => {
         tabPages.forEach(page => {
           if (page.id === `tab-${target}`) {
             page.classList.add("active");
-            if (target === "directory") {
-              if (window.directoryComponent) window.directoryComponent.render();
-              if (window.mapComponent) {
-                window.mapComponent.render(window.db ? window.db.getMembers() : []);
-                if (window.mapComponent.leafletMap) {
-                  setTimeout(() => window.mapComponent.leafletMap.invalidateSize(), 120);
-                }
-              }
-            } else if (target === "timeline") {
-              if (window.timelineComponent) window.timelineComponent.render();
-            } else if (target === "assemblies" || target === "fellowship") {
-              if (window.assembliesComponent) window.assembliesComponent.render();
-            } else if (target === "calendar") {
-              if (window.calendarComponent) window.calendarComponent.render();
-            }
           } else {
             page.classList.remove("active");
           }
@@ -136,31 +120,6 @@ document.addEventListener("DOMContentLoaded", () => {
   try { if (window.timelineComponent) window.timelineComponent.render(); } catch (e) { console.error("Timeline render error:", e); }
   try { if (window.assembliesComponent) window.assembliesComponent.render(); } catch (e) { console.error("Assemblies render error:", e); }
   try { if (window.calendarComponent) window.calendarComponent.render(); } catch (e) { console.error("Calendar render error:", e); }
-
-  // Bind Region Dropdown Change Listener
-  try {
-    const regionDropdown = document.getElementById("regionDropdown");
-    if (regionDropdown) {
-      regionDropdown.addEventListener("change", (e) => {
-        const val = e.target.value;
-        const targetRegion = (val === "all" || !val) ? null : val;
-        if (window.mapComponent) {
-          window.mapComponent.selectRegion(targetRegion);
-        } else if (window.directoryComponent) {
-          window.directoryComponent.activeRegion = targetRegion;
-          window.directoryComponent.render();
-        }
-      });
-    }
-  } catch(e) { console.error("Region dropdown bind error:", e); }
-
-  window.addEventListener("load", () => {
-    try {
-      if (window.mapComponent) {
-        window.mapComponent.render(window.db ? window.db.getMembers() : []);
-      }
-    } catch(e) {}
-  });
 
   // 4. Modal Close Handlers
   try {
