@@ -939,7 +939,7 @@ class TimelineComponent {
   }
 
   getSavedMembersForHistory(historyItem) {
-    const members = window.db ? window.db.getMembers() : [];
+    const members = (window.db && typeof window.db.getMembers === 'function') ? window.db.getMembers() : (window.DEFAULT_MEMBERS || (typeof DEFAULT_MEMBERS !== 'undefined' ? DEFAULT_MEMBERS : []));
     if (!historyItem || !historyItem.date) return [];
 
     const hDateClean = String(historyItem.date).replace(/\s+/g, '');
@@ -979,10 +979,10 @@ class TimelineComponent {
   renderAssemblyTestimonyButton(activeItem) {
     if (!activeItem || !activeItem.title) return '';
 
-    // Only actual evangelistic assemblies ('전도집회') should display the testimony button
+    // Must be related to an assembly/gospel event ('집회' or '전도' or '모임') and not a non-assembly visit/entry
     const title = activeItem.title;
-    const isEvangelisticAssembly = title.includes("집회") && !title.includes("입국") && !title.includes("침례") && !title.includes("방문");
-    if (!isEvangelisticAssembly) {
+    const isAssemblyEvent = (title.includes("집회") || title.includes("전도") || title.includes("모임")) && !title.includes("입국") && !title.includes("방문");
+    if (!isAssemblyEvent) {
       return '';
     }
 
@@ -1032,7 +1032,7 @@ class TimelineComponent {
           ${savedMembers.map(m => {
             const photoUrl = m.photo || 'images/members/mem_shambel.png';
             const testimonyUrl = (m.testimony || m.youtube || "").trim();
-            const ageDisplay = window.directoryComponent ? window.directoryComponent.getCalculatedAge(m) : (m.age || '');
+            const ageDisplay = (window.directoryComponent && typeof window.directoryComponent.getCalculatedAge === 'function') ? window.directoryComponent.getCalculatedAge(m) : (m.age || '');
 
             return `
               <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:18px; padding:1.2rem; display:flex; flex-direction:column; justify-content:space-between; box-shadow:var(--shadow-sm);">

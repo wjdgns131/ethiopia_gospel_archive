@@ -780,15 +780,25 @@ class DirectoryComponent {
     const body = document.getElementById("networkModalBody");
     if (!modal || !body) return;
 
-    const members = window.db ? window.db.getMembers() : [];
+    const members = (window.db && typeof window.db.getMembers === 'function') ? window.db.getMembers() : (window.DEFAULT_MEMBERS || (typeof DEFAULT_MEMBERS !== 'undefined' ? DEFAULT_MEMBERS : []));
     const inviterNameClean = (inviterName || '').trim();
 
+    const norm = (s) => (s || '').replace(/^:/, '').replace(/\(.*?\)/g, '').trim().toLowerCase();
+    const targetNorm = norm(inviterNameClean);
+
     // Find Inviter Profile Object
-    const inviterObj = members.find(m => m.name.toLowerCase() === inviterNameClean.toLowerCase() || inviterNameClean.toLowerCase().includes(m.name.toLowerCase()));
+    const inviterObj = members.find(m => {
+      const mNameNorm = norm(m.name);
+      return mNameNorm === targetNorm || targetNorm.includes(mNameNorm) || mNameNorm.includes(targetNorm);
+    });
     const inviterPhoto = inviterObj && inviterObj.photo ? inviterObj.photo : "images/members/mem_pdf-mem-1.jpg";
 
     // Find All Members Invited by this Inviter
-    const invitedMembers = members.filter(m => m.inviter && m.inviter.toLowerCase().includes(inviterNameClean.toLowerCase()));
+    const invitedMembers = members.filter(m => {
+      if (!m.inviter) return false;
+      const mInvNorm = norm(m.inviter);
+      return mInvNorm === targetNorm || mInvNorm.includes(targetNorm) || targetNorm.includes(mInvNorm);
+    });
 
     body.innerHTML = `
       <div style="padding:0.5rem;">
