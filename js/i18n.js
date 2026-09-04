@@ -920,174 +920,227 @@
 
   // 5. History Specific English Overlay Map (Indexed by history id)
   const HISTORY_EN_MAP = {
-    "hist-202308": {
-      date: "August 2023",
-      location: "Czech ELC",
-      title: "The Beginning of Gospel Outreach to Ethiopia from the Czech Republic",
-      desc: "The first step of the gospel mission in Ethiopia began through connection with Czech ELC."
-    },
+  "hist-202308": {
+    date: "August 2023",
+    title: "The Beginning of Gospel Outreach to Ethiopia from the Czech Republic",
+    location: "Czech ELC",
+    desc: `While Czech ELC was recruiting staff members online, Eden, an Ethiopian who was studying in the Czech Republic at the time, applied and joined the staff after an online interview. This led Samonim to entrust Eden with the Amharic translation of The Bible Is True in order to preach the gospel in Ethiopia, marking the beginning of preparations for gospel outreach in Ethiopia.
 
-    "hist-202404": {
-      date: "April 2024",
-      location: "Online (BIT Channel)",
-      title: "Online Seminar and the First Fruit of Salvation in Ethiopia",
-      desc: "Prior to translating 'The Bible is True' into Amharic, Ethiopia's official language, an online seminar was conducted for translators recruited via online platforms and their acquaintances to thoroughly understand the word message. Through this seminar, Brother Fikru Tesfaye accepted the Gospel as the first fruit of salvation in Ethiopia."
-    },
+However, due to Eden's preparation for her doctoral dissertation and plans to return to Ethiopia, progress on the translation was slow and only the first lecture was completed. The existing work was therefore discontinued, and under Samonim's direction, new local translators and interpreters were recruited online to continue the translation.
 
-    "hist-202408": {
-      date: "August 2024",
-      location: "Online (BIT Channel)",
-      title: "First Online Seminar After Completing the Amharic Dubbing",
-      desc: "After completing the Amharic translation of 'The Bible is True', an online seminar with Amharic audio dubbing was held in August 2024. During this second seminar, Brother Nathinael, who was in charge of Tigrinya dubbing, accepted the Gospel."
-    },
+Missionary Jaehan Park and Brother Andrei then recruited two to three translators and interpreters for each of Ethiopia's three major languages—Amharic, Tigrinya, and Oromo. Together with them, they began the full-scale translation of The Bible Is True in April 2024. As a result, the Amharic translation was completed about four months later, in August 2024.`
+  },
 
-    "hist-202410": {
-      date: "October 2024",
-      location: "Addis Ababa, Ethiopia",
-      title: "Visit by the West Africa Team",
-      desc: "In late October 2024, Samonim requested that the precious blood of Jesus be thoroughly explained to the saved members in Ethiopia. Brother Eunwoo Lee and his wife, along with Brother Jaewon Kim from the West Africa Team, visited Ethiopia and conducted a 3-day seminar. Through this seminar, Sister Eden, wife of Brother Fikru, received salvation."
-    },
+  "hist-202404": {
+    date: "April 2024",
+    title: "Online Seminar & the First Fruit of Salvation in Ethiopia",
+    location: "Online (BIT Channel)",
+    desc: `Before translating The Bible Is True into Amharic, one of Ethiopia's major languages, an English online Evangelical Seminar was held in April 2024 for the interpreters recruited through online platforms and their acquaintances, so that the interpreters could first gain a sufficient understanding of the message.
 
-    "hist-202412": {
-      date: "December 29, 2024 – January 13, 2025",
-      location: "Mekanisa Yotek Compound, Nifas Silk Lafto, Addis Ababa",
-      title: "Visit to Ethiopia by Brother Kanghyun Lee and His Wife & Search for a Moim House",
-      desc: "Brother Kohen Lee and his wife visited Ethiopia from December 29, 2024 to January 13, 2025 to inspect candidate locations for the Moim House. They toured the candidate location in Mekanisa Yotek compound (Nifas Silk Lafto area, Addis Ababa) and fellowshiped with saved members (Nathinael, Fikru, Eden). (Following the 2024 Czech European Retreat, Brother Kohen Lee was appointed as a missionary to Ethiopia after a phone call with Samonim in November.)"
-    },
+Through this seminar, Brother Nathinael, an anesthesiologist, was the first to give a clear confession and testimony of salvation, becoming the first person in Ethiopia to receive salvation through this gospel outreach.`
+  },
 
-    "hist-202505": {
-      date: "May 2025",
-      location: "",
-      title: "Arrival of Brothers Kanghyun Lee and Junghoon Lee to Move into the Moim House and Prepare for In-Person Seminars",
-      desc: "As the move-in date for the Moim House was set but Brother Kohen Lee could not enter immediately, Brother Franco Lee arrived first from Ghana to prepare the house.\n\n- May 12, 2025: Brother Franco Lee entered Ethiopia from Ghana.\n- May 16, 2025: Brother Kohen Lee entered Ethiopia from the UK.\n\nThe two brothers worked together to complete moving in and prepared for the late May evangelical seminar."
-    },
+  "hist-202408": {
+    date: "August 2024",
+    title: "First Online Seminar After Completion of the Amharic Dubbing",
+    location: "Online (BIT Channel)",
+    desc: `After the Amharic translation of The Bible Is True was completed, an online seminar using the Amharic voice dubbing was held in August 2024.
 
-    "hist-20250528": {
-      date: "May 28 – June 1, 2025",
-      location: "Vibes Hotel, Addis Ababa",
-      title: "Ethiopia’s First In-Person Evangelical Seminar",
-      desc: "Ethiopia's First In-Person Seminar\nLocation: Vibes Hotel, Addis Ababa (May 28–June 1, 2025)\n- Lecture: The Bible is True (Amharic Dubbing)\n- Supplementary Explanation: Eunwoo Lee, Hyunsik Jeon\n- Moderators: Kohen, Franco\n- Translators: Yokabet, Biniam [EN<->Amharic], Debora [KO<->Amharic]\n- New Attendees: Approx. 15\n\nVisiting Korean Members (9): Eunwoo Lee, Kyungsoon Han, Soon Ryu (Korea), Hyunsik Jeon (U.S.), Youngsung Park, Gunyang Park (Germany), Lee Benjamin Hae (Malta), Kohen (U.K.), Franco (Ghana)"
-    },
+During this second seminar, Brother Fikru, a doctor working in the same hospital who had been invited by Brother Nathinael, who was in charge of the Tigrinya dubbing, received salvation after listening to the seminar messages.`
+  },
 
-    "hist-20250623": {
-      date: "June 23 – July 13, 2025",
-      location: "Moim House, Addis Ababa, Ethiopia",
-      title: "Departure of Brothers Kanghyun Lee and Junghoon Lee & Visit by Brother Jaewon Kim",
-      desc: "After supporting the seminar in Dar es Salaam, Tanzania following the May seminar, Brothers Kohen and Franco returned to Ethiopia and continued fellowship with local members.\n\nAs their wives neared childbirth, Brother Franco departed for Korea on June 23, 2025, and Brother Kohen departed for the UK on June 24.\n\nDuring their absence, Brother Jaewon Kim came from Togo to stay in Ethiopia for about two weeks (June 27–July 13, 2025) to fellowship with members before returning to Korea."
-    },
+  "hist-202410": {
+    date: "October 2024",
+    title: "Visit by the West Africa Team",
+    location: "Addis Ababa, Ethiopia",
+    desc: `In late October 2024, Samonim said that she hoped the brothers and sisters in Ethiopia who had received salvation could be given a more detailed explanation of the precious blood of Jesus. Brother Eunwoo Lee and his wife, together with Brother Jaewon Kim from the West Africa team, stopped in Ethiopia on their way back after completing seminar schedules in Tanzania and Congo.
 
-    "hist-20250819": {
-      date: "August 19 – October 13, 2025",
-      location: "Moim House, Addis Ababa, Ethiopia",
-      title: "Brother Jaewon Kim and His Family Stay in Ethiopia After the Korea Retreat",
-      desc: "Stopping by Ethiopia before returning to Ghana after the Korea Retreat, Brother Jaewon Kim held weekend meetings focusing on the '7 Covenants' booklet and conducted a small seminar. During this time of praying for staff workers, Brother Fikru officially joined as a staff member."
-    },
+During this visit, they shared The Bible Is True once again with Brother Fikru and his wife, Nathinael, an anesthesiologist, and Mark, and spent time explaining the precious blood of Jesus to them in greater detail.`
+  },
 
-    "hist-20250914": {
-      date: "September 14, 2025",
-      location: "Moim House, Addis Ababa",
-      title: "Ethiopia’s First Baptism",
-      desc: "Four saved brothers and sisters received baptism since the Gospel began in Ethiopia (Eden, Fikru, Zerihun, Getachew / Officiated by Missionary Jaewon Kim). It was the first bold baptism service conducted in an area with strong Orthodox influence."
-    },
+  "hist-202412": {
+    date: "December 29, 2024 – January 13, 2025",
+    title: "Brother Kanghyun Lee and His Wife Visit Ethiopia & Search for a Moim House",
+    location: "Addis Ababa (Mekanisa Yotek Compound, Nifas Silk Lafto)",
+    desc: `Brother Kanghyun Lee and his wife visited Ethiopia from December 29, 2024, to January 13, 2025, to look for a Moim House.
 
-    "hist-20251103": {
-      date: "November 3, 2025",
-      location: "Bole International Airport / Addis Ababa, Ethiopia",
-      title: "Brother Junghoon Lee Re-enters Ethiopia & Preparations Begin for the December Seminar",
-      desc: "Brother Franco Lee arrived in Ethiopia on November 3 and held weekly fellowship meetings centered on 'The Bible is True' with saved members while planning for the next seminar. During this process, Brother Getachew (a medical doctor) assisted in seminar preparations."
-    },
+They personally visited and inspected a potential Moim House in the Mekanisa Yotek Compound in the Nifas Silk Lafto area of Addis Ababa, and also spent time in fellowship with the brothers and sisters who had received salvation (Nathinael, Fikru, and Eden).
 
-    "hist-20251212": {
-      date: "December 12–14, 2025",
-      location: "Moim House, Addis Ababa, Ethiopia",
-      title: "First Evangelical Seminar at the Moim House — Kindling the Flame of the Gospel",
-      desc: "First Evangelical Seminar at the Moim House\nDates: Dec 12–14, 2025\nLocation: Addis Ababa Moim House\n- ELC Staff Fikru & Franco prepared the seminar\n- Brother Kohen joined from the UK on Dec 12\n- Sister Eden & house assistant served meals for 12 attendees\n\n[Saved Members]\n1. Samrawit Megersa (Student, 22)\n2. Mekdes Adunga (Nurse, 31)\n3. Ahimed Seid (Former Prophet/ELC Staff, 32)\n\n(Both Brother Kohen and Brother Franco returned to Ethiopia when their babies were around 90 days old.)"
-    },
+(After the 2024 European Retreat in the Czech Republic, it was decided around November, following a phone conversation with Samonim, that Brother Kanghyun Lee would be sent to Ethiopia as a missionary.)`
+  },
 
-    "hist-20251221": {
-      date: "December 21, 2025",
-      location: "Moim House, Addis Ababa",
-      title: "Baptism",
-      desc: "Baptism administered to 5 saved members from the December seminar (Ahimed, Samrawit, Yosef, Masresha, Dereje)."
-    },
+  "hist-202505": {
+    date: "May 2025",
+    title: "Arrival to Move into the Moim House and Prepare for the In-Person Seminar (Brothers Kanghyun Lee & Junghoon Lee)",
+    location: "",
+    desc: `The move-in date for the Moim House had been set, but Brother Kanghyun Lee was unable to enter Ethiopia immediately. Therefore, Brother Junghoon Lee, who was in Ghana, entered Ethiopia first and began preparing for the move.
 
-    "hist-20260117": {
-      date: "January 17–19, 2026",
-      location: "Gudina Tumsa Retreat Center, Addis Ababa",
-      title: "Evangelical Seminar — The Flame of the Gospel Spreads Further",
-      desc: "During the Epiphany holiday (celebrating the baptism of Jesus), a 3-day evangelical seminar was held from Jan 17 to 19. A total of 16 new attendees heard the Bible lectures."
-    },
+- May 12, 2025: Brother Junghoon Lee entered Ethiopia from Ghana.
+- May 16, 2025: Brother Kanghyun Lee entered Ethiopia from the United Kingdom.
 
-    "hist-1788440866029": {
-      date: "February 1, 2026",
-      location: "Moim House, Addis Ababa",
-      title: "Baptism",
-      desc: "Baptism was administered to members saved through the January seminar. During this period, hymnal sheet music editing, booklet translation, and printing were initiated."
-    },
+The two brothers worked together to complete the move into the Moim House and prepared for the Evangelical Seminar scheduled for the end of May.`
+  },
 
-    "hist-20260206": {
-      date: "February 6–8, 2026",
-      location: "Gudina Tumsa Retreat Center, Addis Ababa",
-      title: "Evangelical Seminar at Gudina Tumsa Retreat Center",
-      desc: "The early February seminar was initially planned to be skipped, but following Samonim's encouraging remark, 'Time passes so quickly, doesn't it?', the brothers immediately pushed forward. Over 50 new attendees filled the venue.\n\nHowever, due to long-term tourist visa stay issues raised by immigration, Brothers Kohen and Franco decided to return to Korea to complete church registration procedures before re-entering. From February onwards, Brother Fikru began leading the seminars directly.\n\n(Through this seminar, Brother Abdissa, now an ELC staff member, and Sena, working as a domestic helper at Brother Fikru's home, were saved.)"
-    },
+  "hist-20250528": {
+    date: "May 28 – June 1, 2025",
+    title: "Ethiopia's First In-Person Seminar",
+    location: "Vibes Hotel, Addis Ababa",
+    desc: `- Lectures: The Bible Is True (Amharic dubbing)
+- Supplementary explanations of the seminar messages: Eunwoo Lee, Hyunsik Jeon
+- Moderators: Kanghyun Lee, Junghoon Lee
+- Interpretation: Yokabet, Biniam [English ↔ Amharic], Deborah (Good News Church staff) [Korean ↔ Amharic]
+- New attendees: approximately 15
 
-    "hist-20260226": {
-      date: "February 26 – March 2, 2026",
-      location: "Moim House, Addis Ababa",
-      title: "Evangelical Seminar at the Moim House (Invitation for Pastor Marcos and Church Board Members)",
-      desc: "Pastor Marcos, residing in Hawassa, is the General Overseer of 'Gospel Change International' with over 2,000 members in Sidama State.\n\nFollowing the February seminar, Pastor Marcos visited the Addis Ababa Moim House and engaged in deep biblical fellowship with Brothers Kohen and Franco."
-    },
+Brothers and sisters from Korea and other countries who supported the seminar (9): Eunwoo Lee, Kyungsoon Han, Soon Ryu (Korea), Hyunsik Jeon (U.S.), Youngsung Park (Germany), Geonyang Park (Germany), Lee Benjamin Hae (Malta), Kanghyun Lee (U.K.), Junghoon Lee (Ghana)`
+  },
 
-    "hist-1788349055531": {
-      date: "March 13–16, 2026",
-      location: "Moim House, Addis Ababa",
-      title: "Evangelical Seminar",
-      desc: "Brother Abdissa, saved in the February seminar, actively began inviting people around him and joined in gospel outreach."
-    },
+  "hist-20250623": {
+    date: "June 23 – July 13, 2025",
+    title: "Brothers Kanghyun Lee & Junghoon Lee Depart & Brother Jaewon Kim Visits Ethiopia",
+    location: "Moim House, Addis Ababa, Ethiopia",
+    desc: `After the May seminar, Brothers Kanghyun Lee and Junghoon Lee returned to Ethiopia after supporting an Evangelical Seminar in Dar es Salaam, Tanzania, and continued having fellowship with the local brothers and sisters.
 
-    "hist-20260424": {
-      date: "April 24–27, 2026",
-      location: "Moim House, Addis Ababa",
-      title: "April Evangelical Seminar",
-      desc: "Through the April seminar, Brother Abenezer Tadese, then an English teacher, accepted the Gospel and currently serves as an ELC staff member."
-    },
+With their wives approaching childbirth, Brother Junghoon Lee departed for Korea on June 23, 2025, and Brother Kanghyun Lee departed for the United Kingdom on June 24.
 
-    "hist-1788369048749": {
-      date: "May 15–18, 2026",
-      location: "Gudina Tumsa Retreat Center, Addis Ababa",
-      title: "Evangelical Seminar",
-      desc: "Evangelical seminars continued without pause despite the prolonged absence of Brothers Kohen and Franco."
-    },
+While the two brothers were away, Brother Jaewon Kim came to Ethiopia from Togo and stayed for about two weeks (June 27–July 13, 2025), spending time in fellowship with the brothers and sisters before returning to Korea.`
+  },
 
-    "hist-1788369145959": {
-      date: "June 5–8 / June 18–22, 2026",
-      location: "Gudina Tumsa Retreat Center, Addis Ababa",
-      title: "Evangelical Seminar",
-      desc: "Two evangelical seminars were held in June, steadily spreading the Gospel."
-    },
+  "hist-20250819": {
+    date: "August 19 – October 13, 2025",
+    title: "Brother Jaewon Kim and His Family Visit and Stay in Ethiopia After the Korea Retreat",
+    location: "Moim House, Addis Ababa, Ethiopia",
+    desc: `After attending the retreat in Korea, Brother Jaewon Kim stopped in Ethiopia before returning to Ghana. He continued holding weekend meetings centered on the Seven Covenants booklet and also held one small seminar. It was a period in which he continued the meetings alone through various difficulties, without any staff members available to help him.`
+  },
 
-    "hist-1788369417375": {
-      date: "July 16–20, 2026",
-      location: "ODA NABEE Hotel, Bishoftu",
-      title: "Evangelical Seminar",
-      desc: "While the EGBCC church registration was completed, ICS immigration registration was delayed. Brother Kohen entered Ethiopia on a tourist visa to handle administrative affairs and organized this seminar."
-    },
+  "hist-20250914": {
+    date: "September 14, 2025",
+    title: "Ethiopia's First Baptism",
+    location: "Moim House, Addis Ababa",
+    desc: `Four brothers and sisters who had received salvation since the gospel work began in Ethiopia were baptized. (From left: Eden, Fikru, Jerihun, Getachew / Baptism conducted by: Missionary Jaewon Kim)
 
-    "hist-1788369801465": {
-      date: "August 16, 2026",
-      location: "Moim House, Addis Ababa",
-      title: "Baptism",
-      desc: "After completing all church registration procedures and attending the Korea Retreat, Brothers Kohen and Franco returned to Ethiopia on August 6 with Brother Fikru's family. On August 16, baptism was administered to 28 members saved through past seminars."
-    },
+Because of the strong influence of the Ethiopian Orthodox Church in Ethiopian society, it was not easy to conduct baptisms in swimming pools, rivers, or lakes where they would attract public attention. Therefore, a portable swimming pool brought from Ghana was filled with water and used for the baptisms.`
+  },
 
-    "hist-1788370209650": {
-      date: "August 20–24, 2026",
-      location: "ODA NABEE Hotel, Bishoftu",
-      title: "Evangelical Seminar",
-      desc: "(New Attendees: 29, Saved Members: 25)\nWith all legal and administrative procedures completed, full-scale gospel preaching began without restrictions. Many attendees gave clear testimonies of salvation."
-    }
-  };
+  "hist-20251103": {
+    date: "November 3, 2025",
+    title: "Brother Junghoon Lee Re-enters Ethiopia & Preparations for the December Seminar",
+    location: "Bole International Airport / Addis Ababa, Ethiopia",
+    desc: `Brother Junghoon Lee entered Ethiopia on November 3 and continued weekly fellowship with the brothers and sisters who had already received salvation, centered on the messages of The Bible Is True, while planning and preparing for the next Evangelical Seminar. During this process, Brother Fikru, who had left his work as a doctor and joined ELC as a staff member, accompanied him and worked together in preparing for the seminar.`
+  },
+
+  "hist-20251212": {
+    date: "December 12–14, 2025",
+    title: "First Evangelical Seminar at the Moim House, Kindling the Flame of the Gospel",
+    location: "Moim House, Addis Ababa, Ethiopia",
+    desc: `The first Evangelical Seminar at the Moim House was held after carefully preparing the interior of the house and inviting people to attend.
+
+Brother Biniam, a pharmacist who had attended the May seminar at Brother Fikru's invitation, continued to regularly attend fellowship afterward. For the December seminar, he invited five pastors from the Adama area. In addition, one of Brother Fikru's coworkers, who was working as a nurse, and Sister Eden's younger sister were invited and attended the seminar.
+
+[Meal Preparation] Since it was too much for Sister Eden alone to prepare meals for 12 people and wash all the dishes, a house helper was hired for three days to assist her.
+
+(On December 12, 2025, the first day of the seminar, Brother Kanghyun Lee came from the United Kingdom and joined the seminar.
+
+- Both Brother Kanghyun Lee and Brother Junghoon Lee came to Ethiopia when their babies were around 90 days old.)`
+  },
+
+  "hist-20251221": {
+    date: "December 21, 2025",
+    title: "Baptism",
+    location: "Moim House, Addis Ababa",
+    desc: `Five brothers and sisters who received salvation through the December seminar were baptized (Ahmed, Samrawit, Yosef, Masresha, Dereje).`
+  },
+
+  "hist-20260117": {
+    date: "January 17–19, 2026",
+    title: "Evangelical Seminar — The Flame of the Gospel Spreads More Powerfully",
+    location: "Gudina Tumsa Retreat Center, Addis Ababa",
+    desc: `During the holiday period for Timkat, one of Ethiopia's major religious festivals commemorating the baptism of Jesus, a three-day Evangelical Seminar was held from Saturday, January 17, through Monday, January 19. A total of 16 new people were invited and attended the seminar.
+
+The nearby Gudina Tumsa Retreat Center was used as the seminar venue. Gudina Tumsa was one of Ethiopia's prominent Christian leaders and a former General Secretary of the Ethiopian Evangelical Church Mekane Yesus (EECMY), the world's largest Lutheran denomination. He was martyred during Ethiopia's communist regime.`
+  },
+
+  "hist-1788440866029": {
+    date: "February 1, 2026",
+    title: "Baptism",
+    location: "Moim House, Addis Ababa",
+    desc: `A brother or sister who received salvation through the January seminar was baptized.
+
+Around this time, work also began on editing hymn sheet music, translating materials for the meetings, and printing them.`
+  },
+
+  "hist-20260206": {
+    date: "February 6–8, 2026",
+    title: "Evangelical Seminar at Gudina Tumsa Retreat Center",
+    location: "Gudina Tumsa, Addis Ababa",
+    desc: `Originally, we had planned to skip the Evangelical Seminar in early February. However, when Samonim said, "Time is passing so quickly, isn't it?" the brothers did not simply let those words pass by, but immediately began preparing for the seminar. Although they had less than a week to invite attendees and arrange a venue, remarkably, more than 50 new people were invited and filled the seminar venue.
+
+Around this time, their extended stay in Ethiopia on tourist visas became an issue with Immigration. As a result, Brothers Kanghyun Lee and Junghoon Lee decided to return to Korea, complete the registration process for the Ethiopian church, and then re-enter Ethiopia. From the seminar period until their departure, they gathered the brothers every night to study the Bible together and discuss how to continue the seminars and fellowship. Beginning with the February seminar, Brother Fikru started taking the lead in conducting the seminars.
+
+(Through this seminar, Brother Abdissa, who is now serving as an ELC staff member, and Sena, who works as a house helper in Brother Fikru's home, received salvation.)`
+  },
+
+  "hist-20260226": {
+    date: "February 26 – March 2, 2026",
+    title: "Evangelical Seminar at the Moim House (Pastor Marcos Invites Church Board Members)",
+    location: "Moim House, Addis Ababa",
+    desc: `Pastor Marcos, who lives in Hawassa, is the chairman and overseeing pastor of Gospel Change International, a denomination with more than 2,000 members in the Sidama Region.
+
+After the seminar in early February, Pastor Marcos was invited to the Moim House. While watching Lesson 8 of The Bible Is True together, which deals with baptism, he said, "I realized that if a person has truly received salvation, it is right for that person to be baptized," and personally asked to be baptized. A baptism pool was therefore quickly set up and filled with water, and he was baptized.
+
+Afterward, Pastor Marcos expressed his desire to invite the board members of his church so that they could also hear the Word. This led to the Evangelical Seminar being held at the end of February.`
+  },
+
+  "hist-1788349055531": {
+    date: "March 13–16, 2026",
+    title: "Evangelical Seminar",
+    location: "Moim House, Addis Ababa",
+    desc: `Brother Abdissa, who received salvation through the February Evangelical Seminar, began actively inviting people around him to the seminars and taking part in spreading the gospel.`
+  },
+
+  "hist-20260424": {
+    date: "April 24–27, 2026",
+    title: "April Evangelical Seminar",
+    location: "Moim House, Addis Ababa",
+    desc: `Through the April Evangelical Seminar, Brother Abenezer Tadese, who was working as an English teacher at the time, received salvation. He has since joined ELC as a staff member and is now working together with us.`
+  },
+
+  "hist-1788369048749": {
+    date: "May 15–18, 2026",
+    title: "Evangelical Seminar",
+    location: "Gudina Tumsa, Addis Ababa",
+    desc: `The Evangelical Seminars continued without interruption even as the absence of Brothers Kanghyun Lee and Junghoon Lee became prolonged.`
+  },
+
+  "hist-1788369145959": {
+    date: "June 5–8 / June 18–22, 2026",
+    title: "Evangelical Seminar",
+    location: "Gudina Tumsa, Addis Ababa",
+    desc: `Two Evangelical Seminars were held in June as well, as the gospel continued to be preached steadily.`
+  },
+
+  "hist-1788369417375": {
+    date: "July 16–20, 2026",
+    title: "Evangelical Seminar",
+    location: "ODA NABEE Hotel, Bishoftu",
+    desc: `Although the church registration with the Ethiopian Gospel Believers' Churches Council (EGBCC) had been completed, registration with Immigration (ICS) was delayed. Brother Kanghyun Lee therefore entered Ethiopia on a tourist visa and, while handling the necessary administrative work, prepared and held this Evangelical Seminar.`
+  },
+
+  "hist-1788369801465": {
+    date: "August 16, 2026",
+    title: "Baptism",
+    location: "Moim House, Addis Ababa",
+    desc: `After completing all the procedures required for the registration of the church in Ethiopia and attending the retreat in Korea, Brothers Kanghyun Lee and Junghoon Lee returned to Ethiopia on August 6 together with Brother Fikru and his family. On August 16, those who had received salvation through the Evangelical Seminars were baptized.
+
+A total of 28 people were baptized.`
+  },
+
+  "hist-1788370209650": {
+    date: "August 20–24, 2026",
+    title: "Evangelical Seminar",
+    location: "ODA NABEE Hotel, Bishoftu",
+    desc: `(New attendees: 29 / Brothers and sisters: 25) After all legal and administrative procedures had been completed and official status had been secured, full-scale gospel outreach began without restrictions. It was an Evangelical Seminar in which many attendees gave clear testimonies of salvation.`
+  }
+};
 
   class I18nManager {
     constructor() {
