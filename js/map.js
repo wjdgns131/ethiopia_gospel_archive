@@ -161,30 +161,30 @@ class EthiopiaMapComponent {
         });
         this.markers = [];
 
-        // Render 100% Exact 3D Volumetric Red/Blue Pins from User Image media_1788507695660.png!
+        // Render Sleek Compact 3D Thumbtack Pins matching user image media_1788507983724.png!
         ETHIOPIA_REGIONS.forEach(reg => {
           const cnt = counts[reg.id] || 0;
           if (cnt === 0) return;
 
           const isActive = this.activeRegion === reg.id;
-          const pinImgSrc = isActive ? "images/pin_3d_blue.png?v=20260904_31" : "images/pin_3d_red.png?v=20260904_31";
+          const pinImgSrc = isActive ? "images/thumbtack_blue.png?v=20260904_32" : "images/thumbtack_red.png?v=20260904_32";
           const nameColor = isActive ? "#fbbf24" : "#ffffff";
           const scaleTransform = isActive ? "scale(1.25)" : "scale(1)";
 
           const customPinHtml = `
-            <div onclick="if(window.mapComponent) window.mapComponent.selectRegion('${reg.id}')" style="display:flex; flex-direction:column; align-items:center; cursor:pointer; transform-origin:bottom center; transform:${scaleTransform}; transition:all 0.2s ease;">
-              <!-- User Uploaded Exact 3D Volumetric Pin Image -->
-              <img src="${pinImgSrc}" alt="3D Pin" style="width:36px; height:40px; display:block; filter:drop-shadow(0 4px 8px rgba(0,0,0,0.6));" />
+            <div onclick="if(window.mapComponent) window.mapComponent.selectRegion('${reg.id}')" style="display:flex; flex-direction:column; align-items:center; cursor:pointer; transform-origin:bottom left; transform:${scaleTransform}; transition:all 0.2s ease;">
+              <!-- Compact Sleek 3D Stuck Thumbtack Pin Image -->
+              <img src="${pinImgSrc}" alt="Thumbtack Pin" style="width:24px; height:26px; display:block; filter:drop-shadow(0 3px 6px rgba(0,0,0,0.65));" />
               <!-- Transparent City Name -->
-              <span style="color:${nameColor}; font-size:11.5px; font-weight:800; text-shadow:0 2px 5px rgba(0,0,0,0.95), 0 0 8px rgba(0,0,0,0.9); white-space:nowrap; margin-top:1px;">${reg.id}</span>
+              <span style="color:${nameColor}; font-size:11px; font-weight:800; text-shadow:0 2px 5px rgba(0,0,0,0.95), 0 0 8px rgba(0,0,0,0.9); white-space:nowrap; margin-top:1px; letter-spacing:-0.01em;">${reg.id}</span>
             </div>
           `;
 
           const pinIcon = L.divIcon({
-            className: 'custom-3d-user-pin',
+            className: 'custom-sleek-thumbtack-pin',
             html: customPinHtml,
-            iconSize: [60, 58],
-            iconAnchor: [30, 40] // Exact Tip Anchor Point!
+            iconSize: [50, 48],
+            iconAnchor: [12, 24] // Exact Stuck Tip Anchor Point!
           });
 
           const marker = L.marker([reg.lat, reg.lng], { icon: pinIcon }).addTo(this.leafletMap);
