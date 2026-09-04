@@ -134,14 +134,16 @@ class EthiopiaMapComponent {
       const isActive = this.activeRegion === reg.id;
       const pos = geoPos[reg.id] || { top: "50%", left: "50%" };
 
+      const pinColor = isActive ? "#2563eb" : "#ef4444";
+      const nameColor = isActive ? "#fbbf24" : "#ffffff";
+      const scaleTransform = isActive ? "scale(1.3)" : "scale(1)";
+
       pinsHtml += `
-        <div onclick="if(window.mapComponent) window.mapComponent.selectRegion('${reg.id}')" style="position:absolute; top:${pos.top}; left:${pos.left}; transform:translate(-50%, -50%); z-index:20; cursor:pointer; display:flex; flex-direction:column; align-items:center;">
-          <div style="background:${isActive ? '#1d4ed8' : '#d97706'}; color:#ffffff; font-weight:900; font-size:11px; padding:3px 8px; border-radius:14px; border:2px solid #ffffff; box-shadow:0 4px 15px rgba(0,0,0,0.6); display:inline-flex; align-items:center; gap:4px; transform:${isActive ? 'scale(1.2)' : 'scale(1)'}; transition:all 0.2s ease; white-space:nowrap;">
-            <i class="fa-solid fa-location-dot" style="color:#fbbf24; font-size:12px;"></i>
-            <span>${reg.id}</span>
-            <span style="background:rgba(255,255,255,0.3); padding:1px 5px; border-radius:10px; font-size:9.5px;">${cnt}명</span>
-          </div>
-          <div style="width:0; height:0; border-left:5px solid transparent; border-right:5px solid transparent; border-top:6px solid ${isActive ? '#1d4ed8' : '#d97706'};"></div>
+        <div onclick="if(window.mapComponent) window.mapComponent.selectRegion('${reg.id}')" style="position:absolute; top:${pos.top}; left:${pos.left}; transform:translate(-50%, -100%); z-index:20; cursor:pointer; display:flex; flex-direction:column; align-items:center; pointer-events:auto; transform-origin:bottom center;">
+          <!-- Red Location Pin Icon -->
+          <i class="fa-solid fa-location-dot" style="color:${pinColor}; font-size:24px; filter:drop-shadow(0 3px 6px rgba(0,0,0,0.7)); transform:${scaleTransform}; transition:all 0.2s ease;"></i>
+          <!-- Transparent Region Name -->
+          <span style="color:${nameColor}; font-size:11.5px; font-weight:800; background:transparent; text-shadow:0 2px 5px rgba(0,0,0,0.95), 0 0 8px rgba(0,0,0,0.9); white-space:nowrap; margin-top:-2px; letter-spacing:-0.01em;">${reg.id}</span>
         </div>
       `;
     });
