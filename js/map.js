@@ -148,8 +148,9 @@ class EthiopiaMapComponent {
           }).addTo(this.leafletMap);
         }
 
-        setTimeout(() => { if (this.leafletMap) { this.leafletMap.invalidateSize(); } }, 100);
-        setTimeout(() => { if (this.leafletMap) { this.leafletMap.invalidateSize(); } }, 500);
+        setTimeout(() => {
+          if (this.leafletMap) this.leafletMap.invalidateSize();
+        }, 200);
 
         this.markers.forEach(m => {
           try { this.leafletMap.removeLayer(m); } catch(e) {}

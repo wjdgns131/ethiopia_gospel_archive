@@ -209,55 +209,36 @@ class DirectoryComponent {
 
   filterMembers() {
     let members = window.db ? window.db.getMembers() : [];
-    if (!members || !Array.isArray(members) || members.length === 0) {
-      members = (window.DEFAULT_MEMBERS && window.DEFAULT_MEMBERS.length > 0) ? window.DEFAULT_MEMBERS : [];
+    if (!members || members.length === 0) {
+      members = (typeof DEFAULT_MEMBERS !== 'undefined') ? DEFAULT_MEMBERS : [];
     }
 
     let filtered = members.filter(m => {
       if (!m) return false;
-
       // Category Filter
-      if (this.activeCategory && this.activeCategory !== "all" && m.category !== this.activeCategory) {
-        return false;
-      }
+      if (this.activeCategory !== "all" && m.category !== this.activeCategory) return false;
 
-      // Region Filter Guard: Skip filtering if activeRegion is null, 'all', 'undefined', 'null', or empty
-      if (this.activeRegion) {
-        const regStr = String(this.activeRegion).toLowerCase().trim();
-        if (regStr && regStr !== "all" && regStr !== "undefined" && regStr !== "null" && !regStr.includes("전체") && !regStr.includes("all")) {
-          const normFunc = (typeof normalizeRegionId === 'function') ? normalizeRegionId : (window.normalizeRegionId || (x => x));
-          const mNorm = normFunc(m.region);
-          const aNorm = normFunc(this.activeRegion);
-          const mRaw = String(m.region || '').toLowerCase();
-          const aRaw = String(this.activeRegion || '').toLowerCase();
-
-          if (mNorm !== aNorm && !mRaw.includes(aRaw) && !aRaw.includes(mRaw)) {
-            return false;
-          }
-        }
+      // Region Filter
+      if (this.activeRegion && !this.activeRegion.toLowerCase().includes("전체") && !this.activeRegion.toLowerCase().includes("all")) {
+        const mRegion = (m.region || '').toLowerCase();
+        const aRegion = this.activeRegion.toLowerCase();
+        if (!mRegion.includes(aRegion) && !aRegion.includes(mRegion)) return false;
       }
 
       // Search Query Filter
       if (this.searchQuery) {
-        const q = String(this.searchQuery).toLowerCase().trim();
-        if (q) {
-          const name = String(m.name || '').toLowerCase();
-          const region = String(m.region || '').toLowerCase();
-          const job = String(m.job || '').toLowerCase();
-          const inviter = String(m.inviter || '').toLowerCase();
-          if (!name.includes(q) && !region.includes(q) && !job.includes(q) && !inviter.includes(q)) return false;
-        }
+        const q = this.searchQuery;
+        const name = (m.name || '').toLowerCase();
+        const region = (m.region || '').toLowerCase();
+        const job = (m.job || '').toLowerCase();
+        const inviter = (m.inviter || '').toLowerCase();
+        if (!name.includes(q) && !region.includes(q) && !job.includes(q) && !inviter.includes(q)) return false;
       }
 
       return true;
     });
 
-    // Zero-Loss Fallback: If filtered list is empty, default to full member list to prevent blank grid
-    if ((!filtered || filtered.length === 0) && (!this.searchQuery || this.searchQuery.trim() === "")) {
-      filtered = members;
-    }
-
-    // Sort Chronologically
+    // Chronological Earliest to Latest Sort (2023년 -> 2024년 -> 2025년 -> 2026년)
     filtered.sort((a, b) => this.parseMemberDate(a.assemblyMonth).localeCompare(this.parseMemberDate(b.assemblyMonth)));
     return filtered;
   }
@@ -268,7 +249,7 @@ class DirectoryComponent {
 
     let filtered = this.filterMembers();
     if (!filtered || filtered.length === 0) {
-      filtered = (typeof (window.DEFAULT_MEMBERS || []) !== 'undefined') ? (window.DEFAULT_MEMBERS || []) : [];
+      filtered = (typeof DEFAULT_MEMBERS !== 'undefined') ? DEFAULT_MEMBERS : [];
     }
 
     this.container.className = "member-grid mockup-member-grid";
@@ -293,14 +274,13 @@ class DirectoryComponent {
     card.style.cssText = "cursor:pointer; background:var(--bg-card); border:1px solid var(--border-color); border-radius:20px; overflow:hidden; box-shadow:var(--shadow-sm); transition:transform 0.25s, box-shadow 0.25s; display:flex; flex-direction:column; padding:0.4rem 0.4rem 1rem 0.4rem;";
 
     const photoFrame = document.createElement("div");
-    photoFrame.style.cssText = "position:relative; width:170px; height:170px; margin:0.8rem auto 0.6rem auto; border-radius:18px; overflow:hidden; border:1px solid var(--border-color); background:var(--bg-secondary, #1e293b); flex-shrink:0; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(0,0,0,0.15);";
+    photoFrame.style.cssText = "position:relative; width:170px; height:170px; margin:0.8rem auto 0.6rem auto; border-radius:18px; overflow:hidden; border:1px solid var(--border-color); background:#ffffff; flex-shrink:0; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(0,0,0,0.06);";
 
     const img = document.createElement("img");
     img.src = photoUrl;
     img.alt = m.name || "식구";
     img.loading = "lazy";
     img.style.cssText = "width:100%; height:100%; object-fit:cover; display:block;";
-    img.onerror = function() { this.onerror=null; this.src="images/members/mem_pdf-mem-1.jpg"; };
     photoFrame.appendChild(img);
 
     if (isDisrupter) {
