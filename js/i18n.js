@@ -1303,6 +1303,22 @@
         sidebarTitle.innerHTML = `<span data-i18n="selectRegionTitle">${isEn ? "Select Region" : "지역 선택"}</span> (${cnt}${isEn ? " members" : "명"})`;
       }
 
+      // Calendar Event Category Dropdown Option Labels
+      const eventCategorySelect = document.getElementById("fieldEventCategory");
+      if (eventCategorySelect) {
+        const opts = eventCategorySelect.querySelectorAll("option");
+        opts.forEach(opt => {
+          const val = opt.value;
+          if (val === "assembly") {
+            opt.textContent = this.currentLang === "en" ? "📢 Evangelical Seminar" : "📢 전도집회";
+          } else if (val === "baptism") {
+            opt.textContent = this.currentLang === "en" ? "🌊 Baptism Service" : "🌊 침례식";
+          } else if (val === "other") {
+            opt.textContent = this.currentLang === "en" ? "📌 Other Events" : "📌 기타 일정";
+          }
+        });
+      }
+
       // Update Region Dropdown Option Labels dynamically
       const regionDropdown = document.getElementById("regionDropdown");
       if (regionDropdown) {
