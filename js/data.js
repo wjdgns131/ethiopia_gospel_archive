@@ -2041,10 +2041,15 @@ if (typeof window !== 'undefined') {
         const stored = getMigratedStorageItem(MEMBERS_KEY, ["ethiopia_members_v39000", "ethiopia_members_v36000", "ethiopia_members"]);
         if (stored) {
           const parsed = JSON.parse(stored);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          if (Array.isArray(parsed)) {
+            const valid = parsed.filter(m => m && typeof m === 'object' && m.name && m.id);
+            if (valid.length > 0) return valid;
+          }
         }
-      } catch(e) {}
-      return window.DEFAULT_MEMBERS || [];
+      } catch(e) {
+        console.error("getMembers error:", e);
+      }
+      return (window.DEFAULT_MEMBERS && Array.isArray(window.DEFAULT_MEMBERS) && window.DEFAULT_MEMBERS.length > 0) ? window.DEFAULT_MEMBERS : (typeof DEFAULT_MEMBERS !== 'undefined' ? DEFAULT_MEMBERS : []);
     },
     saveMembers(mems) {
       try {
@@ -2058,36 +2063,15 @@ if (typeof window !== 'undefined') {
         const stored = getMigratedStorageItem(HISTORY_KEY, ["ethiopia_history_v39000", "ethiopia_history_v36000", "ethiopia_history"]);
         if (stored) {
           const parsed = JSON.parse(stored);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          if (Array.isArray(parsed)) {
+            const valid = parsed.filter(h => h && typeof h === 'object' && h.title && h.id);
+            if (valid.length > 0) return valid;
+          }
         }
-      } catch(e) {}
-      return window.DEFAULT_HISTORY || [];
-    },
-    saveHistory(hists) {
-      if (!Array.isArray(hists)) return;
-      try {
-        localStorage.setItem(HISTORY_KEY, JSON.stringify(hists));
       } catch(e) {
-        console.warn("LocalStorage Quota Exceeded in saveHistory. Compressing large images...", e);
-        // Automatic Quota Exceeded Recovery: Compress any large base64 data URLs
-        try {
-          const compressedHists = hists.map(item => {
-            if (!item || !item.images || item.images.length === 0) return item;
-            const slimImages = item.images.map(imgSrc => {
-              if (typeof imgSrc === 'string' && imgSrc.length > 200000 && imgSrc.startsWith("data:image/")) {
-                // Return slightly sliced or truncated data if emergency needed
-                return imgSrc;
-              }
-              return imgSrc;
-            });
-            return { ...item, images: slimImages };
-          });
-          localStorage.setItem(HISTORY_KEY, JSON.stringify(compressedHists));
-        } catch(retryErr) {
-          console.error("Critical Quota Exceeded in saveHistory:", retryErr);
-          alert("브라우저 저장 공간이 가득 찼습니다. [백업 다운로드 (.json)] 버튼으로 데이터를 백업하시거나 일부 오래된 대형 이미지를 삭제해 주세요.");
-        }
+        console.error("getHistory error:", e);
       }
+      return (window.DEFAULT_HISTORY && Array.isArray(window.DEFAULT_HISTORY) && window.DEFAULT_HISTORY.length > 0) ? window.DEFAULT_HISTORY : (typeof DEFAULT_HISTORY !== 'undefined' ? DEFAULT_HISTORY : []);
     },
     getFellowship() {
       try {
