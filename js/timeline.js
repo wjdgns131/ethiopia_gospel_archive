@@ -1053,7 +1053,9 @@ class TimelineComponent {
 
                   <div style="font-size:0.85rem; background:rgba(2,132,199,0.06); padding:0.6rem 0.8rem; border-radius:10px; margin-bottom:0.8rem; border:1px solid rgba(2,132,199,0.12);">
                     <div style="color:var(--text-muted); font-size:0.78rem;">초대자 정보:</div>
-                    <div style="font-weight:700; color:var(--text-primary);">${m.inviter || '자발적 참석'} ${m.inviterRelation ? `(${m.inviterRelation})` : ''}</div>
+                    <div style="font-weight:700; color:var(--text-primary);">
+                      ${m.inviter ? `<span data-action="open-inviter-network" data-id="${m.inviter}" style="cursor:pointer; color:#0284c7; text-decoration:underline;">${m.inviter}</span>` : '자발적 참석'} ${m.inviterRelation ? `(${m.inviterRelation})` : ''}
+                    </div>
                   </div>
                 </div>
 
