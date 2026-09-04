@@ -19,6 +19,23 @@
       } catch(e) {}
     })();
   </script>
+  <!-- Self-Healing Database Purger & Auto-Sync -->
+  <script>
+    (function() {
+      try {
+        var m = localStorage.getItem("ethiopia_members");
+        if (!m || m === "[]" || m === "null" || (JSON.parse(m)||[]).length === 0) {
+          localStorage.removeItem("ethiopia_members");
+          localStorage.removeItem("ethiopia_gospel_members_permanent_v1");
+        }
+        var h = localStorage.getItem("ethiopia_history");
+        if (!h || h === "[]" || h === "null" || (JSON.parse(h)||[]).length === 0) {
+          localStorage.removeItem("ethiopia_history");
+          localStorage.removeItem("ethiopia_gospel_history_permanent_v1");
+        }
+      } catch(e) {}
+    })();
+  </script>
   <!-- Automatic ServiceWorker & Storage Cache Cleaner -->
   <script>
     (function() {
@@ -61,7 +78,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css?v=20260904_V51000_BULLETPROOF_CDN_AND_AUTO_HEAL" />
+  <link rel="stylesheet" href="css/styles.css?v=20260904_V60000_SELF_CLEANING_DATABASE" />
 
   <script>
     // Ensure history is loaded
@@ -3117,14 +3134,14 @@
 
   <!-- Scripts with updated cache buster -->
   <script src="js/leaflet.js"></script>
-  <script src="js/data.js?v=20260904_V51000_BULLETPROOF_CDN_AND_AUTO_HEAL"></script>
-  <script src="js/i18n.js?v=20260904_V51000_BULLETPROOF_CDN_AND_AUTO_HEAL"></script>
-  <script src="js/map.js?v=20260904_V51000_BULLETPROOF_CDN_AND_AUTO_HEAL"></script>
-  <script src="js/directory.js?v=20260904_V51000_BULLETPROOF_CDN_AND_AUTO_HEAL"></script>
-  <script src="js/timeline.js?v=20260904_V51000_BULLETPROOF_CDN_AND_AUTO_HEAL"></script>
-  <script src="js/assemblies.js?v=20260904_V51000_BULLETPROOF_CDN_AND_AUTO_HEAL"></script>
-  <script src="js/calendar.js?v=20260904_V51000_BULLETPROOF_CDN_AND_AUTO_HEAL"></script>
-  <script src="js/admin.js?v=20260904_V51000_BULLETPROOF_CDN_AND_AUTO_HEAL"></script>
-  <script src="js/app.js?v=20260904_V51000_BULLETPROOF_CDN_AND_AUTO_HEAL"></script>
+  <script src="js/data.js?v=20260904_V60000_SELF_CLEANING_DATABASE"></script>
+  <script src="js/i18n.js?v=20260904_V60000_SELF_CLEANING_DATABASE"></script>
+  <script src="js/map.js?v=20260904_V60000_SELF_CLEANING_DATABASE"></script>
+  <script src="js/directory.js?v=20260904_V60000_SELF_CLEANING_DATABASE"></script>
+  <script src="js/timeline.js?v=20260904_V60000_SELF_CLEANING_DATABASE"></script>
+  <script src="js/assemblies.js?v=20260904_V60000_SELF_CLEANING_DATABASE"></script>
+  <script src="js/calendar.js?v=20260904_V60000_SELF_CLEANING_DATABASE"></script>
+  <script src="js/admin.js?v=20260904_V60000_SELF_CLEANING_DATABASE"></script>
+  <script src="js/app.js?v=20260904_V60000_SELF_CLEANING_DATABASE"></script>
 </body>
 </html>
