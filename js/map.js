@@ -161,32 +161,33 @@ class EthiopiaMapComponent {
         });
         this.markers = [];
 
-        // Render Glossy 3D Red Sphere Needle Pins Anchored to Real Lat/Lng Coordinates!
+        // Render SVG Classic Google Maps Red Teardrop Pins matching user image media_1788507499881.png!
         ETHIOPIA_REGIONS.forEach(reg => {
           const cnt = counts[reg.id] || 0;
           if (cnt === 0) return;
 
           const isActive = this.activeRegion === reg.id;
-          const sphereColor = isActive ? "radial-gradient(circle at 35% 35%, #60a5fa 0%, #1d4ed8 55%, #1e40af 100%)" : "radial-gradient(circle at 35% 35%, #ff8888 0%, #dc2626 55%, #991b1b 100%)";
+          const pinFillColor = isActive ? "#2563eb" : "#e11d48";
           const nameColor = isActive ? "#fbbf24" : "#ffffff";
           const scaleTransform = isActive ? "scale(1.25)" : "scale(1)";
 
           const customPinHtml = `
             <div onclick="if(window.mapComponent) window.mapComponent.selectRegion('${reg.id}')" style="display:flex; flex-direction:column; align-items:center; cursor:pointer; transform-origin:bottom center; transform:${scaleTransform}; transition:all 0.2s ease;">
-              <!-- Glossy 3D Red Sphere Ball -->
-              <div style="width:20px; height:20px; border-radius:50%; background:${sphereColor}; box-shadow:0 4px 10px rgba(0,0,0,0.6), inset -2px -2px 4px rgba(0,0,0,0.4); border:1.5px solid #ffffff;"></div>
-              <!-- Silver Metallic Needle Stem -->
-              <div style="width:2.5px; height:24px; background:linear-gradient(to right, #94a3b8, #f8fafc 50%, #64748b); box-shadow:1px 0 4px rgba(0,0,0,0.5); margin-top:-1px;"></div>
+              <!-- Classic Google Red Teardrop Pin with White Center Circle -->
+              <svg width="28" height="36" viewBox="0 0 28 36" style="filter:drop-shadow(0 4px 8px rgba(0,0,0,0.6));">
+                <path d="M14 0 C6.268 0 0 6.268 0 14 C0 24.5 14 36 14 36 C14 36 28 24.5 28 14 C28 6.268 21.732 0 14 0 Z" fill="${pinFillColor}"/>
+                <circle cx="14" cy="13" r="5.5" fill="#ffffff"/>
+              </svg>
               <!-- Transparent City Name -->
               <span style="color:${nameColor}; font-size:11.5px; font-weight:800; text-shadow:0 2px 5px rgba(0,0,0,0.95), 0 0 8px rgba(0,0,0,0.9); white-space:nowrap; margin-top:2px;">${reg.id}</span>
             </div>
           `;
 
           const pinIcon = L.divIcon({
-            className: 'custom-3d-needle-pin',
+            className: 'custom-google-teardrop-pin',
             html: customPinHtml,
-            iconSize: [60, 60],
-            iconAnchor: [30, 43] // Exact Needle Tip Anchor Point!
+            iconSize: [60, 56],
+            iconAnchor: [30, 36] // Exact Teardrop Tip Anchor Point!
           });
 
           const marker = L.marker([reg.lat, reg.lng], { icon: pinIcon }).addTo(this.leafletMap);
