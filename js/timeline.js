@@ -14,17 +14,37 @@ class TimelineComponent {
     this.initEvents();
   }
 
+  getFilteredAndSortedHistory() {
+    let historyList = [];
+    try {
+      historyList = window.db ? window.db.getHistory() : [];
+    } catch(e) {
+      console.error("Timeline getHistory error:", e);
+      historyList = [];
+    }
+
+    if (!historyList || !Array.isArray(historyList) || historyList.length === 0) {
+      historyList = (window.DEFAULT_HISTORY && window.DEFAULT_HISTORY.length > 0) ? window.DEFAULT_HISTORY : (typeof DEFAULT_HISTORY !== 'undefined' ? DEFAULT_HISTORY : []);
+    }
+
+    historyList = historyList.filter(h => h && typeof h === 'object' && h.title);
+    if (historyList.length === 0) {
+      historyList = (window.DEFAULT_HISTORY && window.DEFAULT_HISTORY.length > 0) ? window.DEFAULT_HISTORY : (typeof DEFAULT_HISTORY !== 'undefined' ? DEFAULT_HISTORY : []);
+    }
+
+    if (this.activeYear) {
+      historyList = historyList.filter(item => item && item.date && item.date.includes(this.activeYear));
+    }
+
+    historyList.sort((a, b) => this.parseTimelineDate(a.date).localeCompare(this.parseTimelineDate(b.date)));
+    return historyList;
+  }
+
   filterByYear(year) {
     this.activeYear = year;
-    let historyList = window.db ? window.db.getHistory() : [];
-    if (!historyList || historyList.length === 0) historyList = DEFAULT_HISTORY;
-
-    const filteredList = this.activeYear 
-      ? historyList.filter(item => item && item.date && item.date.includes(this.activeYear))
-      : historyList;
-
-    if (filteredList && filteredList.length > 0) {
-      this.activeId = filteredList[0].id;
+    const historyList = this.getFilteredAndSortedHistory();
+    if (historyList && historyList.length > 0) {
+      this.activeId = historyList[0].id;
     }
     this.render();
   }
@@ -546,7 +566,7 @@ class TimelineComponent {
     this.isNavigating = true;
     setTimeout(() => { this.isNavigating = false; }, 350);
 
-    const historyList = window.db ? window.db.getHistory() : [];
+    const historyList = this.getFilteredAndSortedHistory();
     if (!historyList || historyList.length === 0) return;
 
     let currentIndex = historyList.findIndex(h => h && h.id === this.activeId);
@@ -574,7 +594,7 @@ class TimelineComponent {
 
   // In-Place Smooth Transition (No DOM Destruction = NO LAG, NO JUMPING!)
   transitionTo(targetId) {
-    const historyList = window.db ? window.db.getHistory() : [];
+    const historyList = this.getFilteredAndSortedHistory();
     const targetIndex = historyList.findIndex(h => h && h.id === targetId);
     if (targetIndex === -1) return;
 
@@ -760,38 +780,20 @@ class TimelineComponent {
     this.container = document.getElementById("timelineContainer") || document.getElementById("timelineList");
     if (!this.container) return;
 
-    let historyList = [];
-    try {
-      historyList = window.db ? window.db.getHistory() : [];
-    } catch(e) {
-      console.error("Timeline getHistory error:", e);
-      historyList = [];
-    }
+    let rawList = [];
+    try { rawList = window.db ? window.db.getHistory() : []; } catch(e) {}
+    if (!rawList || rawList.length === 0) rawList = window.DEFAULT_HISTORY || [];
 
-    if (!historyList || !Array.isArray(historyList) || historyList.length === 0) {
-      historyList = (window.DEFAULT_HISTORY && window.DEFAULT_HISTORY.length > 0) ? window.DEFAULT_HISTORY : [];
-    }
-
-    historyList = historyList.filter(h => h && typeof h === 'object' && h.title);
-    if (historyList.length === 0) {
-      historyList = window.DEFAULT_HISTORY || [];
-    }
+    const historyList = this.getFilteredAndSortedHistory();
 
     // Extract all unique years dynamically for the Year Filter Selector Bar
-    const allYears = Array.from(new Set(historyList.map(item => {
+    const allYears = Array.from(new Set(rawList.map(item => {
       if (!item || !item.date) return null;
       const match = String(item.date).match(/\d{4}/);
       return match ? match[0] : null;
     }).filter(Boolean))).sort((a, b) => a - b);
 
-    // Apply Year Filter if activeYear is selected
-    const allHistoryList = [...historyList];
-    if (this.activeYear) {
-      historyList = historyList.filter(item => item && item.date && item.date.includes(this.activeYear));
-    }
-
-    // Chronological Ascending Sort (Left to Right: 2023 -> 2024 -> 2025 -> 2026)
-    historyList.sort((a, b) => this.parseTimelineDate(a.date).localeCompare(this.parseTimelineDate(b.date)));
+    const allHistoryList = [...rawList];
 
     if (!this.activeId || !historyList.some(h => h && h.id === this.activeId)) {
       this.activeId = historyList[0] ? historyList[0].id : null;

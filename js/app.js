@@ -136,6 +136,31 @@ document.addEventListener("DOMContentLoaded", () => {
   try { if (window.assembliesComponent) window.assembliesComponent.render(); } catch (e) { console.error("Assemblies render error:", e); }
   try { if (window.calendarComponent) window.calendarComponent.render(); } catch (e) { console.error("Calendar render error:", e); }
 
+  // Bind Region Dropdown Change Listener
+  try {
+    const regionDropdown = document.getElementById("regionDropdown");
+    if (regionDropdown) {
+      regionDropdown.addEventListener("change", (e) => {
+        const val = e.target.value;
+        const targetRegion = (val === "all" || !val) ? null : val;
+        if (window.mapComponent) {
+          window.mapComponent.selectRegion(targetRegion);
+        } else if (window.directoryComponent) {
+          window.directoryComponent.activeRegion = targetRegion;
+          window.directoryComponent.render();
+        }
+      });
+    }
+  } catch(e) { console.error("Region dropdown bind error:", e); }
+
+  window.addEventListener("load", () => {
+    try {
+      if (window.mapComponent) {
+        window.mapComponent.render(window.db ? window.db.getMembers() : []);
+      }
+    } catch(e) {}
+  });
+
   // 4. Modal Close Handlers
   try {
     document.querySelectorAll("[data-close]").forEach(btn => {
