@@ -161,29 +161,30 @@ class EthiopiaMapComponent {
         });
         this.markers = [];
 
-        // Render Sleek Dark Backdrop Region Name Pills anchored at Lat/Lng without Pin Graphics!
+        // Render Compact Pin Graphic Icon with Transparent White Text (Zero Box Backdrop!)
         ETHIOPIA_REGIONS.forEach(reg => {
           const cnt = counts[reg.id] || 0;
           if (cnt === 0) return;
 
           const isActive = this.activeRegion === reg.id;
-          const bgStyle = isActive ? "background:#1d4ed8; border:1.5px solid #fbbf24; color:#ffffff;" : "background:rgba(15,23,42,0.85); border:1px solid rgba(255,255,255,0.25); color:#f8fafc;";
-          const scaleTransform = isActive ? "scale(1.15)" : "scale(1)";
+          const pinImgSrc = isActive ? "images/thumbtack_blue.png?v=20260904_34" : "images/thumbtack_red.png?v=20260904_34";
+          const nameColor = isActive ? "#fbbf24" : "#ffffff";
+          const scaleTransform = isActive ? "scale(1.25)" : "scale(1)";
 
-          const customPillHtml = `
-            <div onclick="if(window.mapComponent) window.mapComponent.selectRegion('${reg.id}')" style="display:flex; flex-direction:column; align-items:center; cursor:pointer; transform-origin:center center; transform:${scaleTransform}; transition:all 0.2s ease;">
-              <!-- Sleek Dark Backdrop Region Name Pill -->
-              <div style="${bgStyle} font-size:11.5px; font-weight:800; padding:3px 9px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.6); white-space:nowrap; backdrop-filter:blur(4px); letter-spacing:-0.01em; display:flex; align-items:center; gap:4px;">
-                <span>${reg.id}</span>
-              </div>
+          const customPinHtml = `
+            <div onclick="if(window.mapComponent) window.mapComponent.selectRegion('${reg.id}')" style="display:flex; flex-direction:column; align-items:center; cursor:pointer; transform-origin:bottom left; transform:${scaleTransform}; transition:all 0.2s ease;">
+              <!-- Compact Sleek 3D Pin Icon -->
+              <img src="${pinImgSrc}" alt="Pin Icon" style="width:24px; height:26px; display:block; filter:drop-shadow(0 3px 6px rgba(0,0,0,0.7));" />
+              <!-- Crisp Transparent White Text -->
+              <span style="color:${nameColor}; font-size:11.5px; font-weight:800; background:transparent; text-shadow:0 2px 5px rgba(0,0,0,0.95), 0 0 8px rgba(0,0,0,0.9); white-space:nowrap; margin-top:1px; letter-spacing:-0.01em;">${reg.id}</span>
             </div>
           `;
 
           const pinIcon = L.divIcon({
-            className: 'custom-sleek-pill-marker',
-            html: customPillHtml,
-            iconSize: [60, 30],
-            iconAnchor: [30, 15] // Center Anchor Point!
+            className: 'custom-sleek-pin-marker',
+            html: customPinHtml,
+            iconSize: [50, 48],
+            iconAnchor: [12, 24] // Exact Stuck Tip Anchor Point!
           });
 
           const marker = L.marker([reg.lat, reg.lng], { icon: pinIcon }).addTo(this.leafletMap);
