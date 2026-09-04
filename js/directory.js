@@ -209,8 +209,8 @@ class DirectoryComponent {
 
   filterMembers() {
     let members = window.db ? window.db.getMembers() : [];
-    if (!members || members.length === 0) {
-      members = (typeof (window.DEFAULT_MEMBERS || []) !== 'undefined') ? (window.DEFAULT_MEMBERS || []) : [];
+    if (!members || !Array.isArray(members) || members.length === 0) {
+      members = (window.DEFAULT_MEMBERS && window.DEFAULT_MEMBERS.length > 0) ? window.DEFAULT_MEMBERS : [];
     }
 
     let filtered = members.filter(m => {
@@ -218,27 +218,36 @@ class DirectoryComponent {
       // Category Filter
       if (this.activeCategory !== "all" && m.category !== this.activeCategory) return false;
 
-      // Region Filter
+      // Region Filter with Normalized Bilingual Comparison (Korean <-> English)
       if (this.activeRegion && !this.activeRegion.toLowerCase().includes("전체") && !this.activeRegion.toLowerCase().includes("all")) {
-        const mRegion = (m.region || '').toLowerCase();
-        const aRegion = this.activeRegion.toLowerCase();
-        if (!mRegion.includes(aRegion) && !aRegion.includes(mRegion)) return false;
+        const normFunc = (typeof normalizeRegionId === 'function') ? normalizeRegionId : (window.normalizeRegionId || (x => x));
+        const mNorm = normFunc(m.region);
+        const aNorm = normFunc(this.activeRegion);
+        const mRaw = String(m.region || '').toLowerCase();
+        const aRaw = String(this.activeRegion || '').toLowerCase();
+
+        if (mNorm !== aNorm && !mRaw.includes(aRaw) && !aRaw.includes(mRaw)) return false;
       }
 
       // Search Query Filter
       if (this.searchQuery) {
-        const q = this.searchQuery;
-        const name = (m.name || '').toLowerCase();
-        const region = (m.region || '').toLowerCase();
-        const job = (m.job || '').toLowerCase();
-        const inviter = (m.inviter || '').toLowerCase();
+        const q = String(this.searchQuery).toLowerCase().trim();
+        const name = String(m.name || '').toLowerCase();
+        const region = String(m.region || '').toLowerCase();
+        const job = String(m.job || '').toLowerCase();
+        const inviter = String(m.inviter || '').toLowerCase();
         if (!name.includes(q) && !region.includes(q) && !job.includes(q) && !inviter.includes(q)) return false;
       }
 
       return true;
     });
 
-    // Chronological Earliest to Latest Sort (2023년 -> 2024년 -> 2025년 -> 2026년)
+    // Fallback: If filter results in 0 items but overall members exist, return all members
+    if ((!filtered || filtered.length === 0) && (!this.searchQuery || this.searchQuery.trim() === "") && (!this.activeRegion)) {
+      filtered = members;
+    }
+
+    // Sort Chronologically
     filtered.sort((a, b) => this.parseMemberDate(a.assemblyMonth).localeCompare(this.parseMemberDate(b.assemblyMonth)));
     return filtered;
   }
