@@ -172,6 +172,21 @@ class DirectoryComponent {
         this.render();
       });
     }
+
+    // F. Region Dropdown Listener
+    const regionDropdown = document.getElementById("regionDropdown");
+    if (regionDropdown) {
+      regionDropdown.addEventListener("change", (e) => {
+        const val = e.target.value;
+        const selectedRegion = (!val || val === "all") ? null : val;
+        this.activeRegion = selectedRegion;
+        if (window.mapComponent) {
+          window.mapComponent.selectRegion(selectedRegion);
+        } else {
+          this.render();
+        }
+      });
+    }
   }
 
   resetFilters() {
