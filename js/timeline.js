@@ -14,18 +14,138 @@ class TimelineComponent {
     this.initEvents();
   }
 
-  getFilteredAndSortedHistory() {
-    let historyList = [];
+  getStoredHistory() {
+    let baseList = (window.DEFAULT_HISTORY && window.DEFAULT_HISTORY.length > 0)
+      ? window.DEFAULT_HISTORY
+      : (typeof DEFAULT_HISTORY !== 'undefined' ? DEFAULT_HISTORY : []);
+
+    let historyList = baseList.map(item => ({
+      ...item,
+      images: item && item.images ? [...item.images] : []
+    }));
+
     try {
-      historyList = window.db ? window.db.getHistory() : [];
+      const overridesRaw = localStorage.getItem("ethiopia_history_overrides");
+      if (overridesRaw) {
+        const overrides = JSON.parse(overridesRaw);
+        if (overrides && typeof overrides === 'object') {
+          const { modified = {}, added = [], deleted = [] } = overrides;
+
+          if (Array.isArray(deleted) && deleted.length > 0) {
+            historyList = historyList.filter(item => item && !deleted.includes(item.id));
+          }
+
+          historyList = historyList.map(item => {
+            if (item && modified[item.id]) {
+              const mod = modified[item.id];
+              return {
+                ...item,
+                ...mod,
+                images: mod.images !== undefined ? mod.images : (item.images ? [...item.images] : [])
+              };
+            }
+            return item;
+          });
+
+          if (Array.isArray(added) && added.length > 0) {
+            added.forEach(newItem => {
+              if (newItem && newItem.id) {
+                const idx = historyList.findIndex(h => h && h.id === newItem.id);
+                if (idx !== -1) {
+                  historyList[idx] = newItem;
+                } else {
+                  historyList.unshift(newItem);
+                }
+              }
+            });
+          }
+
+          return historyList;
+        }
+      }
+
+      const legacyRaw = localStorage.getItem("ethiopia_history");
+      if (legacyRaw) {
+        const legacyList = JSON.parse(legacyRaw);
+        if (Array.isArray(legacyList) && legacyList.length > 0) {
+          return legacyList;
+        }
+      }
     } catch(e) {
-      console.error("Timeline getHistory error:", e);
-      historyList = [];
+      console.error("Error reading stored history overrides:", e);
     }
 
-    if (!historyList || !Array.isArray(historyList) || historyList.length === 0) {
-      historyList = (window.DEFAULT_HISTORY && window.DEFAULT_HISTORY.length > 0) ? window.DEFAULT_HISTORY : (typeof DEFAULT_HISTORY !== 'undefined' ? DEFAULT_HISTORY : []);
+    return historyList;
+  }
+
+  saveStoredHistory(savedItem, deleteId = null) {
+    let overrides = { modified: {}, added: [], deleted: [] };
+    try {
+      const overridesRaw = localStorage.getItem("ethiopia_history_overrides");
+      if (overridesRaw) {
+        const parsed = JSON.parse(overridesRaw);
+        if (parsed && typeof parsed === 'object') {
+          overrides.modified = parsed.modified || {};
+          overrides.added = Array.isArray(parsed.added) ? parsed.added : [];
+          overrides.deleted = Array.isArray(parsed.deleted) ? parsed.deleted : [];
+        }
+      }
+    } catch(e) {}
+
+    const baseList = (window.DEFAULT_HISTORY && window.DEFAULT_HISTORY.length > 0)
+      ? window.DEFAULT_HISTORY
+      : (typeof DEFAULT_HISTORY !== 'undefined' ? DEFAULT_HISTORY : []);
+
+    if (deleteId) {
+      const isBaseItem = baseList.some(h => h && String(h.id) === String(deleteId));
+      if (isBaseItem) {
+        if (!overrides.deleted.includes(deleteId)) {
+          overrides.deleted.push(deleteId);
+        }
+        delete overrides.modified[deleteId];
+      } else {
+        overrides.added = overrides.added.filter(h => h && String(h.id) !== String(deleteId));
+      }
+    } else if (savedItem && savedItem.id) {
+      const id = savedItem.id;
+      const baseItem = baseList.find(h => h && String(h.id) === String(id));
+
+      if (baseItem) {
+        const modObj = {
+          date: savedItem.date,
+          title: savedItem.title,
+          location: savedItem.location,
+          desc: savedItem.desc
+        };
+
+        const baseImagesJson = JSON.stringify(baseItem.images || []);
+        const savedImagesJson = JSON.stringify(savedItem.images || []);
+
+        if (baseImagesJson !== savedImagesJson) {
+          modObj.images = savedItem.images;
+        }
+
+        overrides.modified[id] = modObj;
+      } else {
+        const existingIdx = overrides.added.findIndex(h => h && String(h.id) === String(id));
+        if (existingIdx !== -1) {
+          overrides.added[existingIdx] = savedItem;
+        } else {
+          overrides.added.unshift(savedItem);
+        }
+      }
     }
+
+    try {
+      localStorage.setItem("ethiopia_history_overrides", JSON.stringify(overrides));
+    } catch(e) {
+      console.error("Failed to save ethiopia_history_overrides:", e);
+      throw e;
+    }
+  }
+
+  getFilteredAndSortedHistory() {
+    let historyList = this.getStoredHistory();
 
     historyList = historyList.filter(h => h && typeof h === 'object' && h.title);
     if (historyList.length === 0) {
@@ -466,13 +586,7 @@ class TimelineComponent {
     if (!modal) return;
 
     const titleEl = document.getElementById("historyEditModalTitle");
-    let historyList = [];
-    if (window.db && typeof window.db.getHistory === 'function') {
-      historyList = window.db.getHistory();
-    } else {
-      const local = localStorage.getItem("ethiopia_history");
-      historyList = local ? JSON.parse(local) : (window.DEFAULT_HISTORY || []);
-    }
+    const historyList = this.getStoredHistory();
     const item = historyId ? historyList.find(h => h && h.id === historyId) : null;
 
     document.getElementById("historyId").value = item ? item.id : "";
@@ -509,33 +623,13 @@ class TimelineComponent {
     };
 
     try {
-      let currentList = [];
-      if (window.db && typeof window.db.getHistory === 'function') {
-        currentList = window.db.getHistory();
-      } else {
-        const local = localStorage.getItem("ethiopia_history");
-        currentList = local ? JSON.parse(local) : (window.DEFAULT_HISTORY || []);
-      }
-
       if (id) {
         historyData.id = id;
-        const updatedList = currentList.map(h => h && String(h.id) === String(id) ? { ...h, ...historyData } : h);
-        if (window.db && typeof window.db.saveHistory === 'function') {
-          window.db.saveHistory(updatedList);
-        } else {
-          localStorage.setItem("ethiopia_history", JSON.stringify(updatedList));
-          window.DEFAULT_HISTORY = updatedList;
-        }
+        this.saveStoredHistory(historyData);
         this.activeId = id;
       } else {
         historyData.id = "hist-" + Date.now();
-        if (window.db && typeof window.db.addHistory === 'function') {
-          window.db.addHistory(historyData);
-        } else {
-          const updatedList = [historyData, ...currentList];
-          localStorage.setItem("ethiopia_history", JSON.stringify(updatedList));
-          window.DEFAULT_HISTORY = updatedList;
-        }
+        this.saveStoredHistory(historyData);
         this.activeId = historyData.id;
       }
 
@@ -561,21 +655,12 @@ class TimelineComponent {
   deleteHistory(id) {
     if (window.checkAdminPermission && !window.checkAdminPermission()) return;
     if (confirm("정말로 이 역사 기록을 삭제하시겠습니까?")) {
-      let currentList = [];
-      if (window.db && typeof window.db.getHistory === 'function') {
-        currentList = window.db.getHistory();
-      } else {
-        const local = localStorage.getItem("ethiopia_history");
-        currentList = local ? JSON.parse(local) : (window.DEFAULT_HISTORY || []);
+      try {
+        this.saveStoredHistory(null, id);
+        this.render();
+      } catch(err) {
+        console.error("Delete history error:", err);
       }
-      const historyList = currentList.filter(h => h && h.id !== id);
-      if (window.db && typeof window.db.saveHistory === 'function') {
-        window.db.saveHistory(historyList);
-      } else {
-        localStorage.setItem("ethiopia_history", JSON.stringify(historyList));
-        window.DEFAULT_HISTORY = historyList;
-      }
-      this.render();
     }
   }
 
@@ -814,9 +899,7 @@ class TimelineComponent {
     this.container = document.getElementById("timelineContainer") || document.getElementById("timelineList");
     if (!this.container) return;
 
-    let rawList = [];
-    try { rawList = window.db ? window.db.getHistory() : []; } catch(e) {}
-    if (!rawList || rawList.length === 0) rawList = window.DEFAULT_HISTORY || [];
+    let rawList = this.getStoredHistory();
 
     const historyList = this.getFilteredAndSortedHistory();
 
