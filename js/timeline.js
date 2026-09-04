@@ -9,9 +9,18 @@ class TimelineComponent {
     this.isNavigating = false;
     this.lightboxImages = [];
     this.lightboxIndex = 0;
-    this.tempHistoryImages = [];
+    this.tempHistoryItems = [];
+    this.inMemoryBlobMap = {};
     this.activeYear = null; // Filter state for Year 구분
     this.initEvents();
+  }
+
+  getImageSrc(src) {
+    if (!src) return '';
+    if (this.inMemoryBlobMap && this.inMemoryBlobMap[src]) {
+      return this.inMemoryBlobMap[src];
+    }
+    return src;
   }
 
   migrateLegacyStorageIfNeeded() {
@@ -342,87 +351,71 @@ class TimelineComponent {
     });
   }
 
-  processPhotoFile(file) {
-    return new Promise((resolve) => {
-      if (!file) {
-        resolve(null);
-        return;
+  async uploadOriginalPhotoToWorker(file, historyId) {
+    if (!file) return null;
+
+    const workerUrl = window.CF_WORKER_UPLOAD_URL || "https://ethiopia-archive-proxy.wjdgns131.workers.dev";
+    const adminPasscode = sessionStorage.getItem("ethiopia_admin_passcode") || sessionStorage.getItem("ethiopia_admin_role") || "";
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("historyId", historyId);
+    formData.append("originalFileName", file.name || "photo.jpg");
+
+    try {
+      const response = await fetch(workerUrl, {
+        method: "POST",
+        headers: {
+          "X-Admin-Passcode": adminPasscode
+        },
+        body: formData
+      });
+
+      if (!response.ok) {
+        const errJson = await response.json().catch(() => ({}));
+        throw new Error(errJson.error || `HTTP ${response.status}`);
       }
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const rawDataUrl = e.target.result;
-        const img = new Image();
-        img.onload = () => {
-          try {
-            const canvas = document.createElement("canvas");
-            let w = img.width;
-            let h = img.height;
-            const maxDim = 1000; // Optimal Web HD Dimension (Ultra Crisp & Lightweight ~60KB)
-            if (w > maxDim || h > maxDim) {
-              if (w > h) {
-                h = Math.round((h * maxDim) / w);
-                w = maxDim;
-              } else {
-                w = Math.round((w * maxDim) / h);
-                h = maxDim;
-              }
-            }
-            canvas.width = w;
-            canvas.height = h;
-            const ctx = canvas.getContext("2d");
-            ctx.imageSmoothingEnabled = true;
-            ctx.imageSmoothingQuality = "high";
-            ctx.drawImage(img, 0, 0, w, h);
-            // Save as compressed JPEG at 0.75 quality for 95% space savings!
-            resolve(canvas.toDataURL("image/jpeg", 0.75));
-          } catch(err) {
-            console.error("Canvas compression error, using raw DataURL:", err);
-            resolve(rawDataUrl);
-          }
-        };
-        img.onerror = () => resolve(rawDataUrl);
-        img.src = rawDataUrl;
-      };
-      reader.onerror = () => resolve(null);
-      reader.readAsDataURL(file);
-    });
+
+      const result = await response.json();
+      if (result && result.success && result.path) {
+        return result.path;
+      }
+      return null;
+    } catch(err) {
+      console.warn("Cloudflare Worker upload endpoint unavailable or offline:", err.message || err);
+      return null;
+    }
   }
 
-  async readHistoryPhotoFiles(files) {
+  readHistoryPhotoFiles(files) {
     if (!files || files.length === 0) return;
 
-    const modal = document.getElementById("historyEditModal");
-    const saveBtn = modal ? modal.querySelector("button[type='submit']") : null;
-    if (saveBtn) {
-      saveBtn.disabled = true;
-      saveBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> 사진 압축 처리 중...`;
-    }
+    if (!this.tempHistoryItems) this.tempHistoryItems = [];
 
-    if (window.showToast) window.showToast("📷 사진을 최적화 압축하는 중입니다...");
-
-    const fileArray = Array.from(files);
-    const results = await Promise.all(fileArray.map(file => this.processPhotoFile(file)));
-
-    if (!this.tempHistoryImages) this.tempHistoryImages = [];
-    results.forEach(dataUrl => {
-      if (dataUrl) this.tempHistoryImages.push(dataUrl);
+    Array.from(files).forEach(file => {
+      if (file) {
+        if (file.size > 15 * 1024 * 1024) {
+          alert(`사진 용량이 15MB를 초과합니다 (${(file.size / 1024 / 1024).toFixed(1)}MB). 원본 사진 크기를 줄여 주세요.`);
+          return;
+        }
+        const previewUrl = URL.createObjectURL(file);
+        this.tempHistoryItems.push({
+          type: 'new_file',
+          file: file,
+          previewUrl: previewUrl
+        });
+      }
     });
 
     this.renderHistoryPhotoPreviews();
-
-    if (saveBtn) {
-      saveBtn.disabled = false;
-      saveBtn.innerHTML = `저장하기`;
-    }
-
-    if (window.showToast) window.showToast("✨ 사진 첨부 완료! [저장하기] 버튼을 눌러주세요.");
+    if (window.showToast) window.showToast("✨ 원본 사진이 첨부되었습니다! [저장하기] 버튼을 눌러주세요.");
   }
 
   renderHistoryPhotoPreviews() {
     const previewContainer = document.getElementById("historyImagesPreview") || document.getElementById("historyPhotoPreviews");
     if (!previewContainer) return;
 
-    if (!this.tempHistoryImages || this.tempHistoryImages.length === 0) {
+    if (!this.tempHistoryItems || this.tempHistoryItems.length === 0) {
       previewContainer.innerHTML = `<p style="font-size:0.82rem; color:var(--text-muted); width:100%; margin:0.3rem 0;">📷 첨부된 사진이 없습니다. [사진 파일 선택] 버튼 클릭, 이미지 파일 드래그, 또는 [Ctrl + V]로 바로 붙여넣으실 수 있습니다.</p>`;
       return;
     }
@@ -432,40 +425,43 @@ class TimelineComponent {
         <i class="fa-solid fa-up-down-left-right" style="font-size:0.95rem;"></i> 마우스로 사진을 끌어서(드래그) 순서를 바꾸거나, ◀ ▶ 화살표 버튼을 눌러 위치를 이동하세요.
       </div>
       <div style="display:flex; flex-wrap:wrap; gap:0.85rem; width:100%;">
-        ${this.tempHistoryImages.map((src, idx) => `
-          <div draggable="true"
-               ondragstart="window.timelineComponent.handlePhotoDragStart(event, ${idx})"
-               ondragover="window.timelineComponent.handlePhotoDragOver(event)"
-               ondragenter="window.timelineComponent.handlePhotoDragEnter(event)"
-               ondragleave="window.timelineComponent.handlePhotoDragLeave(event)"
-               ondrop="window.timelineComponent.handlePhotoDrop(event, ${idx})"
-               ondragend="window.timelineComponent.handlePhotoDragEnd(event)"
-               style="position:relative; width:98px; height:98px; border-radius:12px; overflow:hidden; border:2px solid var(--border-color); box-shadow:0 4px 12px rgba(0,0,0,0.15); cursor:grab; transition:all 0.2s; background:var(--bg-card);"
-               class="photo-preview-item">
-            <img src="${src}" style="width:100%; height:100%; object-fit:cover; pointer-events:none;" />
+        ${this.tempHistoryItems.map((item, idx) => {
+          const imgSrc = item.type === 'new_file' ? item.previewUrl : this.getImageSrc(item.src);
+          return `
+            <div draggable="true"
+                 ondragstart="window.timelineComponent.handlePhotoDragStart(event, ${idx})"
+                 ondragover="window.timelineComponent.handlePhotoDragOver(event)"
+                 ondragenter="window.timelineComponent.handlePhotoDragEnter(event)"
+                 ondragleave="window.timelineComponent.handlePhotoDragLeave(event)"
+                 ondrop="window.timelineComponent.handlePhotoDrop(event, ${idx})"
+                 ondragend="window.timelineComponent.handlePhotoDragEnd(event)"
+                 style="position:relative; width:98px; height:98px; border-radius:12px; overflow:hidden; border:2px solid var(--border-color); box-shadow:0 4px 12px rgba(0,0,0,0.15); cursor:grab; transition:all 0.2s; background:var(--bg-card);"
+                 class="photo-preview-item">
+              <img src="${imgSrc}" style="width:100%; height:100%; object-fit:cover; pointer-events:none;" />
 
-            <span style="position:absolute; top:4px; left:4px; background:rgba(2,132,199,0.9); color:#fff; font-size:10px; font-weight:800; padding:1px 6px; border-radius:10px; box-shadow:0 2px 4px rgba(0,0,0,0.4); pointer-events:none;">
-              #${idx + 1}
-            </span>
+              <span style="position:absolute; top:4px; left:4px; background:rgba(2,132,199,0.9); color:#fff; font-size:10px; font-weight:800; padding:1px 6px; border-radius:10px; box-shadow:0 2px 4px rgba(0,0,0,0.4); pointer-events:none;">
+                #${idx + 1}
+              </span>
 
-            <button type="button" onclick="event.stopPropagation(); window.timelineComponent.removeHistoryPhoto(${idx})" title="사진 삭제" style="position:absolute; top:4px; right:4px; background:rgba(239,68,68,0.95); color:#fff; border:none; border-radius:50%; width:22px; height:22px; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 6px rgba(0,0,0,0.4);">
-              <i class="fa-solid fa-xmark"></i>
-            </button>
+              <button type="button" onclick="event.stopPropagation(); window.timelineComponent.removeHistoryPhoto(${idx})" title="사진 삭제" style="position:absolute; top:4px; right:4px; background:rgba(239,68,68,0.95); color:#fff; border:none; border-radius:50%; width:22px; height:22px; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 6px rgba(0,0,0,0.4);">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
 
-            <div style="position:absolute; bottom:4px; left:4px; right:4px; display:flex; justify-content:space-between; pointer-events:auto;">
-              ${idx > 0 ? `
-                <button type="button" onclick="event.stopPropagation(); window.timelineComponent.moveHistoryPhoto(${idx}, ${idx - 1})" title="앞으로 이동" style="background:rgba(15,23,42,0.85); color:#fff; border:1px solid rgba(255,255,255,0.4); border-radius:4px; width:24px; height:22px; font-size:11px; cursor:pointer; display:flex; align-items:center; justify-content:center;">
-                  <i class="fa-solid fa-chevron-left"></i>
-                </button>
-              ` : `<div></div>`}
-              ${idx < this.tempHistoryImages.length - 1 ? `
-                <button type="button" onclick="event.stopPropagation(); window.timelineComponent.moveHistoryPhoto(${idx}, ${idx + 1})" title="뒤로 이동" style="background:rgba(15,23,42,0.85); color:#fff; border:1px solid rgba(255,255,255,0.4); border-radius:4px; width:24px; height:22px; font-size:11px; cursor:pointer; display:flex; align-items:center; justify-content:center;">
-                  <i class="fa-solid fa-chevron-right"></i>
-                </button>
-              ` : `<div></div>`}
+              <div style="position:absolute; bottom:4px; left:4px; right:4px; display:flex; justify-content:space-between; pointer-events:auto;">
+                ${idx > 0 ? `
+                  <button type="button" onclick="event.stopPropagation(); window.timelineComponent.moveHistoryPhoto(${idx}, ${idx - 1})" title="앞으로 이동" style="background:rgba(15,23,42,0.85); color:#fff; border:1px solid rgba(255,255,255,0.4); border-radius:4px; width:24px; height:22px; font-size:11px; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+                    <i class="fa-solid fa-chevron-left"></i>
+                  </button>
+                ` : `<div></div>`}
+                ${idx < this.tempHistoryItems.length - 1 ? `
+                  <button type="button" onclick="event.stopPropagation(); window.timelineComponent.moveHistoryPhoto(${idx}, ${idx + 1})" title="뒤로 이동" style="background:rgba(15,23,42,0.85); color:#fff; border:1px solid rgba(255,255,255,0.4); border-radius:4px; width:24px; height:22px; font-size:11px; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+                    <i class="fa-solid fa-chevron-right"></i>
+                  </button>
+                ` : `<div></div>`}
+              </div>
             </div>
-          </div>
-        `).join('')}
+          `;
+        }).join('')}
       </div>
     `;
   }
@@ -507,9 +503,9 @@ class TimelineComponent {
   handlePhotoDrop(e, targetIdx) {
     e.preventDefault();
     const fromIdx = this._draggedPhotoIdx !== undefined ? this._draggedPhotoIdx : parseInt(e.dataTransfer.getData('text/plain'), 10);
-    if (fromIdx !== undefined && !isNaN(fromIdx) && fromIdx !== targetIdx && this.tempHistoryImages) {
-      const movedItem = this.tempHistoryImages.splice(fromIdx, 1)[0];
-      this.tempHistoryImages.splice(targetIdx, 0, movedItem);
+    if (fromIdx !== undefined && !isNaN(fromIdx) && fromIdx !== targetIdx && this.tempHistoryItems) {
+      const movedItem = this.tempHistoryItems.splice(fromIdx, 1)[0];
+      this.tempHistoryItems.splice(targetIdx, 0, movedItem);
       this.renderHistoryPhotoPreviews();
       if (window.showToast) window.showToast("↔️ 사진 순서가 수월하게 변경되었습니다!");
     }
@@ -524,15 +520,15 @@ class TimelineComponent {
   }
 
   moveHistoryPhoto(fromIdx, toIdx) {
-    if (!this.tempHistoryImages || fromIdx < 0 || toIdx < 0 || toIdx >= this.tempHistoryImages.length) return;
-    const movedItem = this.tempHistoryImages.splice(fromIdx, 1)[0];
-    this.tempHistoryImages.splice(toIdx, 0, movedItem);
+    if (!this.tempHistoryItems || fromIdx < 0 || toIdx < 0 || toIdx >= this.tempHistoryItems.length) return;
+    const movedItem = this.tempHistoryItems.splice(fromIdx, 1)[0];
+    this.tempHistoryItems.splice(toIdx, 0, movedItem);
     this.renderHistoryPhotoPreviews();
   }
 
   removeHistoryPhoto(index) {
-    if (!this.tempHistoryImages) return;
-    this.tempHistoryImages.splice(index, 1);
+    if (!this.tempHistoryItems) return;
+    this.tempHistoryItems.splice(index, 1);
     this.renderHistoryPhotoPreviews();
   }
 
@@ -610,7 +606,8 @@ class TimelineComponent {
       });
     }
 
-    this.lightboxImages = images;
+    const resolvedImages = (images || []).map(img => this.getImageSrc(img));
+    this.lightboxImages = resolvedImages;
     this.lightboxIndex = initialIndex;
     this.updateLightboxState();
 
@@ -679,7 +676,9 @@ class TimelineComponent {
     document.getElementById("fieldHistoryLocation").value = item ? item.location || "" : "";
     document.getElementById("fieldHistoryDesc").value = item ? item.desc || "" : "";
 
-    this.tempHistoryImages = item && item.images ? [...item.images] : [];
+    this.tempHistoryItems = (item && item.images)
+      ? item.images.map(img => ({ type: 'existing', src: img }))
+      : [];
     this.renderHistoryPhotoPreviews();
 
     if (titleEl) {
@@ -689,7 +688,7 @@ class TimelineComponent {
     modal.classList.remove("hidden");
   }
 
-  saveHistoryFromForm() {
+  async saveHistoryFromForm() {
     const id = document.getElementById("historyId").value;
     const date = document.getElementById("fieldHistoryDate").value.trim();
     const title = document.getElementById("fieldHistoryTitle").value.trim();
@@ -701,28 +700,55 @@ class TimelineComponent {
       return;
     }
 
-    const historyData = {
-      date, title, location, desc,
-      images: this.tempHistoryImages || []
-    };
+    const modal = document.getElementById("historyEditModal");
+    const saveBtn = modal ? modal.querySelector("button[type='submit']") : null;
+    if (saveBtn) {
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> 원본 사진 업로드 처리 중...`;
+    }
 
     try {
-      if (id) {
-        historyData.id = id;
-        this.saveStoredHistory(historyData);
-        this.activeId = id;
-      } else {
-        historyData.id = "hist-" + Date.now();
-        this.saveStoredHistory(historyData);
-        this.activeId = historyData.id;
+      const historyTargetId = id || ("hist-" + Date.now());
+      const finalImagePaths = [];
+
+      if (this.tempHistoryItems && this.tempHistoryItems.length > 0) {
+        for (let i = 0; i < this.tempHistoryItems.length; i++) {
+          const item = this.tempHistoryItems[i];
+          if (item.type === "new_file" && item.file) {
+            const uploadedPath = await this.uploadOriginalPhotoToWorker(item.file, historyTargetId);
+            if (uploadedPath) {
+              finalImagePaths.push(uploadedPath);
+              if (item.previewUrl && !this.inMemoryBlobMap[uploadedPath]) {
+                this.inMemoryBlobMap[uploadedPath] = item.previewUrl;
+              }
+            } else {
+              // Fallback for local/offline testing: create clean relative path and map object URL
+              const ext = (item.file.name && item.file.name.includes('.')) ? item.file.name.split('.').pop().toLowerCase() : 'jpg';
+              const fallbackPath = `images/history/hist-${historyTargetId}-${Date.now()}-${i + 1}.${ext}`;
+              if (item.previewUrl) {
+                this.inMemoryBlobMap[fallbackPath] = item.previewUrl;
+              }
+              finalImagePaths.push(fallbackPath);
+            }
+          } else if (item.src) {
+            finalImagePaths.push(item.src);
+          }
+        }
       }
 
-      // Reset activeYear so the newly saved item is guaranteed to be visible!
+      const historyData = {
+        id: historyTargetId,
+        date, title, location, desc,
+        images: finalImagePaths
+      };
+
+      this.saveStoredHistory(historyData);
+      this.activeId = historyTargetId;
       this.activeYear = null;
 
       document.getElementById("historyEditModal")?.classList.add("hidden");
       if (window.showToast) {
-        window.showToast(id ? "✨ 역사 기록 및 사진이 영구 저장되었습니다!" : "✨ 새 역사 기록 및 사진이 영구 등록되었습니다!");
+        window.showToast(id ? "✨ 역사 기록 및 원본 사진이 영구 저장되었습니다!" : "✨ 새 역사 기록 및 원본 사진이 영구 등록되었습니다!");
       }
       this.render();
       setTimeout(() => {
@@ -732,7 +758,12 @@ class TimelineComponent {
       }, 80);
     } catch (err) {
       console.error("Save history error:", err);
-      alert("저장 중 오류가 발생했습니다. 사진을 다시 선택하거나 크기를 줄여 주세요.");
+      alert("저장 중 오류가 발생했습니다: " + (err.message || err));
+    } finally {
+      if (saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = `저장하기`;
+      }
     }
   }
 
