@@ -15,8 +15,24 @@ class TimelineComponent {
     this.initEvents();
   }
 
+  getOriginalImageSrc(imageItem) {
+    if (!imageItem) return '';
+    const rawSrc = (typeof imageItem === 'object' && imageItem.original) ? imageItem.original : imageItem;
+    return this.getImageSrc(rawSrc);
+  }
+
+  getThumbnailImageSrc(imageItem) {
+    if (!imageItem) return '';
+    const rawSrc = (typeof imageItem === 'object') ? (imageItem.thumbnail || imageItem.original) : imageItem;
+    return this.getImageSrc(rawSrc);
+  }
+
   getImageSrc(src) {
     if (!src) return '';
+    if (typeof src === 'object') {
+      src = src.thumbnail || src.original || '';
+      if (!src) return '';
+    }
     // Priority A: If already a full URL or blob/data URL, return as is
     if (src.startsWith('http://') || src.startsWith('https://') || src.startsWith('blob:') || src.startsWith('data:')) {
       return src;
@@ -25,13 +41,62 @@ class TimelineComponent {
     if (this.inMemoryBlobMap && this.inMemoryBlobMap[src]) {
       return this.inMemoryBlobMap[src];
     }
-    // Priority C: Newly uploaded image (images/history/hist-) -> Return Raw GitHub CDN URL directly!
+    // Priority C: Newly uploaded image (images/history/) -> Return Raw GitHub CDN URL on production, or relative path on localhost!
     const cleanPath = src.replace(/^\/+/, '');
-    if (cleanPath.startsWith('images/history/hist-')) {
+    if (cleanPath.startsWith('images/history/')) {
+      if (typeof window !== 'undefined' && window.location && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+        return cleanPath;
+      }
       return `https://raw.githubusercontent.com/wjdgns131/ethiopia_gospel_archive/main/${cleanPath}`;
     }
     // Priority D: Existing master images maintain relative path
     return src;
+  }
+
+  createThumbnailBlob(file, maxLongSide = 800, quality = 0.85) {
+    return new Promise((resolve, reject) => {
+      if (!file || !file.type || !file.type.startsWith('image/')) {
+        return reject(new Error('Invalid image file for thumbnail creation'));
+      }
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        let width = img.width;
+        let height = img.height;
+        if (width > maxLongSide || height > maxLongSide) {
+          if (width >= height) {
+            height = Math.round((height * maxLongSide) / width);
+            width = maxLongSide;
+          } else {
+            width = Math.round((width * maxLongSide) / height);
+            height = maxLongSide;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Attempt WebP conversion, fallback to JPEG if unsupported
+        canvas.toBlob((blob) => {
+          if (blob && blob.size > 0) {
+            resolve(blob);
+          } else {
+            canvas.toBlob((jpegBlob) => {
+              if (jpegBlob && jpegBlob.size > 0) resolve(jpegBlob);
+              else reject(new Error('Failed canvas blob export'));
+            }, 'image/jpeg', quality);
+          }
+        }, 'image/webp', quality);
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        reject(new Error('Failed to load image for thumbnail creation'));
+      };
+      img.src = url;
+    });
   }
 
   migrateLegacyStorageIfNeeded() {
@@ -362,7 +427,7 @@ class TimelineComponent {
     });
   }
 
-  async uploadOriginalPhotoToWorker(file, historyId) {
+  async uploadSinglePhotoToWorker(file, historyId, subFolder = "original", extOverride = null) {
     if (!file) return null;
 
     const workerUrl = window.CF_WORKER_UPLOAD_URL || "https://ethiopia-archive-proxy.wjdgns131.workers.dev";
@@ -371,6 +436,10 @@ class TimelineComponent {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("historyId", historyId);
+    formData.append("subFolder", subFolder);
+    if (extOverride) {
+      formData.append("extOverride", extOverride);
+    }
     formData.append("originalFileName", file.name || "photo.jpg");
 
     try {
@@ -396,6 +465,10 @@ class TimelineComponent {
       console.warn("Cloudflare Worker upload endpoint unavailable or offline:", err.message || err);
       return null;
     }
+  }
+
+  async uploadOriginalPhotoToWorker(file, historyId) {
+    return this.uploadSinglePhotoToWorker(file, historyId, "original");
   }
 
   readHistoryPhotoFiles(files) {
@@ -437,7 +510,7 @@ class TimelineComponent {
       </div>
       <div style="display:flex; flex-wrap:wrap; gap:0.85rem; width:100%;">
         ${this.tempHistoryItems.map((item, idx) => {
-          const imgSrc = item.type === 'new_file' ? item.previewUrl : this.getImageSrc(item.src);
+          const imgSrc = item.type === 'new_file' ? item.previewUrl : this.getThumbnailImageSrc(item.src);
           return `
             <div draggable="true"
                  ondragstart="window.timelineComponent.handlePhotoDragStart(event, ${idx})"
@@ -617,7 +690,7 @@ class TimelineComponent {
       });
     }
 
-    const resolvedImages = (images || []).map(img => this.getImageSrc(img));
+    const resolvedImages = (images || []).map(img => this.getOriginalImageSrc(img));
     this.lightboxImages = resolvedImages;
     this.rawLightboxImages = (images || []);
     this.lightboxIndex = initialIndex;
@@ -730,20 +803,61 @@ class TimelineComponent {
         for (let i = 0; i < this.tempHistoryItems.length; i++) {
           const item = this.tempHistoryItems[i];
           if (item.type === "new_file" && item.file) {
-            const uploadedPath = await this.uploadOriginalPhotoToWorker(item.file, historyTargetId);
-            if (uploadedPath) {
-              finalImagePaths.push(uploadedPath);
-              if (item.previewUrl && !this.inMemoryBlobMap[uploadedPath]) {
-                this.inMemoryBlobMap[uploadedPath] = item.previewUrl;
+            // 1. Generate Thumbnail Blob (max long side 800px, WebP/JPEG quality 0.85)
+            let thumbBlob = null;
+            try {
+              thumbBlob = await this.createThumbnailBlob(item.file, 800, 0.85);
+            } catch(tErr) {
+              console.warn("Thumbnail generation fallback to original:", tErr);
+            }
+
+            // 2. Upload Original Photo (uncompressed, 100% loss-free)
+            const origPath = await this.uploadSinglePhotoToWorker(item.file, historyTargetId, "original");
+
+            // 3. Upload Thumbnail Photo
+            let thumbPath = null;
+            if (thumbBlob) {
+              const thumbExt = thumbBlob.type.includes("webp") ? ".webp" : ".jpg";
+              const thumbFile = new File([thumbBlob], `thumb${thumbExt}`, { type: thumbBlob.type });
+              thumbPath = await this.uploadSinglePhotoToWorker(thumbFile, historyTargetId, "thumb", thumbExt);
+            }
+
+            if (origPath) {
+              const imageObj = {
+                original: origPath,
+                thumbnail: thumbPath || origPath
+              };
+              finalImagePaths.push(imageObj);
+
+              // Map session preview URLs for instant display
+              if (item.previewUrl) {
+                this.inMemoryBlobMap[origPath] = item.previewUrl;
+              }
+              if (thumbBlob) {
+                const thumbPreviewUrl = URL.createObjectURL(thumbBlob);
+                this.inMemoryBlobMap[thumbPath || origPath] = thumbPreviewUrl;
               }
             } else {
-              // Fallback for local/offline testing: create clean relative path and map object URL
+              // Fallback for local/offline testing: create clean relative paths and map object URLs
               const ext = (item.file.name && item.file.name.includes('.')) ? item.file.name.split('.').pop().toLowerCase() : 'jpg';
-              const fallbackPath = `images/history/hist-${historyTargetId}-${Date.now()}-${i + 1}.${ext}`;
+              const timeStamp = Date.now();
+              const fallbackOrigPath = `images/history/original/hist-${historyTargetId}-${timeStamp}-${i + 1}.${ext}`;
+              const thumbExt = (thumbBlob && thumbBlob.type.includes("webp")) ? "webp" : "jpg";
+              const fallbackThumbPath = `images/history/thumb/hist-${historyTargetId}-${timeStamp}-${i + 1}.${thumbExt}`;
+
               if (item.previewUrl) {
-                this.inMemoryBlobMap[fallbackPath] = item.previewUrl;
+                this.inMemoryBlobMap[fallbackOrigPath] = item.previewUrl;
               }
-              finalImagePaths.push(fallbackPath);
+              if (thumbBlob) {
+                this.inMemoryBlobMap[fallbackThumbPath] = URL.createObjectURL(thumbBlob);
+              } else if (item.previewUrl) {
+                this.inMemoryBlobMap[fallbackThumbPath] = item.previewUrl;
+              }
+
+              finalImagePaths.push({
+                original: fallbackOrigPath,
+                thumbnail: fallbackThumbPath
+              });
             }
           } else if (item.src) {
             finalImagePaths.push(item.src);
@@ -987,7 +1101,7 @@ class TimelineComponent {
 
           <div class="timeline-gallery-grid ${activeItem.images.length <= 2 ? 'single-col' : ''}" id="hzGalleryScroll_${activeItem.id}" onmousedown="window.timelineComponent.handleGalleryDragStart(event, this)" style="display:grid !important; grid-template-rows:${activeItem.images.length === 1 ? '380px' : 'repeat(2, 250px)'} !important; grid-auto-columns:${activeItem.images.length <= 2 ? '100%' : 'min(420px, 78vw)'} !important; grid-auto-flow:column !important; overflow-x:auto !important; overflow-y:hidden !important; gap:1.0rem !important; margin-top:0.5rem !important; padding:0.4rem 0.2rem 0.8rem 0.2rem !important; scroll-snap-type:x mandatory !important; scroll-behavior:smooth !important; -webkit-overflow-scrolling:touch !important; cursor:grab;">
             ${activeItem.images.map((img, imgIdx) => {
-              const resolvedSrc = this.getImageSrc(img);
+              const resolvedSrc = this.getThumbnailImageSrc(img);
               return `
                 <div class="gallery-image-box" onclick="window.timelineComponent.openPhotoLightboxById('${activeItem.id}', ${imgIdx})" style="width:100% !important; height:100% !important; border-radius:16px !important; overflow:hidden !important; position:relative !important; cursor:pointer !important; background:#ffffff !important; border:1px solid var(--border-color) !important; box-shadow:0 4px 14px rgba(0,0,0,0.08) !important; scroll-snap-align:start !important;">
                   <img src="${resolvedSrc}" alt="${activeItem.title}"

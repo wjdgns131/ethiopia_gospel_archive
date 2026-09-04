@@ -79,11 +79,19 @@ export default {
       const now = new Date();
       const timestamp = now.toISOString().replace(/[-:T.]/g, "").substring(0, 14); // YYYYMMDDHHMMSS
       const randomHash = Math.random().toString(36).substring(2, 6);
+      const extOverride = formData.get("extOverride");
       const extMatch = file.name.match(/\.[a-zA-Z0-9]+$/);
-      const ext = extMatch ? extMatch[0].toLowerCase() : ".jpg";
+      const ext = extOverride || (extMatch ? extMatch[0].toLowerCase() : ".jpg");
       const cleanHistoryId = String(historyId).replace(/[^a-zA-Z0-9_-]/g, "");
+
+      const subFolder = formData.get("subFolder");
+      let folderPath = "images/history";
+      if (subFolder === "original" || subFolder === "thumb") {
+        folderPath = `images/history/${subFolder}`;
+      }
+
       const filename = `hist-${cleanHistoryId}-${timestamp}-${randomHash}${ext}`;
-      const repoPath = `images/history/${filename}`;
+      const repoPath = `${folderPath}/${filename}`;
 
       // 9. Convert Original File ArrayBuffer to Base64 for GitHub API
       const arrayBuffer = await file.arrayBuffer();
