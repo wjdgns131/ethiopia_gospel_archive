@@ -1,6 +1,6 @@
 /**
- * 에티오피아 선교 아카이브 - 실시간 구글 지도(Google Maps) 대화형 연동 엔진
- * Google Maps Roadmap / Satellite / Terrain 타일 지원 + GPS 100% 밀착
+ * 에티오피아 선교 아카이브 - 실시간 구글 지도(Google Maps) 대화형 연동 엔진 v25000
+ * 구글 공식 라이브 지도 Iframe + 실시간 도시 줌인 & 식구 연동
  */
 
 const ETHIOPIA_REGIONS = [
@@ -49,53 +49,15 @@ class EthiopiaMapComponent {
     this.pillsContainer = document.getElementById(this.pillsContainerId);
     this.onRegionSelect = onRegionSelect;
     this.activeRegion = null;
-    this.leafletMap = null;
-    this.currentTileLayer = null;
-    this.currentLayerMode = 'roadmap';
-    this.markers = [];
-  }
-
-  openMapLightbox() {
-    let modal = document.getElementById("mapLightboxModal");
-    if (!modal) {
-      modal = document.createElement("div");
-      modal.id = "mapLightboxModal";
-      modal.className = "modal-backdrop";
-      modal.style.zIndex = "99999";
-      modal.innerHTML = `
-        <div style="position:relative; width:92vw; max-width:1100px; max-height:92vh; background:#0f172a; padding:1.25rem; border-radius:16px; display:flex; flex-direction:column; align-items:center; box-shadow:0 25px 50px rgba(0,0,0,0.6);">
-          <button style="position:absolute; top:-12px; right:-12px; background:#ef4444; color:#fff; border:none; border-radius:50%; width:34px; height:34px; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center;" onclick="document.getElementById('mapLightboxModal').classList.add('hidden')"><i class="fa-solid fa-xmark"></i></button>
-          
-          <div style="display:flex; justify-content:space-between; align-items:center; width:100%; margin-bottom:0.75rem; color:#fff;">
-            <h3 style="font-size:1.15rem; font-weight:700; margin:0;"><i class="fa-solid fa-map-location-dot" style="color:var(--accent-gold);"></i> 에티오피아 Google Maps 정밀 지도</h3>
-            <span style="font-size:0.8rem; color:#94a3b8;"><i class="fa-solid fa-circle-info"></i> 클릭 및 줌으로 자유 확대</span>
-          </div>
-
-          <div style="position:relative; width:100%; max-height:80vh; overflow:auto; border-radius:12px; background:#f1f5f9; border:1px solid #334155;">
-            <img src="images/ethiopia_map_clean.png?v=20260902_85" alt="Ethiopia Map Zoomed" style="width:100%; min-width:900px; display:block;" />
-          </div>
-        </div>
-      `;
-      document.body.appendChild(modal);
-      modal.addEventListener("click", (e) => {
-        if (e.target === modal) modal.classList.add("hidden");
-      });
-    }
-    modal.classList.remove("hidden");
   }
 
   render(members) {
-    if (!this.container) this.container = document.getElementById(this.containerId || "ethiopiaMapContainer");
     if (!this.pillsContainer) this.pillsContainer = document.getElementById(this.pillsContainerId || "regionPillsList");
-    
-    if (!this.container || !this.pillsContainer) return;
-
     members = members || (window.db ? window.db.getMembers() : []);
 
     const totalCntEl = document.getElementById("totalMembersCount");
     if (totalCntEl) totalCntEl.innerText = members ? members.length : 0;
 
-    // Compute member counts per region
     const counts = {};
     ETHIOPIA_REGIONS.forEach(r => counts[r.id] = 0);
     members.forEach(m => {
@@ -103,62 +65,87 @@ class EthiopiaMapComponent {
       counts[regId] = (counts[regId] || 0) + 1;
     });
 
-    // ALWAYS Render Map Engine (Unconditionally!)
-    this.renderGoogleMap(counts, members);
-
-    // Render Sidebar Region Pills (ONLY for regions with count > 0)
-    const isEn = window.i18n && window.i18n.getLang() === 'en';
-    const unitDisp = isEn ? '' : '명';
-    let pillsHtml = `
-      <button class="region-pill ${!this.activeRegion ? 'active' : ''}" data-region="all">
-        <span>${isEn ? '📍 All Regions' : '📍 전체 지역'}</span>
-        <span class="region-badge">${members.length}${unitDisp}</span>
-      </button>
-    `;
-
-    ETHIOPIA_REGIONS.forEach(reg => {
-      const cnt = counts[reg.id] || 0;
-      if (cnt === 0) return;
-
-      const isActive = this.activeRegion === reg.id;
-      const regNameDisp = isEn ? window.i18n.translateContent(reg.name) : reg.name;
-      pillsHtml += `
-        <button class="region-pill ${isActive ? 'active' : ''}" data-region="${reg.id}">
-          <span>📍 ${regNameDisp}</span>
-          <span class="region-badge">${cnt}${unitDisp}</span>
+    if (this.pillsContainer) {
+      const isEn = window.i18n && window.i18n.getLang() === 'en';
+      const unitDisp = isEn ? '' : '명';
+      let pillsHtml = `
+        <button class="region-pill ${!this.activeRegion ? 'active' : ''}" data-region="all">
+          <span>${isEn ? '📍 All Regions' : '📍 전체 지역'}</span>
+          <span class="region-badge">${members.length}${unitDisp}</span>
         </button>
       `;
-    });
 
-    this.pillsContainer.innerHTML = pillsHtml;
+      ETHIOPIA_REGIONS.forEach(reg => {
+        const cnt = counts[reg.id] || 0;
+        if (cnt === 0) return;
 
-    // Attach Listener to Pills
-    this.pillsContainer.querySelectorAll('.region-pill').forEach(pill => {
-      pill.addEventListener('click', () => {
-        const reg = pill.getAttribute('data-region');
-        this.selectRegion(reg === 'all' ? null : reg);
+        const isActive = this.activeRegion === reg.id;
+        const regNameDisp = isEn ? window.i18n.translateContent(reg.name) : reg.name;
+        pillsHtml += `
+          <button class="region-pill ${isActive ? 'active' : ''}" data-region="${reg.id}">
+            <span>📍 ${regNameDisp}</span>
+            <span class="region-badge">${cnt}${unitDisp}</span>
+          </button>
+        `;
       });
-    });
-  }
 
-  renderGoogleMap(counts, members) {
-    // Pure HTML5 Official Google Maps Embed is rendered directly in index.html with Zero JS logic!
-    return;
+      this.pillsContainer.innerHTML = pillsHtml;
+
+      this.pillsContainer.querySelectorAll('.region-pill').forEach(pill => {
+        pill.addEventListener('click', () => {
+          const reg = pill.getAttribute('data-region');
+          this.selectRegion(reg === 'all' ? null : reg);
+        });
+      });
+    }
   }
 
   selectRegion(regionId) {
     this.activeRegion = regionId;
+
+    const iframe = document.getElementById("liveGoogleMapsIframe");
+    let mapQuery = "Addis+Ababa,Ethiopia";
+    let zoomLevel = 7;
+
+    if (regionId === "아디스아바바") {
+      mapQuery = "Addis+Ababa,Ethiopia";
+      zoomLevel = 11;
+    } else if (regionId === "아다마") {
+      mapQuery = "Adama,Ethiopia";
+      zoomLevel = 12;
+    } else if (regionId === "비쇼프투") {
+      mapQuery = "Bishoftu,Ethiopia";
+      zoomLevel = 12;
+    } else if (regionId === "세베타") {
+      mapQuery = "Sebeta,Ethiopia";
+      zoomLevel = 12;
+    } else if (regionId === "네켐테") {
+      mapQuery = "Nekemte,Ethiopia";
+      zoomLevel = 12;
+    }
+
+    if (iframe) {
+      iframe.src = `https://maps.google.com/maps?q=${mapQuery}&t=m&z=${zoomLevel}&output=embed`;
+    }
+
+    // Update Region Pills UI
+    document.querySelectorAll(".region-pill").forEach(p => {
+      const regAttr = p.getAttribute("data-region");
+      const isMatch = (!regionId && regAttr === "all") || (regionId === regAttr);
+      p.classList.toggle("active", isMatch);
+    });
+
     if (window.directoryComponent) {
       window.directoryComponent.activeRegion = regionId;
       window.directoryComponent.render();
     }
+
     if (this.onRegionSelect) {
       try { this.onRegionSelect(regionId); } catch(e) {}
     }
-    this.render(window.db ? window.db.getMembers() : []);
-  }
-}
   }
 }
 
-window.EthiopiaMapComponent = EthiopiaMapComponent;
+if (typeof window !== 'undefined') {
+  window.EthiopiaMapComponent = EthiopiaMapComponent;
+}
