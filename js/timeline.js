@@ -333,8 +333,8 @@ class TimelineComponent {
   }
 
   openPhotoLightboxById(historyId, initialIndex = 0) {
-    const historyList = window.db ? window.db.getHistory() : [];
-    const item = historyList.find(h => h && h.id === historyId);
+    const historyList = this.getFilteredAndSortedHistory();
+    const item = historyList.find(h => h && String(h.id) === String(historyId));
     if (!item || !item.images || item.images.length === 0) return;
 
     this.openPhotoLightbox(item.images, initialIndex);
@@ -349,9 +349,9 @@ class TimelineComponent {
       modal = document.createElement("div");
       modal.id = "photoLightboxModal";
       modal.className = "modal-backdrop";
-      modal.style.zIndex = "99999";
+      modal.style.cssText = "position:fixed; inset:0; width:100vw; height:100vh; z-index:99999; display:flex; align-items:center; justify-content:center; background:rgba(10,15,28,0.96); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);";
       modal.innerHTML = `
-        <div class="lightbox-content-wrapper" style="position:fixed; inset:0; width:100vw; height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:10px; box-sizing:border-box; z-index:99999; background:rgba(10,15,28,0.96); backdrop-filter:blur(16px);">
+        <div class="lightbox-content-wrapper" style="position:relative; width:100vw; height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:10px; box-sizing:border-box; z-index:99999;">
           
           <div style="position:absolute; top:18px; left:20px; right:20px; display:flex; align-items:center; justify-content:space-between; z-index:100100; pointer-events:none;">
             <div id="lightboxCounter" style="pointer-events:auto; background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color:#fff; font-size:1rem; font-weight:800; padding:0.4rem 1.2rem; border-radius:25px; border:1px solid #38bdf8; box-shadow:0 6px 18px rgba(0,0,0,0.6);">
@@ -363,7 +363,7 @@ class TimelineComponent {
                 <i class="fa-solid fa-expand"></i> 화면 꽉 차게 확대
               </button>
 
-              <button type="button" style="background:#ef4444; color:#fff; border:none; border-radius:50%; width:46px; height:46px; font-size:24px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 20px rgba(239,68,68,0.6); transition:transform 0.2s;" onclick="document.getElementById('photoLightboxModal').classList.add('hidden')" title="닫기 (Esc)">
+              <button type="button" style="background:#ef4444; color:#fff; border:none; border-radius:50%; width:46px; height:46px; font-size:24px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 20px rgba(239,68,68,0.6); transition:transform 0.2s;" onclick="document.getElementById('photoLightboxModal').classList.add('hidden'); document.getElementById('photoLightboxModal').style.display='none';" title="닫기 (Esc)">
                 <i class="fa-solid fa-xmark"></i>
               </button>
             </div>
@@ -387,7 +387,10 @@ class TimelineComponent {
       document.body.appendChild(modal);
 
       modal.addEventListener("click", (e) => {
-        if (e.target === modal) modal.classList.add("hidden");
+        if (e.target === modal) {
+          modal.classList.add("hidden");
+          modal.style.display = "none";
+        }
       });
 
       document.addEventListener("keydown", (e) => {
@@ -398,6 +401,7 @@ class TimelineComponent {
           this.prevLightboxPhoto();
         } else if (e.key === "Escape") {
           modal.classList.add("hidden");
+          modal.style.display = "none";
         }
       });
     }
@@ -406,15 +410,8 @@ class TimelineComponent {
     this.lightboxIndex = initialIndex;
     this.updateLightboxState();
 
+    modal.style.display = "flex";
     modal.classList.remove("hidden");
-  }
-
-  openPhotoLightboxById(historyId, imgIdx = 0) {
-    const historyList = window.db ? window.db.getHistory() : [];
-    const item = historyList.find(h => h && h.id === historyId);
-    if (item && item.images && item.images.length > 0) {
-      this.openPhotoLightbox(item.images, imgIdx);
-    }
   }
 
   updateLightboxState() {

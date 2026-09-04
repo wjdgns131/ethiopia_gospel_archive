@@ -802,60 +802,123 @@ class DirectoryComponent {
 
     const members = window.db ? window.db.getMembers() : [];
     const inviterNameClean = (inviterName || '').trim();
+    const cleanSearchStr = inviterNameClean.replace(/^:\s*/, '').replace(/\(.*?\)/g, '').trim().toLowerCase();
 
-    // Find Inviter Profile Object
-    const inviterObj = members.find(m => m.name.toLowerCase() === inviterNameClean.toLowerCase() || inviterNameClean.toLowerCase().includes(m.name.toLowerCase()));
+    // 1. Find Inviter Profile Object with robust name matching
+    let inviterObj = null;
+    if (cleanSearchStr) {
+      inviterObj = members.find(m => {
+        const mClean = String(m.name || '').replace(/\(.*?\)/g, '').trim().toLowerCase();
+        return mClean === cleanSearchStr || mClean.includes(cleanSearchStr) || cleanSearchStr.includes(mClean);
+      });
+      if (!inviterObj) {
+        const firstToken = cleanSearchStr.split(/\s+/)[0];
+        if (firstToken.length >= 3) {
+          inviterObj = members.find(m => {
+            const mClean = String(m.name || '').replace(/\(.*?\)/g, '').trim().toLowerCase();
+            return mClean.includes(firstToken);
+          });
+        }
+      }
+    }
+
     const inviterPhoto = inviterObj && inviterObj.photo ? inviterObj.photo : "images/members/mem_pdf-mem-1.jpg";
 
-    // Find All Members Invited by this Inviter
-    const invitedMembers = members.filter(m => m.inviter && m.inviter.toLowerCase().includes(inviterNameClean.toLowerCase()));
+    // 2. Find All Members Invited by this Inviter
+    const invitedMembers = members.filter(m => {
+      if (!m || !m.inviter) return false;
+      const mInv = String(m.inviter).replace(/^:\s*/, '').replace(/\(.*?\)/g, '').trim().toLowerCase();
+      if (!mInv || !cleanSearchStr) return false;
+      if (mInv === cleanSearchStr || mInv.includes(cleanSearchStr) || cleanSearchStr.includes(mInv)) return true;
+      const firstToken = cleanSearchStr.split(/\s+/)[0];
+      if (firstToken.length >= 3 && mInv.includes(firstToken)) return true;
+      return false;
+    });
+
+    const isEn = window.i18n && window.i18n.getLang() === 'en';
+    const ageDisp = inviterObj ? this.getCalculatedAge(inviterObj) : '';
+    const inviterTestimonyUrl = inviterObj ? (inviterObj.testimony || inviterObj.youtube || "").trim() : "";
 
     body.innerHTML = `
       <div style="padding:0.5rem;">
         
-        <!-- INVITER HEADER CARD WITH LARGE FACE -->
-        <div style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color:#ffffff; padding:1.2rem 1.4rem; border-radius:18px; margin-bottom:1.5rem; box-shadow:0 8px 25px rgba(2,132,199,0.3); display:flex; align-items:center; gap:1.2rem; flex-wrap:wrap;">
+        <!-- INVITER RICH PROFILE HEADER CARD -->
+        <div style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color:#ffffff; padding:1.25rem 1.5rem; border-radius:20px; margin-bottom:1.5rem; box-shadow:0 8px 25px rgba(2,132,199,0.35); display:flex; align-items:center; gap:1.25rem; flex-wrap:wrap;">
           
-          <!-- Inviter Face Photo (100px x 100px) -->
-          <div style="position:relative; width:95px; height:95px; border-radius:18px; overflow:hidden; border:3px solid #ffffff; box-shadow:0 4px 12px rgba(0,0,0,0.2); flex-shrink:0; background:var(--bg-secondary, #1e293b);">
+          <!-- Inviter Face Photo -->
+          <div style="position:relative; width:95px; height:95px; border-radius:18px; overflow:hidden; border:3px solid #ffffff; box-shadow:0 4px 14px rgba(0,0,0,0.25); flex-shrink:0; background:#1e293b;">
             <img src="${inviterPhoto}" alt="${inviterNameClean}" style="width:100%; height:100%; object-fit:cover; display:block;" />
           </div>
 
-          <div>
-            <span style="font-size:0.8rem; color:#e0f2fe; font-weight:800; letter-spacing:0.5px; text-transform:uppercase;">
-              <i class="fa-solid fa-sitemap"></i> 전도 초대자 계보
-            </span>
-            <h2 style="font-size:1.5rem; font-weight:900; margin:2px 0; color:#ffffff;">${inviterNameClean}</h2>
-            <p style="font-size:0.92rem; color:#f0f9ff; margin:0; font-weight:700;">
-              직접 초청한 참석자: <strong style="color:#fbbf24; font-size:1.1rem;">총 ${invitedMembers.length}명</strong>
-            </p>
+          <div style="flex:1; min-width:200px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:0.5rem; margin-bottom:0.2rem; flex-wrap:wrap;">
+              <span style="font-size:0.78rem; color:#e0f2fe; font-weight:800; letter-spacing:0.5px; text-transform:uppercase; background:rgba(255,255,255,0.18); padding:2px 8px; border-radius:10px;">
+                <i class="fa-solid fa-sitemap" style="color:#fbbf24; margin-right:4px;"></i> ${isEn ? 'Evangelism Inviter Network' : '전도 초대자 계보'}
+              </span>
+              <span style="font-size:0.88rem; color:#ffffff; font-weight:800; background:rgba(15,23,42,0.4); padding:3px 10px; border-radius:12px;">
+                ${isEn ? 'Invited: ' : '직접 초청한 식구: '} <strong style="color:#fbbf24; font-size:1.05rem;">총 ${invitedMembers.length}명</strong>
+              </span>
+            </div>
+
+            <h2 style="font-size:1.55rem; font-weight:900; margin:2px 0 6px 0; color:#ffffff;">${inviterObj ? inviterObj.name : inviterNameClean}</h2>
+            
+            ${inviterObj ? `
+              <div style="display:flex; align-items:center; gap:0.8rem; font-size:0.86rem; color:#f0f9ff; flex-wrap:wrap; margin-bottom:0.5rem;">
+                <span>📍 ${inviterObj.region || '에티오피아'}</span>
+                ${ageDisp ? `<span>• ${ageDisp}</span>` : ''}
+                <span>💼 ${inviterObj.job || '직업 미기재'}</span>
+              </div>
+            ` : ''}
+
+            ${inviterTestimonyUrl ? `
+              <button type="button" onclick="event.stopPropagation(); window.directoryComponent.openVideoModal('${inviterTestimonyUrl}', '${inviterObj ? inviterObj.name : inviterNameClean}')" style="background:#ffffff; color:#0284c7; border:none; border-radius:12px; padding:0.4rem 0.95rem; font-size:0.85rem; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:0.4rem; box-shadow:0 3px 10px rgba(0,0,0,0.15); transition:transform 0.18s;">
+                <i class="fa-solid fa-circle-play" style="color:#d97706; font-size:1rem;"></i> ${isEn ? 'Watch Inviter Testimony' : '초대자 구원 간증 보기'}
+              </button>
+            ` : ''}
           </div>
         </div>
 
         <!-- INVITED MEMBERS GRID WITH MINI FACE AVATARS -->
-        <h4 style="font-size:1.05rem; font-weight:800; color:var(--text-primary); margin-bottom:0.8rem; display:flex; align-items:center; gap:0.4rem;">
-          <i class="fa-solid fa-users" style="color:#0284c7;"></i> 초청된 식구 명단 (${invitedMembers.length}명)
-        </h4>
+        <h3 style="font-size:1.1rem; font-weight:800; color:var(--text-primary); margin-bottom:0.9rem; display:flex; align-items:center; justify-content:space-between;">
+          <span style="display:flex; align-items:center; gap:0.4rem;">
+            <i class="fa-solid fa-users" style="color:#0284c7;"></i> ${isEn ? 'Invited Members List' : '초청받아 구원받은 식구 명단'}
+          </span>
+          <span style="font-size:0.85rem; color:var(--text-muted); font-weight:700;">(${invitedMembers.length}${isEn ? ' Members' : '명'})</span>
+        </h3>
 
         ${invitedMembers.length === 0 ? `
-          <div style="text-align:center; padding:2.5rem 1rem; color:var(--text-muted); background:var(--bg-main); border-radius:14px; border:1px solid var(--border-color);">
-            <i class="fa-solid fa-users-slash" style="font-size:2rem; margin-bottom:0.5rem; color:#0284c7;"></i>
-            <p style="font-size:0.95rem; font-weight:700; margin:0;">등록된 초청 식구가 없습니다.</p>
+          <div style="text-align:center; padding:2.5rem 1rem; color:var(--text-muted); background:var(--bg-main); border-radius:16px; border:1px solid var(--border-color);">
+            <i class="fa-solid fa-users-slash" style="font-size:2.2rem; margin-bottom:0.6rem; color:#0284c7;"></i>
+            <p style="font-size:0.98rem; font-weight:700; margin:0;">${isEn ? 'No invited members registered yet.' : '등록된 초청 식구가 없습니다.'}</p>
           </div>
         ` : `
-          <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:0.9rem;">
+          <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); gap:1.0rem;">
             ${invitedMembers.map(m => {
               const photo = m.photo || "images/members/mem_pdf-mem-1.jpg";
+              const testimony = (m.testimony || m.youtube || "").trim();
+              const memberAge = this.getCalculatedAge(m);
+
               return `
-                <div data-action="open-member-detail" data-id="${m.id}" style="cursor:pointer; background:var(--bg-card); border:1px solid var(--border-color); border-radius:16px; padding:0.75rem; display:flex; align-items:center; gap:0.85rem; box-shadow:var(--shadow-sm); transition:transform 0.2s;" class="hover-text-primary">
-                  <!-- Mini Face Avatar (65px x 65px) -->
-                  <div style="width:65px; height:65px; border-radius:14px; overflow:hidden; border:2px solid #0284c7; flex-shrink:0; background:var(--bg-secondary, #1e293b); box-shadow:0 2px 8px rgba(0,0,0,0.08);">
-                    <img src="${photo}" alt="${m.name}" style="width:100%; height:100%; object-fit:cover; display:block;" />
+                <div data-action="open-member-detail" data-id="${m.id}" style="cursor:pointer; background:var(--bg-card); border:1px solid var(--border-color); border-radius:18px; padding:0.85rem; display:flex; flex-direction:column; justify-content:space-between; box-shadow:var(--shadow-sm); transition:all 0.2s;" class="hover-text-primary">
+                  <div style="display:flex; align-items:center; gap:0.85rem; margin-bottom:0.6rem;">
+                    <!-- Mini Face Avatar -->
+                    <div style="width:68px; height:68px; border-radius:14px; overflow:hidden; border:2px solid #0284c7; flex-shrink:0; background:#1e293b; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+                      <img src="${photo}" alt="${m.name}" style="width:100%; height:100%; object-fit:cover; display:block;" />
+                    </div>
+                    <div style="flex:1; overflow:hidden;">
+                      <h4 style="font-size:1.08rem; font-weight:800; margin:0 0 2px 0; color:#1e3a8a; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${m.name}</h4>
+                      <p style="font-size:0.82rem; color:var(--text-secondary); margin:0 0 2px 0; font-weight:600;">📍 ${m.region || '에티오피아'} ${memberAge ? `• ${memberAge}` : ''}</p>
+                      <span style="font-size:0.78rem; color:var(--text-muted); font-weight:600; display:block; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">💼 ${m.job || '-'}</span>
+                    </div>
                   </div>
-                  <div style="flex:1; overflow:hidden;">
-                    <h4 style="font-size:1.05rem; font-weight:800; margin:0 0 2px 0; color:#1e3a8a; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${m.name}</h4>
-                    <p style="font-size:0.8rem; color:var(--text-secondary); margin:0 0 2px 0; font-weight:600;">📍 ${m.region}</p>
-                    <span style="font-size:0.75rem; color:var(--accent-gold); font-weight:700;">📅 ${m.assemblyMonth || '-'}</span>
+
+                  <div style="display:flex; align-items:center; justify-content:space-between; padding-top:0.5rem; border-top:1px solid var(--border-color); font-size:0.78rem; gap:0.4rem;">
+                    <span style="color:var(--text-muted); font-weight:600;">📅 ${m.assemblyMonth || '-'}</span>
+                    ${testimony ? `
+                      <button type="button" onclick="event.stopPropagation(); window.directoryComponent.openVideoModal('${testimony}', '${m.name}')" style="background:#f0f9ff; color:#0284c7; border:1px solid #7dd3fc; border-radius:8px; padding:0.18rem 0.5rem; font-weight:800; font-size:0.75rem; cursor:pointer; display:inline-flex; align-items:center; gap:0.25rem;">
+                        <i class="fa-solid fa-circle-play" style="color:#0284c7;"></i> 간증
+                      </button>
+                    ` : ''}
                   </div>
                 </div>
               `;
