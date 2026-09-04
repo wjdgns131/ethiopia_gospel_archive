@@ -2567,8 +2567,8 @@
       <!-- Empty State -->
       <div id="emptyState" class="empty-state hidden">
         <i class="fa-solid fa-users-slash empty-icon"></i>
-        <h3>조건에 맞는 식구가 없습니다.</h3>
-        <p>검색어나 지역 필터를 변경해 보세요.</p>
+        <h3 data-i18n="noMembersFound">조건에 맞는 식구가 없습니다.</h3>
+        <p data-i18n="noMembersSubtitle">검색어나 지역 필터를 변경해 보세요.</p>
       </div>
     </section>
 
@@ -2576,15 +2576,15 @@
     <section id="tab-timeline" class="tab-page">
       <div class="section-heading">
         <div class="heading-left">
-          <h2>복음 선교 역사 타임라인</h2>
-          <p class="subtitle">에티오피아 복음 전파의 발자취와 하나님의 놀라운 역사 기록입니다.</p>
+          <h2 data-i18n="timelineTitle">복음 선교 역사 타임라인</h2>
+          <p class="subtitle" data-i18n="timelineSubtitle">에티오피아 복음 전파의 발자취와 하나님의 놀라운 역사 기록입니다.</p>
         </div>
         <div class="heading-right" style="display:flex; gap:0.5rem; align-items:center;">
           <button class="btn btn-secondary" onclick="window.db.triggerImportDatabase()" title="내 컴퓨터의 백업 파일(.json) 복원" style="padding: 0.5rem 0.9rem; font-size: 0.9rem;">
-            <i class="fa-solid fa-folder-open"></i> 백업 파일 복원 (.json)
+            <i class="fa-solid fa-folder-open"></i> <span data-i18n="restoreBackupBtn">백업 파일 복원 (.json)</span>
           </button>
           <button id="openAddHistoryBtn" class="btn btn-primary" onclick="window.timelineComponent.openEditModal()">
-            <i class="fa-solid fa-plus"></i> 새 역사 기록 추가
+            <i class="fa-solid fa-plus"></i> <span data-i18n="addHistoryBtn">새 역사 기록 추가</span>
           </button>
         </div>
       </div>
@@ -2599,11 +2599,11 @@
     <section id="tab-assemblies" class="tab-page">
       <div class="section-heading">
         <div class="heading-left">
-          <h2>교제 & 선교 활동 아카이브</h2>
+          <h2 data-i18n="fellowshipTitle">교제 & 선교 활동 아카이브</h2>
         </div>
         <div class="heading-right">
           <button id="addNewFellowshipBtn" class="btn btn-primary" onclick="window.fellowshipComponent.openEditModal()">
-            <i class="fa-solid fa-plus"></i> 새 활동 소식 작성하기
+            <i class="fa-solid fa-plus"></i> <span data-i18n="addFellowshipBtn">새 활동 소식 작성하기</span>
           </button>
         </div>
       </div>
@@ -2611,11 +2611,11 @@
       <!-- Fellowship Category Filter Bar -->
       <div class="controls-bar" style="margin-bottom:1.5rem;">
         <div class="category-tabs" id="fellowshipCategoryTabs">
-          <button class="cat-tab active" data-category="all">📍 전체보기</button>
-          <button class="cat-tab" data-category="fellowship">☕ 교제</button>
-          <button class="cat-tab" data-category="daily">🏠 일상</button>
-          <button class="cat-tab" data-category="visit">🚗 탐방</button>
-          <button class="cat-tab" data-category="book">📚 책자</button>
+          <button class="cat-tab active" data-category="all" data-i18n="catAll">📍 전체보기</button>
+          <button class="cat-tab" data-category="fellowship" data-i18n="catFellowship">☕ 교제</button>
+          <button class="cat-tab" data-category="daily" data-i18n="catDaily">🏠 일상</button>
+          <button class="cat-tab" data-category="visit" data-i18n="catVisit">🚗 탐방</button>
+          <button class="cat-tab" data-category="book" data-i18n="catBook">📚 책자</button>
         </div>
       </div>
 

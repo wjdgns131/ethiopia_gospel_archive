@@ -254,6 +254,29 @@
     { ko: /추진하였습니다/g, en: "was initiated" },
     { ko: /물색하였으며/g, en: "was recruited" },
 
+
+    // Holidays & Calendar Mappings
+    { ko: /엔쿠타타시\s*\([^)]*\)/g, en: "Enkutatash (Ethiopian New Year)" },
+    { ko: /메스켈\s*\([^)]*\)/g, en: "Meskel (Finding of the True Cross)" },
+    { ko: /게나\s*\([^)]*\)/g, en: "Genna (Ethiopian Christmas)" },
+    { ko: /팀캇\s*둘째\s*날\s*\([^)]*\)/g, en: "Timkat Day 2" },
+    { ko: /팀캇\s*\([^)]*\)/g, en: "Timkat (Ethiopian Epiphany)" },
+    { ko: /아드와\s*승전일\s*\([^)]*\)/g, en: "Adwa Victory Day" },
+    { ko: /애국자의\s*날\s*\([^)]*\)/g, en: "Patriots' Victory Day" },
+    { ko: /에티오피아\s*국회의\s*날\s*\([^)]*\)/g, en: "Ethiopian National Day" },
+    { ko: /에티오피아 새해/g, en: "Ethiopian New Year" },
+    { ko: /십자가 발견 축제/g, en: "Finding of the True Cross" },
+    { ko: /주현절/g, en: "Epiphany" },
+
+    // Statistics & History Labels
+    { ko: /신규 참석\s*:\s*(\d+)/g, en: "New Attendees: $1" },
+    { ko: /식구\s*:\s*(\d+)명/g, en: "Saved Members: $1" },
+    { ko: /신규 참석/g, en: "New Attendees" },
+    { ko: /문구 및 사진 수정/g, en: "Edit Text & Photos" },
+    { ko: /역사 기록 삭제/g, en: "Delete Record" },
+    { ko: /새 역사 기록 추가/g, en: "Add New History Record" },
+    { ko: /백업 파일 복원/g, en: "Restore Backup" },
+
     // Relationships
     { ko: /지인/g, en: "acquaintance" },
     { ko: /동료/g, en: "colleague" },
@@ -901,168 +924,168 @@
       date: "August 2023",
       location: "Czech ELC",
       title: "The Beginning of Gospel Outreach to Ethiopia from the Czech Republic",
-      desc: ""
+      desc: "The first step of the gospel mission in Ethiopia began through connection with Czech ELC."
     },
 
     "hist-202404": {
       date: "April 2024",
       location: "Online (BIT Channel)",
       title: "Online Seminar and the First Fruit of Salvation in Ethiopia",
-      desc: ""
+      desc: "Prior to translating 'The Bible is True' into Amharic, Ethiopia's official language, an online seminar was conducted for translators recruited via online platforms and their acquaintances to thoroughly understand the word message. Through this seminar, Brother Fikru Tesfaye accepted the Gospel as the first fruit of salvation in Ethiopia."
     },
 
     "hist-202408": {
       date: "August 2024",
       location: "Online (BIT Channel)",
       title: "First Online Seminar After Completing the Amharic Dubbing",
-      desc: ""
+      desc: "After completing the Amharic translation of 'The Bible is True', an online seminar with Amharic audio dubbing was held in August 2024. During this second seminar, Brother Nathinael, who was in charge of Tigrinya dubbing, accepted the Gospel."
     },
 
     "hist-202410": {
       date: "October 2024",
       location: "Addis Ababa, Ethiopia",
       title: "Visit by the West Africa Team",
-      desc: ""
+      desc: "In late October 2024, Samonim requested that the precious blood of Jesus be thoroughly explained to the saved members in Ethiopia. Brother Eunwoo Lee and his wife, along with Brother Jaewon Kim from the West Africa Team, visited Ethiopia and conducted a 3-day seminar. Through this seminar, Sister Eden, wife of Brother Fikru, received salvation."
     },
 
     "hist-202412": {
       date: "December 29, 2024 – January 13, 2025",
       location: "Mekanisa Yotek Compound, Nifas Silk Lafto, Addis Ababa",
       title: "Visit to Ethiopia by Brother Kanghyun Lee and His Wife & Search for a Moim House",
-      desc: ""
+      desc: "Brother Kohen Lee and his wife visited Ethiopia from December 29, 2024 to January 13, 2025 to inspect candidate locations for the Moim House. They toured the candidate location in Mekanisa Yotek compound (Nifas Silk Lafto area, Addis Ababa) and fellowshiped with saved members (Nathinael, Fikru, Eden). (Following the 2024 Czech European Retreat, Brother Kohen Lee was appointed as a missionary to Ethiopia after a phone call with Samonim in November.)"
     },
 
     "hist-202505": {
       date: "May 2025",
       location: "",
       title: "Arrival of Brothers Kanghyun Lee and Junghoon Lee to Move into the Moim House and Prepare for In-Person Seminars",
-      desc: ""
+      desc: "As the move-in date for the Moim House was set but Brother Kohen Lee could not enter immediately, Brother Franco Lee arrived first from Ghana to prepare the house.\n\n- May 12, 2025: Brother Franco Lee entered Ethiopia from Ghana.\n- May 16, 2025: Brother Kohen Lee entered Ethiopia from the UK.\n\nThe two brothers worked together to complete moving in and prepared for the late May evangelical seminar."
     },
 
     "hist-20250528": {
       date: "May 28 – June 1, 2025",
       location: "Vibes Hotel, Addis Ababa",
       title: "Ethiopia’s First In-Person Evangelical Seminar",
-      desc: ""
+      desc: "Ethiopia's First In-Person Seminar\nLocation: Vibes Hotel, Addis Ababa (May 28–June 1, 2025)\n- Lecture: The Bible is True (Amharic Dubbing)\n- Supplementary Explanation: Eunwoo Lee, Hyunsik Jeon\n- Moderators: Kohen, Franco\n- Translators: Yokabet, Biniam [EN<->Amharic], Debora [KO<->Amharic]\n- New Attendees: Approx. 15\n\nVisiting Korean Members (9): Eunwoo Lee, Kyungsoon Han, Soon Ryu (Korea), Hyunsik Jeon (U.S.), Youngsung Park, Gunyang Park (Germany), Lee Benjamin Hae (Malta), Kohen (U.K.), Franco (Ghana)"
     },
 
     "hist-20250623": {
       date: "June 23 – July 13, 2025",
       location: "Moim House, Addis Ababa, Ethiopia",
       title: "Departure of Brothers Kanghyun Lee and Junghoon Lee & Visit by Brother Jaewon Kim",
-      desc: ""
+      desc: "After supporting the seminar in Dar es Salaam, Tanzania following the May seminar, Brothers Kohen and Franco returned to Ethiopia and continued fellowship with local members.\n\nAs their wives neared childbirth, Brother Franco departed for Korea on June 23, 2025, and Brother Kohen departed for the UK on June 24.\n\nDuring their absence, Brother Jaewon Kim came from Togo to stay in Ethiopia for about two weeks (June 27–July 13, 2025) to fellowship with members before returning to Korea."
     },
 
     "hist-20250819": {
       date: "August 19 – October 13, 2025",
       location: "Moim House, Addis Ababa, Ethiopia",
       title: "Brother Jaewon Kim and His Family Stay in Ethiopia After the Korea Retreat",
-      desc: ""
+      desc: "Stopping by Ethiopia before returning to Ghana after the Korea Retreat, Brother Jaewon Kim held weekend meetings focusing on the '7 Covenants' booklet and conducted a small seminar. During this time of praying for staff workers, Brother Fikru officially joined as a staff member."
     },
 
     "hist-20250914": {
       date: "September 14, 2025",
       location: "Moim House, Addis Ababa",
       title: "Ethiopia’s First Baptism",
-      desc: ""
+      desc: "Four saved brothers and sisters received baptism since the Gospel began in Ethiopia (Eden, Fikru, Zerihun, Getachew / Officiated by Missionary Jaewon Kim). It was the first bold baptism service conducted in an area with strong Orthodox influence."
     },
 
     "hist-20251103": {
       date: "November 3, 2025",
       location: "Bole International Airport / Addis Ababa, Ethiopia",
       title: "Brother Junghoon Lee Re-enters Ethiopia & Preparations Begin for the December Seminar",
-      desc: ""
+      desc: "Brother Franco Lee arrived in Ethiopia on November 3 and held weekly fellowship meetings centered on 'The Bible is True' with saved members while planning for the next seminar. During this process, Brother Getachew (a medical doctor) assisted in seminar preparations."
     },
 
     "hist-20251212": {
       date: "December 12–14, 2025",
       location: "Moim House, Addis Ababa, Ethiopia",
       title: "First Evangelical Seminar at the Moim House — Kindling the Flame of the Gospel",
-      desc: ""
+      desc: "First Evangelical Seminar at the Moim House\nDates: Dec 12–14, 2025\nLocation: Addis Ababa Moim House\n- ELC Staff Fikru & Franco prepared the seminar\n- Brother Kohen joined from the UK on Dec 12\n- Sister Eden & house assistant served meals for 12 attendees\n\n[Saved Members]\n1. Samrawit Megersa (Student, 22)\n2. Mekdes Adunga (Nurse, 31)\n3. Ahimed Seid (Former Prophet/ELC Staff, 32)\n\n(Both Brother Kohen and Brother Franco returned to Ethiopia when their babies were around 90 days old.)"
     },
 
     "hist-20251221": {
       date: "December 21, 2025",
       location: "Moim House, Addis Ababa",
       title: "Baptism",
-      desc: ""
+      desc: "Baptism administered to 5 saved members from the December seminar (Ahimed, Samrawit, Yosef, Masresha, Dereje)."
     },
 
     "hist-20260117": {
       date: "January 17–19, 2026",
       location: "Gudina Tumsa Retreat Center, Addis Ababa",
       title: "Evangelical Seminar — The Flame of the Gospel Spreads Further",
-      desc: ""
+      desc: "During the Epiphany holiday (celebrating the baptism of Jesus), a 3-day evangelical seminar was held from Jan 17 to 19. A total of 16 new attendees heard the Bible lectures."
     },
 
     "hist-1788440866029": {
       date: "February 1, 2026",
       location: "Moim House, Addis Ababa",
       title: "Baptism",
-      desc: ""
+      desc: "Baptism was administered to members saved through the January seminar. During this period, hymnal sheet music editing, booklet translation, and printing were initiated."
     },
 
     "hist-20260206": {
       date: "February 6–8, 2026",
       location: "Gudina Tumsa Retreat Center, Addis Ababa",
       title: "Evangelical Seminar at Gudina Tumsa Retreat Center",
-      desc: ""
+      desc: "The early February seminar was initially planned to be skipped, but following Samonim's encouraging remark, 'Time passes so quickly, doesn't it?', the brothers immediately pushed forward. Over 50 new attendees filled the venue.\n\nHowever, due to long-term tourist visa stay issues raised by immigration, Brothers Kohen and Franco decided to return to Korea to complete church registration procedures before re-entering. From February onwards, Brother Fikru began leading the seminars directly.\n\n(Through this seminar, Brother Abdissa, now an ELC staff member, and Sena, working as a domestic helper at Brother Fikru's home, were saved.)"
     },
 
     "hist-20260226": {
       date: "February 26 – March 2, 2026",
       location: "Moim House, Addis Ababa",
       title: "Evangelical Seminar at the Moim House (Invitation for Pastor Marcos and Church Board Members)",
-      desc: ""
+      desc: "Pastor Marcos, residing in Hawassa, is the General Overseer of 'Gospel Change International' with over 2,000 members in Sidama State.\n\nFollowing the February seminar, Pastor Marcos visited the Addis Ababa Moim House and engaged in deep biblical fellowship with Brothers Kohen and Franco."
     },
 
     "hist-1788349055531": {
       date: "March 13–16, 2026",
       location: "Moim House, Addis Ababa",
       title: "Evangelical Seminar",
-      desc: ""
+      desc: "Brother Abdissa, saved in the February seminar, actively began inviting people around him and joined in gospel outreach."
     },
 
     "hist-20260424": {
       date: "April 24–27, 2026",
       location: "Moim House, Addis Ababa",
       title: "April Evangelical Seminar",
-      desc: ""
+      desc: "Through the April seminar, Brother Abenezer Tadese, then an English teacher, accepted the Gospel and currently serves as an ELC staff member."
     },
 
     "hist-1788369048749": {
       date: "May 15–18, 2026",
       location: "Gudina Tumsa Retreat Center, Addis Ababa",
       title: "Evangelical Seminar",
-      desc: ""
+      desc: "Evangelical seminars continued without pause despite the prolonged absence of Brothers Kohen and Franco."
     },
 
     "hist-1788369145959": {
       date: "June 5–8 / June 18–22, 2026",
       location: "Gudina Tumsa Retreat Center, Addis Ababa",
       title: "Evangelical Seminar",
-      desc: ""
+      desc: "Two evangelical seminars were held in June, steadily spreading the Gospel."
     },
 
     "hist-1788369417375": {
       date: "July 16–20, 2026",
       location: "ODA NABEE Hotel, Bishoftu",
       title: "Evangelical Seminar",
-      desc: ""
+      desc: "While the EGBCC church registration was completed, ICS immigration registration was delayed. Brother Kohen entered Ethiopia on a tourist visa to handle administrative affairs and organized this seminar."
     },
 
     "hist-1788369801465": {
       date: "August 16, 2026",
       location: "Moim House, Addis Ababa",
       title: "Baptism",
-      desc: ""
+      desc: "After completing all church registration procedures and attending the Korea Retreat, Brothers Kohen and Franco returned to Ethiopia on August 6 with Brother Fikru's family. On August 16, baptism was administered to 28 members saved through past seminars."
     },
 
     "hist-1788370209650": {
       date: "August 20–24, 2026",
       location: "ODA NABEE Hotel, Bishoftu",
       title: "Evangelical Seminar",
-      desc: ""
+      desc: "(New Attendees: 29, Saved Members: 25)\nWith all legal and administrative procedures completed, full-scale gospel preaching began without restrictions. Many attendees gave clear testimonies of salvation."
     }
   };
 
@@ -1194,6 +1217,91 @@
           }
         }
       });
+
+      // Verse Banner toggle
+      const verseKr = document.querySelector(".verse-kr");
+      const verseEn = document.querySelector(".verse-en");
+      if (verseKr && verseEn) {
+        verseKr.style.display = this.currentLang === "en" ? "none" : "block";
+        verseEn.style.display = this.currentLang === "en" ? "block" : "none";
+      }
+
+      // Search Input Placeholder
+      const searchInput = document.getElementById("searchInput") || document.getElementById("memberSearchInput");
+      if (searchInput) {
+        searchInput.placeholder = this.currentLang === "en" 
+          ? "Search by name, occupation, inviter, region..." 
+          : "이름, 직업, 초대자, 지역 검색...";
+      }
+
+      // Category Tabs
+      const catTabs = document.querySelectorAll("#categoryTabs .cat-tab");
+      catTabs.forEach(tab => {
+        const cat = tab.getAttribute("data-category");
+        if (cat === "all") tab.textContent = this.currentLang === "en" ? "View All" : "전체보기";
+        else if (cat === "saved") tab.textContent = this.currentLang === "en" ? "🍇 Saved Members" : "🍇 구원받은 식구";
+        else if (cat === "disrupter") tab.textContent = this.currentLang === "en" ? "⚠️ Disrupters" : "⚠️ 분탕꾼";
+      });
+
+      // Active Filter Bar
+      const activeFilterBar = document.getElementById("activeFilterBar");
+      if (activeFilterBar) {
+        const labelSpan = activeFilterBar.querySelector("span");
+        if (labelSpan) {
+          const strong = document.getElementById("activeFilterLabel");
+          const strongText = strong ? strong.textContent : "";
+          const trStrong = (this.currentLang === "en" && (strongText === "전체" || strongText === "all")) ? "All" : strongText;
+          labelSpan.innerHTML = `${this.currentLang === "en" ? "Applied Filter:" : "적용된 필터:"} <strong id="activeFilterLabel">${trStrong}</strong>`;
+        }
+        const resetBtn = document.getElementById("resetFilterBtn");
+        if (resetBtn) {
+          resetBtn.innerHTML = `<i class="fa-solid fa-rotate-left"></i> ${this.currentLang === "en" ? "Reset Filters" : "필터 초기화"}`;
+        }
+      }
+
+      // Fellowship Tabs
+      const felTabs = document.querySelectorAll("#assembliesCategoryTabs .cat-tab");
+      felTabs.forEach(tab => {
+        const cat = tab.getAttribute("data-category");
+        if (cat === "all") tab.textContent = this.currentLang === "en" ? "📍 View All" : "📍 전체보기";
+        else if (cat === "fellowship") tab.textContent = this.currentLang === "en" ? "☕ Fellowship" : "☕ 교제";
+        else if (cat === "daily") tab.textContent = this.currentLang === "en" ? "🏠 Daily Life" : "🏠 일상";
+        else if (cat === "visit") tab.textContent = this.currentLang === "en" ? "🚗 Visits" : "🚗 탐방";
+        else if (cat === "book") tab.textContent = this.currentLang === "en" ? "📚 Materials" : "📚 책자";
+      });
+
+      // Fellowship Action Button
+      const addFelBtn = document.getElementById("addNewFellowshipBtn");
+      if (addFelBtn) {
+        addFelBtn.innerHTML = `<i class="fa-solid fa-plus"></i> ${this.currentLang === "en" ? "Add New Activity Update" : "새 활동 소식 작성하기"}`;
+      }
+
+      // Timeline Nav Buttons
+      const hzPrevBtn = document.getElementById("hzPrevBtn");
+      if (hzPrevBtn) hzPrevBtn.title = this.currentLang === "en" ? "Previous Event" : "이전 사건";
+      const hzNextBtn = document.getElementById("hzNextBtn");
+      if (hzNextBtn) hzNextBtn.title = this.currentLang === "en" ? "Next Event" : "다음 사건";
+
+      // Footer & Admin Login Translations
+      const footerH4 = document.querySelector(".footer-brand h4");
+      if (footerH4) footerH4.textContent = this.currentLang === "en" ? "Ethiopia Mission Archive" : "에티오피아 선교 아카이브";
+
+      const footerP = document.querySelector(".footer-brand p");
+      if (footerP) footerP.textContent = this.currentLang === "en" ? '"I am under obligation both to Greeks and to barbarians, both to the wise and to the foolish." (Rom 1:14)' : '"헬라인이나 야만이나 지혜 있는 자나 어리석은 자에게 다 내가 빚진 자라" (롬 1:14)';
+
+      const footerCopy = document.querySelector(".footer-copy");
+      if (footerCopy) footerCopy.textContent = this.currentLang === "en" ? "© 2026 Ethiopia Mission Archive | Gospel Records & Member System" : "© 2026 에티오피아 선교 아카이브 | 복음 기록 및 식구 관리 시스템";
+
+      const adminText = document.querySelector(".admin-btn-text");
+      if (adminText) adminText.textContent = this.currentLang === "en" ? "Admin Login" : "관리자 로그인";
+
+      const sidebarTitle = document.querySelector(".sidebar-title");
+      if (sidebarTitle) {
+        const cntEl = document.getElementById("totalMembersCount");
+        const cnt = cntEl ? cntEl.innerText : "94";
+        const isEn = this.currentLang === "en";
+        sidebarTitle.innerHTML = `<span data-i18n="selectRegionTitle">${isEn ? "Select Region" : "지역 선택"}</span> (${cnt}${isEn ? " members" : "명"})`;
+      }
 
       // Update Region Dropdown Option Labels dynamically
       const regionDropdown = document.getElementById("regionDropdown");

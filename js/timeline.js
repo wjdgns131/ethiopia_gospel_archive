@@ -858,7 +858,8 @@ class TimelineComponent {
             <div style="position:relative; width:100%; min-width:${trackMinWidth}px; height: 4px; background: var(--border-color); border-radius: 2px; margin: 1.5rem 0;">
               
               <!-- Nodes distributed evenly along min-width line -->
-              ${historyList.map((item, idx) => {
+              ${historyList.map((rawItem, idx) => {
+                const item = (window.i18n && typeof window.i18n.getTranslatedHistory === "function") ? window.i18n.getTranslatedHistory(rawItem) : rawItem;
                 const nodePercent = totalCount > 1 ? (idx / (totalCount - 1)) * 100 : 0;
                 const isActive = item.id === this.activeId;
 
