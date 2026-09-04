@@ -24,20 +24,20 @@ const ETHIOPIA_REGIONS = [
 function normalizeRegionId(rawRegion) {
   if (!rawRegion) return "기타";
   const str = String(rawRegion).toLowerCase().trim();
-  if (str.includes("아디스아바바") || str.includes("addis")) return "아디스아바바";
+  if (str.includes("아르바민치") || str.includes("아르바 민치") || str.includes("arba minch") || str.includes("arbaminch")) return "아르바민치";
   if (str.includes("비쇼프투") || str.includes("bishoftu")) return "비쇼프투";
-  if (str.includes("아다마") || str.includes("adama")) return "아다마";
+  if (str.includes("아다마") || str.includes("adama") || str.includes("nazret")) return "아다마";
   if (str.includes("세베타") || str.includes("sebeta")) return "세베타";
   if (str.includes("모조") || str.includes("mojo") || str.includes("modjo")) return "모조";
   if (str.includes("네켐테") || str.includes("nekemte")) return "네켐테";
   if (str.includes("하와사") || str.includes("hawassa") || str.includes("아와사") || str.includes("awassa")) return "하와사";
-  if (str.includes("아르바민치") || str.includes("아르바 민치") || str.includes("arba minch") || str.includes("arbaminch")) return "아르바민치";
   if (str.includes("알렘테나") || str.includes("alem tena") || str.includes("alemtena")) return "알렘테나";
   if (str.includes("아사사") || str.includes("asasa") || str.includes("아르시") || str.includes("arsi")) return "아사사";
   if (str.includes("바히르다르") || str.includes("bahir")) return "바히르다르";
   if (str.includes("디레다와") || str.includes("dire")) return "디레다와";
   if (str.includes("곤다르") || str.includes("gondar")) return "곤다르";
   if (str.includes("지마") || str.includes("jimma")) return "지마";
+  if (str.includes("아디스아바바") || str.includes("addis")) return "아디스아바바";
   return "기타";
 }
 
@@ -228,6 +228,18 @@ class EthiopiaMapComponent {
     const regionDropdown = document.getElementById("regionDropdown");
     if (regionDropdown) {
       regionDropdown.value = regionId || "all";
+    }
+
+    const activeFilterBar = document.getElementById("activeFilterBar");
+    const activeFilterLabel = document.getElementById("activeFilterLabel");
+    if (activeFilterBar && activeFilterLabel) {
+      if (regionId) {
+        const regObj = ETHIOPIA_REGIONS.find(r => r.id === regionId);
+        activeFilterLabel.innerText = `📍 ${regObj ? regObj.name : regionId}`;
+        activeFilterBar.classList.remove("hidden");
+      } else {
+        activeFilterBar.classList.add("hidden");
+      }
     }
 
     if (this.onRegionSelect) {
