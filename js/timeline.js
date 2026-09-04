@@ -769,10 +769,13 @@ class TimelineComponent {
     }
 
     if (!historyList || !Array.isArray(historyList) || historyList.length === 0) {
-      historyList = DEFAULT_HISTORY;
+      historyList = (window.DEFAULT_HISTORY && window.DEFAULT_HISTORY.length > 0) ? window.DEFAULT_HISTORY : [];
     }
 
-    historyList = historyList.filter(h => h && typeof h === 'object');
+    historyList = historyList.filter(h => h && typeof h === 'object' && h.title);
+    if (historyList.length === 0) {
+      historyList = window.DEFAULT_HISTORY || [];
+    }
 
     // Extract all unique years dynamically for the Year Filter Selector Bar
     const allYears = Array.from(new Set(historyList.map(item => {

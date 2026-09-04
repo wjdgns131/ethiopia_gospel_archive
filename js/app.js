@@ -60,6 +60,21 @@ document.addEventListener("DOMContentLoaded", () => {
         tabPages.forEach(page => {
           if (page.id === `tab-${target}`) {
             page.classList.add("active");
+            if (target === "directory") {
+              if (window.directoryComponent) window.directoryComponent.render();
+              if (window.mapComponent) {
+                window.mapComponent.render(window.db ? window.db.getMembers() : []);
+                if (window.mapComponent.leafletMap) {
+                  setTimeout(() => window.mapComponent.leafletMap.invalidateSize(), 120);
+                }
+              }
+            } else if (target === "timeline") {
+              if (window.timelineComponent) window.timelineComponent.render();
+            } else if (target === "assemblies" || target === "fellowship") {
+              if (window.assembliesComponent) window.assembliesComponent.render();
+            } else if (target === "calendar") {
+              if (window.calendarComponent) window.calendarComponent.render();
+            }
           } else {
             page.classList.remove("active");
           }

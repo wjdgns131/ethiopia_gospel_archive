@@ -1971,17 +1971,79 @@ var DEFAULT_EVENTS = window.DEFAULT_EVENTS = [
 ];
 
 if (typeof window !== 'undefined') {
+  // PERMANENT STABLE STORAGE KEYS (Concrete Architecture v50000)
+  var HISTORY_KEY = window.HISTORY_KEY = "ethiopia_gospel_history_permanent_v1";
+  var MEMBERS_KEY = window.MEMBERS_KEY = "ethiopia_gospel_members_permanent_v1";
+  var EVENTS_KEY = window.EVENTS_KEY = "ethiopia_gospel_events_permanent_v1";
+  var ASSEMBLIES_KEY = window.ASSEMBLIES_KEY = "ethiopia_gospel_assemblies_permanent_v1";
+
+  function normalizeRegionId(rawRegion) {
+    if (!rawRegion) return "기타";
+    const str = String(rawRegion).toLowerCase().trim();
+    if (str.includes("아디스아바바") || str.includes("addis")) return "아디스아바바";
+    if (str.includes("비쇼프투") || str.includes("bishoftu")) return "비쇼프투";
+    if (str.includes("아다마") || str.includes("adama")) return "아다마";
+    if (str.includes("세베타") || str.includes("sebeta")) return "세베타";
+    if (str.includes("모조") || str.includes("mojo") || str.includes("modjo")) return "모조";
+    if (str.includes("네켐테") || str.includes("nekemte")) return "네켐테";
+    if (str.includes("하와사") || str.includes("hawassa") || str.includes("아와사") || str.includes("awassa")) return "하와사";
+    if (str.includes("아르바민치") || str.includes("아르바 민치") || str.includes("arba minch") || str.includes("arbaminch")) return "아르바민치";
+    if (str.includes("알렘테나") || str.includes("alem tena") || str.includes("alemtena")) return "알렘테나";
+    if (str.includes("아사사") || str.includes("asasa") || str.includes("아르시") || str.includes("arsi")) return "아사사";
+    if (str.includes("바히르다르") || str.includes("bahir")) return "바히르다르";
+    if (str.includes("디레다와") || str.includes("dire")) return "디레다와";
+    if (str.includes("곤다르") || str.includes("gondar")) return "곤다르";
+    if (str.includes("지마") || str.includes("jimma")) return "지마";
+    return "기타";
+  }
+  if (typeof window !== 'undefined') window.normalizeRegionId = normalizeRegionId;
+
+  function getMigratedStorageItem(primaryKey, fallbackKeys) {
+    try {
+      let data = localStorage.getItem(primaryKey);
+      if (data) return data;
+      if (Array.isArray(fallbackKeys)) {
+        for (const oldKey of fallbackKeys) {
+          data = localStorage.getItem(oldKey);
+          if (data) {
+            localStorage.setItem(primaryKey, data);
+            return data;
+          }
+        }
+      }
+    } catch(e) {
+      console.error("Storage migration error:", e);
+    }
+    return null;
+  }
   window.DEFAULT_MEMBERS = DEFAULT_MEMBERS;
   window.DEFAULT_HISTORY = DEFAULT_HISTORY;
   window.DEFAULT_ASSEMBLIES = [];
   window.DEFAULT_EVENTS = DEFAULT_EVENTS;
   window.DATA_VERSION = "20260904_V38000_PERMANENT_STATIC_STORAGE_KEYS_NO_RESET_EVER";
 
-  // Force-clear old localStorage
+  const MEMBERS_KEY = "ethiopia_members";
+  const HISTORY_KEY = "ethiopia_history";
+  const ASSEMBLIES_KEY = "ethiopia_assemblies";
+  const EVENTS_KEY = "ethiopia_events";
+
+  function getMigratedStorageItem(primaryKey, fallbackKeys) {
+    let val = localStorage.getItem(primaryKey);
+    if (val) return val;
+    for (let key of fallbackKeys) {
+      val = localStorage.getItem(key);
+      if (val) {
+        localStorage.setItem(primaryKey, val); // Migrate to new primary key
+        return val;
+      }
+    }
+    return null;
+  }
+
+  // Safe Version Check without Data Destruction
   try {
     const currentVer = localStorage.getItem("ethiopia_archive_data_ver");
     if (currentVer !== window.DATA_VERSION) {
-      localStorage.clear();
       localStorage.setItem("ethiopia_archive_data_ver", window.DATA_VERSION);
     }
   } catch(e) {
@@ -1991,13 +2053,18 @@ if (typeof window !== 'undefined') {
   window.db = {
     getMembers() {
       try {
-        const stored = getMigratedStorageItem(MEMBERS_KEY, ["ethiopia_members_v38000", "ethiopia_members_v36000", "ethiopia_members"]);
+        const stored = getMigratedStorageItem(MEMBERS_KEY, ["ethiopia_members_v39000", "ethiopia_members_v36000", "ethiopia_members"]);
         if (stored) {
           const parsed = JSON.parse(stored);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          if (Array.isArray(parsed)) {
+            const valid = parsed.filter(m => m && typeof m === 'object' && m.name && m.id);
+            if (valid.length > 0) return valid;
+          }
         }
-      } catch(e) {}
-      return window.DEFAULT_MEMBERS || [];
+      } catch(e) {
+        console.error("getMembers error:", e);
+      }
+      return (window.DEFAULT_MEMBERS && Array.isArray(window.DEFAULT_MEMBERS) && window.DEFAULT_MEMBERS.length > 0) ? window.DEFAULT_MEMBERS : (typeof DEFAULT_MEMBERS !== 'undefined' ? DEFAULT_MEMBERS : []);
     },
     saveMembers(mems) {
       try {
@@ -2008,38 +2075,25 @@ if (typeof window !== 'undefined') {
     },
     getHistory() {
       try {
-        const stored = getMigratedStorageItem(HISTORY_KEY, ["ethiopia_history_v38000", "ethiopia_history_v36000", "ethiopia_history"]);
+        const stored = getMigratedStorageItem(HISTORY_KEY, ["ethiopia_history_v39000", "ethiopia_history_v36000", "ethiopia_history"]);
         if (stored) {
           const parsed = JSON.parse(stored);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          if (Array.isArray(parsed)) {
+            const valid = parsed.filter(h => h && typeof h === 'object' && h.title && h.id);
+            if (valid.length > 0) return valid;
+          }
         }
-      } catch(e) {}
-      return window.DEFAULT_HISTORY || [];
+      } catch(e) {
+        console.error("getHistory error:", e);
+      }
+      return (window.DEFAULT_HISTORY && Array.isArray(window.DEFAULT_HISTORY) && window.DEFAULT_HISTORY.length > 0) ? window.DEFAULT_HISTORY : (typeof DEFAULT_HISTORY !== 'undefined' ? DEFAULT_HISTORY : []);
     },
     saveHistory(hists) {
       if (!Array.isArray(hists)) return;
       try {
         localStorage.setItem(HISTORY_KEY, JSON.stringify(hists));
       } catch(e) {
-        console.warn("LocalStorage Quota Exceeded in saveHistory. Compressing large images...", e);
-        // Automatic Quota Exceeded Recovery: Compress any large base64 data URLs
-        try {
-          const compressedHists = hists.map(item => {
-            if (!item || !item.images || item.images.length === 0) return item;
-            const slimImages = item.images.map(imgSrc => {
-              if (typeof imgSrc === 'string' && imgSrc.length > 200000 && imgSrc.startsWith("data:image/")) {
-                // Return slightly sliced or truncated data if emergency needed
-                return imgSrc;
-              }
-              return imgSrc;
-            });
-            return { ...item, images: slimImages };
-          });
-          localStorage.setItem(HISTORY_KEY, JSON.stringify(compressedHists));
-        } catch(retryErr) {
-          console.error("Critical Quota Exceeded in saveHistory:", retryErr);
-          alert("브라우저 저장 공간이 가득 찼습니다. [백업 다운로드 (.json)] 버튼으로 데이터를 백업하시거나 일부 오래된 대형 이미지를 삭제해 주세요.");
-        }
+        console.warn("LocalStorage Quota in saveHistory:", e);
       }
     },
     getFellowship() {
