@@ -173,7 +173,7 @@ class EthiopiaMapComponent {
               <!-- Compact Sleek 3D Pin Icon -->
               <img src="${pinImgSrc}" alt="Pin Icon" style="width:24px; height:26px; display:block; filter:drop-shadow(0 3px 6px rgba(0,0,0,0.7));" />
               <!-- Crisp Transparent English Region Name Text -->
-              <span style="color:${nameColor}; font-size:11.5px; font-weight:800; background:transparent; text-shadow:0 2px 5px rgba(0,0,0,0.95), 0 0 8px rgba(0,0,0,0.9); white-space:nowrap; margin-top:1px; letter-spacing:-0.01em;">${englishRegionName}</span>
+              <span style="font-family:'Roboto', -apple-system, BlinkMacSystemFont, 'Google Sans', 'Segoe UI', Arial, sans-serif; color:${nameColor}; font-size:11px; font-weight:700; background:transparent; text-shadow:-1px -1px 0 #0f172a, 1px -1px 0 #0f172a, -1px 1px 0 #0f172a, 1px 1px 0 #0f172a, 0 2px 4px rgba(0,0,0,0.8); white-space:nowrap; margin-top:1px; letter-spacing:0.02em;">${englishRegionName}</span>
             </div>
           `;
 
