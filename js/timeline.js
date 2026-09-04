@@ -14,7 +14,97 @@ class TimelineComponent {
     this.initEvents();
   }
 
+  migrateLegacyStorageIfNeeded() {
+    try {
+      const legacyRaw = localStorage.getItem("ethiopia_history");
+      if (!legacyRaw) return; // No legacy storage to migrate
+
+      const existingOverridesRaw = localStorage.getItem("ethiopia_history_overrides");
+      
+      let legacyList = [];
+      try {
+        legacyList = JSON.parse(legacyRaw);
+      } catch(e) {
+        // Corrupt legacy data, safely remove to reclaim quota
+        localStorage.removeItem("ethiopia_history");
+        return;
+      }
+
+      if (!Array.isArray(legacyList) || legacyList.length === 0) {
+        localStorage.removeItem("ethiopia_history");
+        return;
+      }
+
+      const baseList = (window.DEFAULT_HISTORY && window.DEFAULT_HISTORY.length > 0)
+        ? window.DEFAULT_HISTORY
+        : (typeof DEFAULT_HISTORY !== 'undefined' ? DEFAULT_HISTORY : []);
+
+      let overrides = { modified: {}, added: [], deleted: [] };
+      if (existingOverridesRaw) {
+        try {
+          const parsed = JSON.parse(existingOverridesRaw);
+          if (parsed && typeof parsed === 'object') {
+            overrides.modified = parsed.modified || {};
+            overrides.added = Array.isArray(parsed.added) ? parsed.added : [];
+            overrides.deleted = Array.isArray(parsed.deleted) ? parsed.deleted : [];
+          }
+        } catch(e) {}
+      }
+
+      // Safely extract user modifications from legacyList without losing user edits
+      legacyList.forEach(legacyItem => {
+        if (!legacyItem || !legacyItem.id) return;
+
+        const baseItem = baseList.find(b => b && String(b.id) === String(legacyItem.id));
+        if (baseItem) {
+          const isTextDiff = (legacyItem.title !== baseItem.title) ||
+                             (legacyItem.desc !== baseItem.desc) ||
+                             (legacyItem.date !== baseItem.date) ||
+                             (legacyItem.location !== baseItem.location);
+
+          const baseImagesJson = JSON.stringify(baseItem.images || []);
+          const legacyImagesJson = JSON.stringify(legacyItem.images || []);
+          const isImagesDiff = baseImagesJson !== legacyImagesJson;
+
+          if (isTextDiff || isImagesDiff) {
+            if (!overrides.modified[legacyItem.id]) {
+              const modObj = {
+                date: legacyItem.date,
+                title: legacyItem.title,
+                location: legacyItem.location,
+                desc: legacyItem.desc
+              };
+              if (isImagesDiff) {
+                modObj.images = legacyItem.images;
+              }
+              overrides.modified[legacyItem.id] = modObj;
+            }
+          }
+        } else {
+          if (!overrides.added.some(a => a && String(a.id) === String(legacyItem.id))) {
+            overrides.added.push(legacyItem);
+          }
+        }
+      });
+
+      // Write lightweight migrated overrides first
+      localStorage.setItem("ethiopia_history_overrides", JSON.stringify(overrides));
+
+      // Successfully saved overrides! Now safely remove legacy key to free ~4.8MB quota
+      localStorage.removeItem("ethiopia_history");
+      console.log("✨ Safe migration complete: Reclaimed ~4.8MB localStorage quota while preserving user history edits!");
+    } catch(e) {
+      console.error("Migration error:", e);
+      // If migration error occurred, if overrides already exists, remove legacy key to prevent locking quota
+      if (localStorage.getItem("ethiopia_history_overrides")) {
+        try { localStorage.removeItem("ethiopia_history"); } catch(ex) {}
+      }
+    }
+  }
+
   getStoredHistory() {
+    this.migrateLegacyStorageIfNeeded();
+
     let baseList = (window.DEFAULT_HISTORY && window.DEFAULT_HISTORY.length > 0)
       ? window.DEFAULT_HISTORY
       : (typeof DEFAULT_HISTORY !== 'undefined' ? DEFAULT_HISTORY : []);
@@ -63,14 +153,6 @@ class TimelineComponent {
           return historyList;
         }
       }
-
-      const legacyRaw = localStorage.getItem("ethiopia_history");
-      if (legacyRaw) {
-        const legacyList = JSON.parse(legacyRaw);
-        if (Array.isArray(legacyList) && legacyList.length > 0) {
-          return legacyList;
-        }
-      }
     } catch(e) {
       console.error("Error reading stored history overrides:", e);
     }
@@ -79,6 +161,8 @@ class TimelineComponent {
   }
 
   saveStoredHistory(savedItem, deleteId = null) {
+    this.migrateLegacyStorageIfNeeded();
+
     let overrides = { modified: {}, added: [], deleted: [] };
     try {
       const overridesRaw = localStorage.getItem("ethiopia_history_overrides");
