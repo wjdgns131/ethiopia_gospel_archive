@@ -50,7 +50,7 @@
       }
     } catch(e) {}
   </script>
-  <script src="js/data.js?v=20260904_V21000_STATIC_PRE_RENDERED_MAP_ENGINE"></script>
+  <script src="js/data.js?v=20260904_V22000_OFFICIAL_PURE_GOOGLE_MAPS_LIVE_ENGINE"></script>
 </head>
 <body>
   <!-- Header / Navigation Bar -->
@@ -142,22 +142,35 @@
           <div class="map-layout">
             <!-- Interactive Google Maps Container -->
             <!-- 100% Static Pre-rendered Google Cartographic Vector Map (Zero JS Dependency!) -->
-            <div class="map-wrapper" id="ethiopiaMapContainer" style="position:relative; width:100%; height:340px; border-radius:14px; overflow:hidden; border:1px solid var(--border-color); box-shadow:var(--shadow-sm); background:linear-gradient(135deg, #0f172a 0%, #1e293b 100%); display:flex; flex-direction:column; justify-content:space-between; padding:0.75rem 1rem;">
+            <!-- 100% Pure Native Official Google Maps Live Embed (Zero JS Logic Required!) -->
+            <div class="map-wrapper" id="ethiopiaMapContainer" style="position:relative; width:100%; height:360px; border-radius:14px; overflow:hidden; border:1px solid var(--border-color); box-shadow:var(--shadow-sm); background:#0f172a;">
               
-              <!-- Top Toolbar Overlay -->
-              <div style="display:flex; justify-content:space-between; align-items:center; z-index:10;">
-                <div style="display:flex; align-items:center; gap:0.5rem; color:#f8fafc;">
-                  <i class="fa-solid fa-map-location-dot" style="color:#38bdf8; font-size:1.1rem;"></i>
-                  <strong style="font-size:0.95rem;">에티오피아 실시간 복음 사역 지도</strong>
-                  <span style="font-size:0.75rem; background:rgba(56,189,248,0.2); color:#38bdf8; padding:2px 8px; border-radius:10px; border:1px solid rgba(56,189,248,0.3);">GPS 정밀 연동</span>
-                </div>
+              <!-- Official Google Maps Live Iframe -->
+              <iframe 
+                src="https://maps.google.com/maps?q=8.8,38.8&t=m&z=7&output=embed" 
+                width="100%" 
+                height="360" 
+                frameborder="0" 
+                style="border:0; width:100%; height:360px; display:block;" 
+                allowfullscreen 
+                loading="lazy" 
+                referrerpolicy="no-referrer-when-downgrade">
+              </iframe>
 
-                <div style="display:flex; gap:6px; align-items:center;">
-                  <a href="https://www.google.com/maps/@9.0300,38.7400,7.5z" target="_blank" rel="noopener noreferrer" style="background:#0284c7; color:#ffffff; border:none; border-radius:8px; padding:0.35rem 0.75rem; font-weight:800; font-size:0.78rem; text-decoration:none; display:inline-flex; align-items:center; gap:5px; box-shadow:0 4px 12px rgba(2,132,199,0.4);" title="Google Maps 외부 앱에서 열기">
-                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Google Maps 앱에서 보기
-                  </a>
-                </div>
+              <!-- Top Right Toolbar Overlay: Direct Google Maps App Actions -->
+              <div style="position:absolute; top:10px; right:10px; z-index:10; display:flex; gap:6px; align-items:center;">
+                <a href="https://www.google.com/maps/@9.0300,38.7400,7.5z" target="_blank" rel="noopener noreferrer" style="background:#0284c7; color:#ffffff; border:none; border-radius:8px; padding:0.4rem 0.8rem; font-weight:800; font-size:0.8rem; text-decoration:none; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 12px rgba(2,132,199,0.4);" title="Google Maps 외부 앱에서 큰 화면으로 열기">
+                  <i class="fa-solid fa-arrow-up-right-from-square"></i> 🗺️ Google Maps 큰 화면으로 열기
+                </a>
               </div>
+
+              <!-- Bottom Status Bar -->
+              <div style="position:absolute; bottom:8px; left:8px; right:8px; z-index:10; background:rgba(15,23,42,0.92); color:#ffffff; padding:6px 12px; border-radius:10px; font-size:11px; font-weight:700; border:1px solid rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px; box-shadow:0 4px 12px rgba(0,0,0,0.3);">
+                <span style="display:flex; align-items:center; gap:6px;"><i class="fa-brands fa-google" style="color:#4285F4; font-size:13px;"></i> Official Google Maps Live Server (구글 지적도 실시간 100% 직통 연동)</span>
+                <span style="color:#fbbf24; font-size:10.5px;">📍 마우스 드래그 & 줌 확대 지원</span>
+              </div>
+            </div>
+
 
               <!-- Center Native Vector Cartographic SVG Map -->
               <div style="position:relative; width:100%; height:230px; display:flex; align-items:center; justify-content:center;">
@@ -3162,14 +3175,14 @@
   </footer>
 
   <!-- Scripts with updated cache buster -->
-  <script src="js/data.js?v=20260904_V21000_STATIC_PRE_RENDERED_MAP_ENGINE"></script>
-  <script src="js/i18n.js?v=20260904_V21000_STATIC_PRE_RENDERED_MAP_ENGINE"></script>
-  <script src="js/map.js?v=20260904_V21000_STATIC_PRE_RENDERED_MAP_ENGINE"></script>
-  <script src="js/directory.js?v=20260904_V21000_STATIC_PRE_RENDERED_MAP_ENGINE"></script>
-  <script src="js/timeline.js?v=20260904_V21000_STATIC_PRE_RENDERED_MAP_ENGINE"></script>
-  <script src="js/assemblies.js?v=20260904_V21000_STATIC_PRE_RENDERED_MAP_ENGINE"></script>
-  <script src="js/calendar.js?v=20260904_V21000_STATIC_PRE_RENDERED_MAP_ENGINE"></script>
-  <script src="js/admin.js?v=20260904_V21000_STATIC_PRE_RENDERED_MAP_ENGINE"></script>
-  <script src="js/app.js?v=20260904_V21000_STATIC_PRE_RENDERED_MAP_ENGINE"></script>
+  <script src="js/data.js?v=20260904_V22000_OFFICIAL_PURE_GOOGLE_MAPS_LIVE_ENGINE"></script>
+  <script src="js/i18n.js?v=20260904_V22000_OFFICIAL_PURE_GOOGLE_MAPS_LIVE_ENGINE"></script>
+  <script src="js/map.js?v=20260904_V22000_OFFICIAL_PURE_GOOGLE_MAPS_LIVE_ENGINE"></script>
+  <script src="js/directory.js?v=20260904_V22000_OFFICIAL_PURE_GOOGLE_MAPS_LIVE_ENGINE"></script>
+  <script src="js/timeline.js?v=20260904_V22000_OFFICIAL_PURE_GOOGLE_MAPS_LIVE_ENGINE"></script>
+  <script src="js/assemblies.js?v=20260904_V22000_OFFICIAL_PURE_GOOGLE_MAPS_LIVE_ENGINE"></script>
+  <script src="js/calendar.js?v=20260904_V22000_OFFICIAL_PURE_GOOGLE_MAPS_LIVE_ENGINE"></script>
+  <script src="js/admin.js?v=20260904_V22000_OFFICIAL_PURE_GOOGLE_MAPS_LIVE_ENGINE"></script>
+  <script src="js/app.js?v=20260904_V22000_OFFICIAL_PURE_GOOGLE_MAPS_LIVE_ENGINE"></script>
 </body>
 </html>

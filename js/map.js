@@ -142,25 +142,8 @@ class EthiopiaMapComponent {
   }
 
   renderGoogleMap(counts, members) {
-    const container = document.getElementById("ethiopiaMapContainer");
-    if (!container) return;
-
-    // If static map HTML is already pre-rendered in HTML, update pin badges safely without wiping container!
-    const activeReg = this.activeRegion;
-    const pinElems = container.querySelectorAll("[onclick*='selectRegion']");
-    if (pinElems && pinElems.length > 0) {
-      pinElems.forEach(el => {
-        const onclickAttr = el.getAttribute("onclick") || "";
-        let isMatch = false;
-        if (activeReg && onclickAttr.includes(activeReg)) isMatch = true;
-        const badgeDiv = el.querySelector("div");
-        if (badgeDiv) {
-          badgeDiv.style.background = isMatch ? "#2563eb" : "#d97706";
-          badgeDiv.style.transform = isMatch ? "scale(1.15)" : "scale(1)";
-        }
-      });
-      return;
-    }
+    // Pure HTML5 Official Google Maps Embed is rendered directly in index.html with Zero JS logic!
+    return;
   }
 
   selectRegion(regionId) {
