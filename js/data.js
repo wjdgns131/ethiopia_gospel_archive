@@ -1,4 +1,4 @@
-// Ethiopia Gospel Mission Database (Optimized for GitHub Server Hosting v38000)
+// Ethiopia Gospel Mission Database (Optimized for GitHub Server Hosting v39000)
 const DEFAULT_MEMBERS = [
   {
     "id": "pdf-mem-1",
@@ -1975,13 +1975,13 @@ if (typeof window !== 'undefined') {
   window.DEFAULT_HISTORY = DEFAULT_HISTORY;
   window.DEFAULT_ASSEMBLIES = [];
   window.DEFAULT_EVENTS = DEFAULT_EVENTS;
-  window.DATA_VERSION = "20260904_V38000_PERMANENT_STATIC_STORAGE_KEYS_NO_RESET_EVER";
+  window.DATA_VERSION = "20260904_V39000_REMOVED_LOCALSTORAGE_CLEAR_BUG";
 
   // Force-clear old localStorage
   try {
     const currentVer = localStorage.getItem("ethiopia_archive_data_ver");
     if (currentVer !== window.DATA_VERSION) {
-      localStorage.clear();
+      // localStorage.clear() REMOVED FOREVER TO PREVENT DATA LOSS!
       localStorage.setItem("ethiopia_archive_data_ver", window.DATA_VERSION);
     }
   } catch(e) {
@@ -1991,7 +1991,7 @@ if (typeof window !== 'undefined') {
   window.db = {
     getMembers() {
       try {
-        const stored = getMigratedStorageItem(MEMBERS_KEY, ["ethiopia_members_v38000", "ethiopia_members_v36000", "ethiopia_members"]);
+        const stored = getMigratedStorageItem(MEMBERS_KEY, ["ethiopia_members_v39000", "ethiopia_members_v36000", "ethiopia_members"]);
         if (stored) {
           const parsed = JSON.parse(stored);
           if (Array.isArray(parsed) && parsed.length > 0) return parsed;
@@ -2008,7 +2008,7 @@ if (typeof window !== 'undefined') {
     },
     getHistory() {
       try {
-        const stored = getMigratedStorageItem(HISTORY_KEY, ["ethiopia_history_v38000", "ethiopia_history_v36000", "ethiopia_history"]);
+        const stored = getMigratedStorageItem(HISTORY_KEY, ["ethiopia_history_v39000", "ethiopia_history_v36000", "ethiopia_history"]);
         if (stored) {
           const parsed = JSON.parse(stored);
           if (Array.isArray(parsed) && parsed.length > 0) return parsed;
@@ -2044,7 +2044,7 @@ if (typeof window !== 'undefined') {
     },
     getFellowship() {
       try {
-        const stored = getMigratedStorageItem(ASSEMBLIES_KEY, ["ethiopia_assemblies_v38000", "ethiopia_assemblies_v36000", "ethiopia_assemblies"]);
+        const stored = getMigratedStorageItem(ASSEMBLIES_KEY, ["ethiopia_assemblies_v39000", "ethiopia_assemblies_v36000", "ethiopia_assemblies"]);
         if (stored) {
           const parsed = JSON.parse(stored);
           if (Array.isArray(parsed)) return parsed;
@@ -2059,7 +2059,7 @@ if (typeof window !== 'undefined') {
     },
     getEvents() {
       try {
-        const stored = getMigratedStorageItem(EVENTS_KEY, ["ethiopia_events_v38000", "ethiopia_events_v36000", "ethiopia_events"]);
+        const stored = getMigratedStorageItem(EVENTS_KEY, ["ethiopia_events_v39000", "ethiopia_events_v36000", "ethiopia_events"]);
         if (stored) {
           const parsed = JSON.parse(stored);
           if (Array.isArray(parsed)) return parsed;
@@ -2131,7 +2131,7 @@ if (typeof window !== 'undefined') {
     },
     resetToDefaults() {
       try {
-        localStorage.clear();
+        // localStorage.clear() REMOVED FOREVER TO PREVENT DATA LOSS!
         localStorage.setItem("ethiopia_archive_data_ver", window.DATA_VERSION);
       } catch(e) {}
       if (window.showToast) window.showToast("⚡ GitHub 서버 최신 사진 및 데이터로 동기화되었습니다!");
