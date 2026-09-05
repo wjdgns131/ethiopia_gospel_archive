@@ -90,16 +90,9 @@ class TimelineComponent {
     if (this.inMemoryBlobMap && this.inMemoryBlobMap[src]) {
       return this.inMemoryBlobMap[src];
     }
-    // Priority C: Newly uploaded image (images/history/) -> Return Raw GitHub CDN URL on production, or relative path on localhost!
+    // Priority C: Relative path (images/history/ or any relative path) -> Return clean relative path for same-origin loading
     const cleanPath = src.replace(/^\/+/, '');
-    if (cleanPath.startsWith('images/history/')) {
-      if (typeof window !== 'undefined' && window.location && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
-        return cleanPath;
-      }
-      return `https://raw.githubusercontent.com/wjdgns131/ethiopia_gospel_archive/main/${cleanPath}`;
-    }
-    // Priority D: Existing master images maintain relative path
-    return src;
+    return cleanPath;
   }
 
   dataURLtoBlob(dataurl) {
