@@ -11,30 +11,79 @@ class TimelineComponent {
     this.lightboxIndex = 0;
     this.tempHistoryItems = [];
     this.inMemoryBlobMap = {};
+    this.legacyBase64Cache = {};
+    this.pendingLegacyConversions = {};
     this.activeYear = null; // Filter state for Year 구분
     this.initEvents();
   }
 
-  getOriginalImageSrc(imageItem) {
+  getHighResImageSrc(imageItem, historyId = null, imgIdx = 0) {
     if (!imageItem) return '';
-    const rawSrc = (typeof imageItem === 'object' && imageItem.original) ? imageItem.original : imageItem;
-    return this.getImageSrc(rawSrc);
+    if (typeof imageItem === 'object') {
+      const rawSrc = imageItem.highres || imageItem.original || imageItem.thumbnail || '';
+      return this.getImageSrc(rawSrc);
+    }
+    if (typeof imageItem === 'string' && imageItem.startsWith('data:image/')) {
+      if (historyId !== null) {
+        const keyHigh = `${historyId}:${imgIdx}:highres`;
+        if (this.legacyBase64Cache[keyHigh]) {
+          return this.legacyBase64Cache[keyHigh];
+        }
+      }
+      const origBlob = this.dataURLtoBlob(imageItem);
+      if (origBlob) {
+        const highresUrl = URL.createObjectURL(origBlob);
+        if (historyId !== null) {
+          const keyHigh = `${historyId}:${imgIdx}:highres`;
+          this.legacyBase64Cache[keyHigh] = highresUrl;
+        }
+        return highresUrl;
+      }
+      return '';
+    }
+    return this.getImageSrc(imageItem);
   }
 
-  getThumbnailImageSrc(imageItem) {
+  getOriginalImageSrc(imageItem, historyId = null, imgIdx = 0) {
+    return this.getHighResImageSrc(imageItem, historyId, imgIdx);
+  }
+
+  getThumbnailImageSrc(imageItem, historyId = null, imgIdx = 0) {
     if (!imageItem) return '';
-    const rawSrc = (typeof imageItem === 'object') ? (imageItem.thumbnail || imageItem.original) : imageItem;
-    return this.getImageSrc(rawSrc);
+    if (typeof imageItem === 'object') {
+      const rawSrc = imageItem.thumbnail || imageItem.highres || imageItem.original || '';
+      return this.getImageSrc(rawSrc);
+    }
+    if (typeof imageItem === 'string' && imageItem.startsWith('data:image/')) {
+      if (historyId !== null) {
+        const keyThumb = `${historyId}:${imgIdx}:thumbnail`;
+        const keyHigh = `${historyId}:${imgIdx}:highres`;
+        if (this.legacyBase64Cache[keyThumb]) {
+          return this.legacyBase64Cache[keyThumb];
+        }
+        if (this.legacyBase64Cache[keyHigh]) {
+          return this.legacyBase64Cache[keyHigh];
+        }
+        const origBlob = this.dataURLtoBlob(imageItem);
+        if (origBlob) {
+          const highresUrl = URL.createObjectURL(origBlob);
+          this.legacyBase64Cache[keyHigh] = highresUrl;
+          return highresUrl;
+        }
+      }
+      return 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600"><rect width="100%" height="100%" fill="%23f1f5f9"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%2394a3b8" font-family="sans-serif" font-size="24">📷 Loading Image...</text></svg>';
+    }
+    return this.getImageSrc(imageItem);
   }
 
   getImageSrc(src) {
     if (!src) return '';
     if (typeof src === 'object') {
-      src = src.thumbnail || src.original || '';
+      src = src.thumbnail || src.highres || src.original || '';
       if (!src) return '';
     }
-    // Priority A: If already a full URL or blob/data URL, return as is
-    if (src.startsWith('http://') || src.startsWith('https://') || src.startsWith('blob:') || src.startsWith('data:')) {
+    // Priority A: If already a full URL or blob URL, return as is
+    if (src.startsWith('http://') || src.startsWith('https://') || src.startsWith('blob:')) {
       return src;
     }
     // Priority B: In-memory Blob ObjectURL during current tab session right after upload
@@ -53,15 +102,41 @@ class TimelineComponent {
     return src;
   }
 
-  createThumbnailBlob(file, maxLongSide = 800, quality = 0.85) {
-    return new Promise((resolve, reject) => {
-      if (!file || !file.type || !file.type.startsWith('image/')) {
-        return reject(new Error('Invalid image file for thumbnail creation'));
+  dataURLtoBlob(dataurl) {
+    try {
+      const arr = dataurl.split(',');
+      const mime = arr[0].match(/:(.*?);/)[1];
+      const bstr = atob(arr[1]);
+      let n = bstr.length;
+      const u8arr = new Uint8Array(n);
+      while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
       }
+      return new Blob([u8arr], { type: mime });
+    } catch (e) {
+      console.warn("Failed to convert dataURL to Blob:", e);
+      return null;
+    }
+  }
+
+  createResizedImageBlob(input, maxLongSide = 800, quality = 0.85) {
+    return new Promise((resolve, reject) => {
+      if (!input) return reject(new Error("No input provided for image resizing"));
+      let url = "";
+      let shouldRevoke = false;
+
+      if (typeof input === 'string') {
+        url = input;
+      } else if (input instanceof Blob || input instanceof File) {
+        url = URL.createObjectURL(input);
+        shouldRevoke = true;
+      } else {
+        return reject(new Error("Unsupported input format for image resizing"));
+      }
+
       const img = new Image();
-      const url = URL.createObjectURL(file);
       img.onload = () => {
-        URL.revokeObjectURL(url);
+        if (shouldRevoke) URL.revokeObjectURL(url);
         let width = img.width;
         let height = img.height;
         if (width > maxLongSide || height > maxLongSide) {
@@ -73,29 +148,111 @@ class TimelineComponent {
             height = maxLongSide;
           }
         }
-        const canvas = document.createElement('canvas');
+        const canvas = document.createElement("canvas");
         canvas.width = width;
         canvas.height = height;
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0, width, height);
 
-        // Attempt WebP conversion, fallback to JPEG if unsupported
         canvas.toBlob((blob) => {
           if (blob && blob.size > 0) {
             resolve(blob);
           } else {
             canvas.toBlob((jpegBlob) => {
               if (jpegBlob && jpegBlob.size > 0) resolve(jpegBlob);
-              else reject(new Error('Failed canvas blob export'));
-            }, 'image/jpeg', quality);
+              else reject(new Error("Failed canvas blob export"));
+            }, "image/jpeg", quality);
           }
-        }, 'image/webp', quality);
+        }, "image/webp", quality);
       };
+
       img.onerror = () => {
-        URL.revokeObjectURL(url);
-        reject(new Error('Failed to load image for thumbnail creation'));
+        if (shouldRevoke) URL.revokeObjectURL(url);
+        reject(new Error("Failed to load image for resizing"));
       };
+
       img.src = url;
+    });
+  }
+
+  createThumbnailBlob(file, maxLongSide = 800, quality = 0.85) {
+    return this.createResizedImageBlob(file, maxLongSide, quality);
+  }
+
+  convertLegacyBase64ItemAsync(historyId, dataUrl, imgIdx = 0) {
+    const keyHigh = `${historyId}:${imgIdx}:highres`;
+    const keyThumb = `${historyId}:${imgIdx}:thumbnail`;
+
+    if (this.legacyBase64Cache[keyHigh] && this.legacyBase64Cache[keyThumb]) {
+      return Promise.resolve({
+        highresUrl: this.legacyBase64Cache[keyHigh],
+        thumbnailUrl: this.legacyBase64Cache[keyThumb]
+      });
+    }
+
+    if (this.pendingLegacyConversions[keyThumb]) {
+      return this.pendingLegacyConversions[keyThumb];
+    }
+
+    const conversionPromise = (async () => {
+      try {
+        const origBlob = this.dataURLtoBlob(dataUrl);
+        if (!origBlob) throw new Error("Invalid base64 string");
+
+        const highresUrl = URL.createObjectURL(origBlob);
+        this.legacyBase64Cache[keyHigh] = highresUrl;
+
+        let thumbBlob = null;
+        try {
+          thumbBlob = await this.createResizedImageBlob(origBlob, 800, 0.85);
+        } catch (e) {
+          console.warn("Thumbnail resize fallback to original blob:", e);
+        }
+
+        const thumbnailUrl = thumbBlob ? URL.createObjectURL(thumbBlob) : highresUrl;
+        this.legacyBase64Cache[keyThumb] = thumbnailUrl;
+
+        delete this.pendingLegacyConversions[keyThumb];
+        return { highresUrl, thumbnailUrl };
+      } catch (err) {
+        console.warn(`Failed legacy conversion for ${historyId}:${imgIdx}:`, err);
+        delete this.pendingLegacyConversions[keyThumb];
+        return { highresUrl: '', thumbnailUrl: '' };
+      }
+    })();
+
+    this.pendingLegacyConversions[keyThumb] = conversionPromise;
+    return conversionPromise;
+  }
+
+  hydrateCardImages(targetId) {
+    if (!targetId) return;
+    const historyList = this.getFilteredAndSortedHistory();
+    const item = historyList.find(h => h && String(h.id) === String(targetId));
+    if (!item || !item.images || item.images.length === 0) return;
+
+    item.images.forEach((imgItem, idx) => {
+      if (typeof imgItem === 'string' && imgItem.startsWith('data:image/')) {
+        const keyThumb = `${targetId}:${idx}:thumbnail`;
+        if (this.legacyBase64Cache[keyThumb]) {
+          const imgEl = document.querySelector(`#hzGalleryScroll_${targetId} img[data-img-idx="${idx}"]`);
+          if (imgEl && imgEl.src !== this.legacyBase64Cache[keyThumb]) {
+            imgEl.src = this.legacyBase64Cache[keyThumb];
+          }
+          return;
+        }
+
+        this.convertLegacyBase64ItemAsync(targetId, imgItem, idx).then(({ thumbnailUrl }) => {
+          // Rule 6: Verify card is still displaying the SAME history item before assigning!
+          if (this.activeId !== targetId) return;
+          if (thumbnailUrl) {
+            const imgEl = document.querySelector(`#hzGalleryScroll_${targetId} img[data-img-idx="${idx}"]`);
+            if (imgEl) {
+              imgEl.src = thumbnailUrl;
+            }
+          }
+        });
+      }
     });
   }
 
@@ -621,10 +778,10 @@ class TimelineComponent {
     const item = historyList.find(h => h && String(h.id) === String(historyId));
     if (!item || !item.images || item.images.length === 0) return;
 
-    this.openPhotoLightbox(item.images, initialIndex);
+    this.openPhotoLightbox(item.images, initialIndex, historyId);
   }
 
-  openPhotoLightbox(images, initialIndex = 0) {
+  openPhotoLightbox(images, initialIndex = 0, historyId = null) {
     if (!images || images.length === 0) return;
     if (typeof images === 'string') images = [images];
 
@@ -690,7 +847,7 @@ class TimelineComponent {
       });
     }
 
-    const resolvedImages = (images || []).map(img => this.getOriginalImageSrc(img));
+    const resolvedImages = (images || []).map((img, idx) => this.getOriginalImageSrc(img, historyId, idx));
     this.lightboxImages = resolvedImages;
     this.rawLightboxImages = (images || []);
     this.lightboxIndex = initialIndex;
@@ -803,16 +960,29 @@ class TimelineComponent {
         for (let i = 0; i < this.tempHistoryItems.length; i++) {
           const item = this.tempHistoryItems[i];
           if (item.type === "new_file" && item.file) {
-            // 1. Generate Thumbnail Blob (max long side 800px, WebP/JPEG quality 0.85)
+            // 1. Generate High-res Blob (max long side 2560px, quality 0.90) & Thumbnail Blob (max long side 800px, quality 0.85)
+            let highresBlob = null;
             let thumbBlob = null;
             try {
-              thumbBlob = await this.createThumbnailBlob(item.file, 800, 0.85);
+              highresBlob = await this.createResizedImageBlob(item.file, 2560, 0.90);
+            } catch(hErr) {
+              console.warn("Highres generation fallback to original file:", hErr);
+            }
+            try {
+              thumbBlob = await this.createResizedImageBlob(item.file, 800, 0.85);
             } catch(tErr) {
-              console.warn("Thumbnail generation fallback to original:", tErr);
+              console.warn("Thumbnail generation fallback to original file:", tErr);
             }
 
-            // 2. Upload Original Photo (uncompressed, 100% loss-free)
-            const origPath = await this.uploadSinglePhotoToWorker(item.file, historyTargetId, "original");
+            // 2. Upload High-res Photo
+            let highresPath = null;
+            if (highresBlob) {
+              const hExt = highresBlob.type.includes("webp") ? ".webp" : ".jpg";
+              const hFile = new File([highresBlob], `highres${hExt}`, { type: highresBlob.type });
+              highresPath = await this.uploadSinglePhotoToWorker(hFile, historyTargetId, "highres", hExt);
+            } else {
+              highresPath = await this.uploadSinglePhotoToWorker(item.file, historyTargetId, "highres");
+            }
 
             // 3. Upload Thumbnail Photo
             let thumbPath = null;
@@ -822,31 +992,30 @@ class TimelineComponent {
               thumbPath = await this.uploadSinglePhotoToWorker(thumbFile, historyTargetId, "thumb", thumbExt);
             }
 
-            if (origPath) {
+            if (highresPath || thumbPath) {
               const imageObj = {
-                original: origPath,
-                thumbnail: thumbPath || origPath
+                highres: highresPath || thumbPath,
+                thumbnail: thumbPath || highresPath
               };
               finalImagePaths.push(imageObj);
 
-              // Map session preview URLs for instant display
               if (item.previewUrl) {
-                this.inMemoryBlobMap[origPath] = item.previewUrl;
+                this.inMemoryBlobMap[highresPath || thumbPath] = item.previewUrl;
               }
               if (thumbBlob) {
                 const thumbPreviewUrl = URL.createObjectURL(thumbBlob);
-                this.inMemoryBlobMap[thumbPath || origPath] = thumbPreviewUrl;
+                this.inMemoryBlobMap[thumbPath || highresPath] = thumbPreviewUrl;
               }
             } else {
               // Fallback for local/offline testing: create clean relative paths and map object URLs
               const ext = (item.file.name && item.file.name.includes('.')) ? item.file.name.split('.').pop().toLowerCase() : 'jpg';
               const timeStamp = Date.now();
-              const fallbackOrigPath = `images/history/original/hist-${historyTargetId}-${timeStamp}-${i + 1}.${ext}`;
+              const fallbackHighPath = `images/history/highres/hist-${historyTargetId}-${timeStamp}-${i + 1}.${ext}`;
               const thumbExt = (thumbBlob && thumbBlob.type.includes("webp")) ? "webp" : "jpg";
               const fallbackThumbPath = `images/history/thumb/hist-${historyTargetId}-${timeStamp}-${i + 1}.${thumbExt}`;
 
               if (item.previewUrl) {
-                this.inMemoryBlobMap[fallbackOrigPath] = item.previewUrl;
+                this.inMemoryBlobMap[fallbackHighPath] = item.previewUrl;
               }
               if (thumbBlob) {
                 this.inMemoryBlobMap[fallbackThumbPath] = URL.createObjectURL(thumbBlob);
@@ -855,7 +1024,7 @@ class TimelineComponent {
               }
 
               finalImagePaths.push({
-                original: fallbackOrigPath,
+                highres: fallbackHighPath,
                 thumbnail: fallbackThumbPath
               });
             }
@@ -1022,6 +1191,7 @@ class TimelineComponent {
 
       setTimeout(() => {
         cardWrapper.innerHTML = this.renderCardInner(targetItem, targetIndex, totalCount, historyList);
+        this.hydrateCardImages(targetId);
 
         requestAnimationFrame(() => {
           cardWrapper.style.transition = "opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1), transform 0.45s cubic-bezier(0.16, 1, 0.3, 1)";
@@ -1101,10 +1271,10 @@ class TimelineComponent {
 
           <div class="timeline-gallery-grid ${activeItem.images.length <= 2 ? 'single-col' : ''}" id="hzGalleryScroll_${activeItem.id}" onmousedown="window.timelineComponent.handleGalleryDragStart(event, this)" style="display:grid !important; grid-template-rows:${activeItem.images.length === 1 ? '380px' : 'repeat(2, 250px)'} !important; grid-auto-columns:${activeItem.images.length <= 2 ? '100%' : 'min(420px, 78vw)'} !important; grid-auto-flow:column !important; overflow-x:auto !important; overflow-y:hidden !important; gap:1.0rem !important; margin-top:0.5rem !important; padding:0.4rem 0.2rem 0.8rem 0.2rem !important; scroll-snap-type:x mandatory !important; scroll-behavior:smooth !important; -webkit-overflow-scrolling:touch !important; cursor:grab;">
             ${activeItem.images.map((img, imgIdx) => {
-              const resolvedSrc = this.getThumbnailImageSrc(img);
+              const resolvedSrc = this.getThumbnailImageSrc(img, activeItem.id, imgIdx);
               return `
                 <div class="gallery-image-box" onclick="window.timelineComponent.openPhotoLightboxById('${activeItem.id}', ${imgIdx})" style="width:100% !important; height:100% !important; border-radius:16px !important; overflow:hidden !important; position:relative !important; cursor:pointer !important; background:#ffffff !important; border:1px solid var(--border-color) !important; box-shadow:0 4px 14px rgba(0,0,0,0.08) !important; scroll-snap-align:start !important;">
-                  <img src="${resolvedSrc}" alt="${activeItem.title}"
+                  <img src="${resolvedSrc}" data-img-idx="${imgIdx}" alt="${activeItem.title}"
                        style="width:100% !important; height:100% !important; object-fit:cover !important; object-position:center 20% !important; border-radius:16px !important; display:block !important; transition:transform 0.3s ease !important;" class="insta-hover-img" />
                   <div class="image-hover-overlay" style="position:absolute; bottom:8px; right:8px; background:rgba(15,23,42,0.85); color:#fff; padding:5px 12px; border-radius:14px; font-size:12px; font-weight:700; pointer-events:none; display:flex; align-items:center; gap:5px; box-shadow:0 3px 10px rgba(0,0,0,0.25);">
                     <i class="fa-solid fa-magnifying-glass-plus" style="color:var(--accent-gold);"></i> <span>${isEn ? 'Enlarge' : '확대보기'}</span>
@@ -1284,6 +1454,7 @@ class TimelineComponent {
     `;
 
     this.container.innerHTML = html;
+    this.hydrateCardImages(this.activeId);
 
     requestAnimationFrame(() => {
       this.autoScrollToActiveNode(this.activeId);

@@ -86,7 +86,7 @@ export default {
 
       const subFolder = formData.get("subFolder");
       let folderPath = "images/history";
-      if (subFolder === "original" || subFolder === "thumb") {
+      if (subFolder === "highres" || subFolder === "original" || subFolder === "thumb") {
         folderPath = `images/history/${subFolder}`;
       }
 
