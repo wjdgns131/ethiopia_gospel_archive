@@ -20,6 +20,7 @@ class CalendarComponent {
     this.container = document.getElementById(this.containerId);
     this.currentDate = new Date();
     this.initEvents();
+    this.fetchRemoteEvents();
   }
 
   initEvents() {
@@ -57,6 +58,62 @@ class CalendarComponent {
     modal.classList.remove("hidden");
   }
 
+  async fetchRemoteEvents() {
+    try {
+      const res = await fetch(`data/events.json?t=${Date.now()}`);
+      if (res.ok) {
+        const remoteEvents = await res.json();
+        if (Array.isArray(remoteEvents) && remoteEvents.length > 0) {
+          window.DEFAULT_EVENTS = remoteEvents;
+          this.render();
+        }
+      }
+    } catch (e) {}
+  }
+
+  getStoredEvents() {
+    let baseEvents = (window.DEFAULT_EVENTS && Array.isArray(window.DEFAULT_EVENTS))
+      ? [...window.DEFAULT_EVENTS]
+      : ((typeof DEFAULT_EVENTS !== 'undefined' && Array.isArray(DEFAULT_EVENTS)) ? [...DEFAULT_EVENTS] : []);
+
+    let localEvents = [];
+    try {
+      const local = localStorage.getItem("ethiopia_events");
+      if (local) {
+        localEvents = JSON.parse(local);
+        if (!Array.isArray(localEvents)) localEvents = [];
+      }
+    } catch(e) {}
+
+    if (localEvents.length === 0) return baseEvents;
+
+    const mergedMap = new Map();
+    baseEvents.forEach(e => { if (e && e.id) mergedMap.set(String(e.id), e); });
+    localEvents.forEach(e => { if (e && e.id) mergedMap.set(String(e.id), e); });
+    return Array.from(mergedMap.values());
+  }
+
+  async syncEventsToWorker(allEvents) {
+    try {
+      const token = sessionStorage.getItem("ethiopia_auth_token");
+      if (!token) return;
+      const workerUrl = window.CF_WORKER_UPLOAD_URL || "https://ethiopia-archive-proxy.wjdgns131.workers.dev";
+      const syncEndpoint = `${workerUrl.replace(/\/+$/, '')}/sync`;
+
+      await fetch(syncEndpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          action: "sync_events",
+          events: allEvents
+        })
+      }).catch(() => {});
+    } catch(e) {}
+  }
+
   saveEventFromForm() {
     const startVal = document.getElementById("fieldEventStartDate").value;
     let endVal = document.getElementById("fieldEventEndDate").value;
@@ -84,18 +141,12 @@ class CalendarComponent {
       desc: descVal
     };
 
-    if (window.db && typeof window.db.addEvent === 'function') {
-      window.db.addEvent(newEvt);
-    } else {
-      let events = [];
-      try {
-        const local = localStorage.getItem("ethiopia_events");
-        events = local ? JSON.parse(local) : (window.DEFAULT_EVENTS ? [...window.DEFAULT_EVENTS] : []);
-      } catch(e) { events = []; }
-      events.push(newEvt);
-      localStorage.setItem("ethiopia_events", JSON.stringify(events));
-      window.DEFAULT_EVENTS = events;
-    }
+    let allEvents = this.getStoredEvents();
+    allEvents.push(newEvt);
+    localStorage.setItem("ethiopia_events", JSON.stringify(allEvents));
+    window.DEFAULT_EVENTS = allEvents;
+
+    this.syncEventsToWorker(allEvents);
 
     document.getElementById("calendarEventModal").classList.add("hidden");
     if (window.showToast) window.showToast("✨ 일정이 성공적으로 등록되었습니다!");
@@ -106,14 +157,10 @@ class CalendarComponent {
   deleteEvent(id) {
     if (!id) return;
     if (confirm("정말로 이 일정을 삭제하시겠습니까?")) {
-      if (window.db && typeof window.db.deleteEvent === "function") {
-        window.db.deleteEvent(id);
-      } else {
-        let events = JSON.parse(localStorage.getItem("ethiopia_events") || "[]");
-        events = events.filter(e => e.id !== id);
-        localStorage.setItem("ethiopia_events", JSON.stringify(events));
-        window.DEFAULT_EVENTS = events;
-      }
+      let allEvents = this.getStoredEvents().filter(e => e && String(e.id) !== String(id));
+      localStorage.setItem("ethiopia_events", JSON.stringify(allEvents));
+      window.DEFAULT_EVENTS = allEvents;
+      this.syncEventsToWorker(allEvents);
       this.render();
     }
   }
@@ -140,15 +187,7 @@ class CalendarComponent {
     const currentMonthHolidays = ETHIOPIAN_HOLIDAYS.filter(h => h.month === (month + 1));
 
     // Custom Mission Events in current month (including multi-day date range matches!)
-    let allEvents = [];
-    try {
-      if (window.db && typeof window.db.getEvents === 'function') {
-        allEvents = window.db.getEvents();
-      } else {
-        const local = localStorage.getItem("ethiopia_events");
-        allEvents = local ? JSON.parse(local) : (window.DEFAULT_EVENTS || []);
-      }
-    } catch(e) { console.error('getEvents error:', e); }
+    let allEvents = this.getStoredEvents();
     const currentMonthStr = `${year}-${String(month + 1).padStart(2, '0')}`;
     const currentMonthEvents = allEvents.filter(e => {
       const s = e.date;

@@ -369,7 +369,7 @@ class DirectoryComponent {
     photoFrame.style.cssText = "position:relative; width:170px; height:170px; margin:0.8rem auto 0.6rem auto; border-radius:18px; overflow:hidden; border:1px solid var(--border-color); background:#ffffff; flex-shrink:0; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(0,0,0,0.06);";
 
     const img = document.createElement("img");
-    img.src = photoUrl;
+    img.src = window.formatImageUrl ? window.formatImageUrl(photoUrl) : photoUrl;
     img.alt = m.name || (isEn ? "Member" : "식구");
     img.loading = "lazy";
     img.decoding = "async";
@@ -863,7 +863,7 @@ class DirectoryComponent {
         
         <!-- LARGE HERO PHOTO CONTAINER -->
         <div style="position:relative; width:100%; max-width:280px; height:280px; margin:0 auto 1.25rem auto; border-radius:24px; overflow:hidden; border:3px solid ${isDisrupter ? '#ef4444' : '#0284c7'}; box-shadow:0 12px 30px rgba(0,0,0,0.18); background:#ffffff; display:flex; align-items:center; justify-content:center;">
-          <img src="${photoUrl}" alt="${m.name}" style="width:100%; height:100%; object-fit:cover; display:block;" />
+          <img src="${window.formatImageUrl ? window.formatImageUrl(photoUrl) : photoUrl}" alt="${m.name}" style="width:100%; height:100%; object-fit:cover; display:block;" />
           ${isDisrupter ? '<span class="badge badge-danger" style="position:absolute; top:10px; left:10px; font-size:0.85rem; font-weight:800; padding:0.3rem 0.7rem; border-radius:12px; z-index:2;">⚠️ Disrupter</span>' : ''}
         </div>
 

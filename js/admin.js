@@ -183,6 +183,10 @@ class AdminComponent {
     this.updateUiForRole();
     if (typeof window.initializeMainContent === "function") {
       window.initializeMainContent();
+      try { if (window.directoryComponent) window.directoryComponent.render(); } catch(e) {}
+      try { if (window.timelineComponent) window.timelineComponent.render(); } catch(e) {}
+      try { if (window.assembliesComponent) window.assembliesComponent.render(); } catch(e) {}
+      try { if (window.calendarComponent) window.calendarComponent.render(); } catch(e) {}
     } else {
       window.__pendingMainContentInit = true;
     }

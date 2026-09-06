@@ -1,0 +1,83 @@
+[
+  {
+    "id": "evt-20250528",
+    "date": "2025-05-28",
+    "endDate": "2025-06-01",
+    "title": "에티오피아 첫 오프라인 전도집회",
+    "category": "assembly",
+    "location": "Vibes Hotel, 아디스아바바",
+    "desc": "에티오피아에서 열린 첫 오프라인 전도집회 (성경은 사실이다 강연)"
+  },
+  {
+    "id": "evt-20250914",
+    "date": "2025-09-14",
+    "endDate": "2025-09-14",
+    "title": "에티오피아 첫 침례식",
+    "category": "baptism",
+    "location": "모임집, 아디스아바바",
+    "desc": "구원받은 4명의 식구가 침례를 받았습니다."
+  },
+  {
+    "id": "evt-20251212",
+    "date": "2025-12-12",
+    "endDate": "2025-12-14",
+    "title": "모임집에서의 첫 전도집회",
+    "category": "assembly",
+    "location": "아디스아바바 모임집",
+    "desc": "아디스아바바 모임집에서 열린 전도집회"
+  },
+  {
+    "id": "evt-20251221",
+    "date": "2025-12-21",
+    "endDate": "2025-12-21",
+    "title": "침례식",
+    "category": "baptism",
+    "location": "아디스아바바 모임집",
+    "desc": "모임집 침례식"
+  },
+  {
+    "id": "evt-20260117",
+    "date": "2026-01-17",
+    "endDate": "2026-01-19",
+    "title": "1월 전도집회",
+    "category": "assembly",
+    "location": "아디스아바바 모임집",
+    "desc": "1월 정기 전도집회"
+  },
+  {
+    "id": "evt-20260201",
+    "date": "2026-02-01",
+    "endDate": "2026-02-01",
+    "title": "침례식",
+    "category": "baptism",
+    "location": "아디스아바바 모임집",
+    "desc": "1월 집회 후 침례식"
+  },
+  {
+    "id": "evt-20260206",
+    "date": "2026-02-06",
+    "endDate": "2026-02-08",
+    "title": "구디나 전도집회",
+    "category": "assembly",
+    "location": "구디나",
+    "desc": "구디나 지역 전도집회"
+  },
+  {
+    "id": "evt-20260816",
+    "date": "2026-08-16",
+    "endDate": "2026-08-16",
+    "title": "침례식",
+    "category": "baptism",
+    "location": "아디스아바바 모임집",
+    "desc": "8월 침례식 (28명 침례)"
+  },
+  {
+    "id": "evt-20260820",
+    "date": "2026-08-20",
+    "endDate": "2026-08-24",
+    "title": "8월 전도집회",
+    "category": "assembly",
+    "location": "아디스아바바 모임집",
+    "desc": "8월 전도집회"
+  }
+]

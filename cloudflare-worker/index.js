@@ -199,6 +199,72 @@ export default {
       return new Response(JSON.stringify({ ok: false, error: "Invalid passcode" }), { status: 401, headers: corsHeaders });
     }
 
+    // 3.5 Shared Data Sync Endpoint (POST /sync)
+    const isSyncReq = url.pathname === "/sync" || url.pathname.endsWith("/sync") || (jsonBody && (jsonBody.action === "sync_events" || jsonBody.action === "sync_data"));
+    if (isSyncReq) {
+      if (!env.AUTH_SESSION_SECRET) {
+        return new Response(JSON.stringify({ error: "Server Configuration Error: AUTH_SESSION_SECRET missing." }), { status: 500, headers: corsHeaders });
+      }
+      if (!bearerToken) {
+        return new Response(JSON.stringify({ error: "Unauthorized: Missing authentication token." }), { status: 401, headers: corsHeaders });
+      }
+      const payload = await verifyHMACSessionToken(bearerToken, env.AUTH_SESSION_SECRET);
+      if (!payload || payload.role !== "admin") {
+        return new Response(JSON.stringify({ error: "Forbidden: Admin privileges required." }), { status: 403, headers: corsHeaders });
+      }
+
+      if (jsonBody && jsonBody.action === "sync_events") {
+        const eventsData = jsonBody.events || [];
+        const githubPat = env.GITHUB_PAT || env.GITHUB_TOKEN;
+        if (githubPat) {
+          const repoPath = "data/events.json";
+          const githubApiUrl = `https://api.github.com/repos/wjdgns131/ethiopia_gospel_archive/contents/${repoPath}`;
+          
+          let sha = "";
+          try {
+            const getRes = await fetch(githubApiUrl, {
+              headers: { "Authorization": `Bearer ${githubPat}`, "User-Agent": "Ethiopia-Archive-Worker" }
+            });
+            if (getRes.ok) {
+              const getData = await getRes.json();
+              sha = getData.sha;
+            }
+          } catch(e) {}
+
+          const jsonStr = JSON.stringify(eventsData, null, 2);
+          const uint8 = new TextEncoder().encode(jsonStr);
+          let binary = "";
+          for (let i = 0; i < uint8.byteLength; i++) {
+            binary += String.fromCharCode(uint8[i]);
+          }
+          const base64Content = btoa(binary);
+
+          const commitBody = {
+            message: "Sync shared calendar events data",
+            content: base64Content,
+            branch: "main"
+          };
+          if (sha) commitBody.sha = sha;
+
+          const putRes = await fetch(githubApiUrl, {
+            method: "PUT",
+            headers: {
+              "Authorization": `Bearer ${githubPat}`,
+              "Content-Type": "application/json",
+              "User-Agent": "Ethiopia-Archive-Worker"
+            },
+            body: JSON.stringify(commitBody)
+          });
+
+          if (!putRes.ok) {
+            const errTxt = await putRes.text();
+            return new Response(JSON.stringify({ error: `GitHub Sync Failed: ${errTxt}` }), { status: 502, headers: corsHeaders });
+          }
+        }
+        return new Response(JSON.stringify({ ok: true, synced: true }), { status: 200, headers: corsHeaders });
+      }
+    }
+
     // 4. Image Upload Proxy Endpoint (Requires Valid Admin Session Token)
     try {
       if (!env.AUTH_SESSION_SECRET) {

@@ -239,7 +239,7 @@ const DEFAULT_MEMBERS = [
     "category": "saved",
     "age": "45세",
     "region": "아디스아바바",
-    "job": "전) 전도사, 현) elc staff",
+    "job": "전) 전도사, 현) ELC staff",
     "assemblyMonth": "2026.2.06~08",
     "inviter": "Ahimed Seid",
     "inviterRelation": "지인",
@@ -247,7 +247,7 @@ const DEFAULT_MEMBERS = [
     "youtube": "https://www.youtube.com/watch?v=yAmkrpUsWBs&feature=youtu.be",
     "testimony": "https://www.youtube.com/watch?v=yAmkrpUsWBs&feature=youtu.be",
     "registeredYear": 2026,
-    "jobEn": "전) Evangelist, 현) elc staff",
+    "jobEn": "전) Evangelist, 현) ELC staff",
     "inviterRelationEn": "acquaintance",
     "testimonyEn": "https://www.youtube.com/watch?v=yAmkrpUsWBs&feature=youtu.be"
   },
@@ -291,7 +291,7 @@ const DEFAULT_MEMBERS = [
     "category": "saved",
     "age": "34세",
     "region": "아디스아바바",
-    "job": "(전) 산부인과 의사, (현) elc스테프",
+    "job": "(전) 산부인과 의사, (현) ELC스테프",
     "assemblyMonth": "2024.8.19~29",
     "inviter": "Nathinael",
     "inviterRelation": "직장 동료",
@@ -299,7 +299,7 @@ const DEFAULT_MEMBERS = [
     "youtube": "https://youtu.be/lAKqGKrhgBI?si=UQi35q2nraGAhsmi",
     "testimony": "",
     "registeredYear": 2026,
-    "jobEn": "(전) 산부인과 Doctor, (현) elc스테프",
+    "jobEn": "(전) 산부인과 Doctor, (현) ELC스테프",
     "inviterRelationEn": "직장 colleague"
   },
   {
@@ -427,7 +427,7 @@ const DEFAULT_MEMBERS = [
     "category": "saved",
     "age": "32세",
     "region": "아다마",
-    "job": "(전) 선지자 현) elc staff",
+    "job": "(전) 선지자 현) ELC staff",
     "assemblyMonth": "2025.12.12~14",
     "inviter": "Biniam Alemu",
     "inviterRelation": "지인",
@@ -435,7 +435,7 @@ const DEFAULT_MEMBERS = [
     "youtube": "https://www.youtube.com/watch?v=4GIbe_-4oSY",
     "testimony": "",
     "registeredYear": 2026,
-    "jobEn": "(전) 선지자 현) elc staff",
+    "jobEn": "(전) 선지자 현) ELC staff",
     "inviterRelationEn": "acquaintance"
   },
   {
@@ -904,7 +904,7 @@ const DEFAULT_MEMBERS = [
     "category": "saved",
     "age": "26세",
     "region": "아디스아바바",
-    "job": "전) 초등학교 영어 선생 / 현) elc 스텝",
+    "job": "전) 초등학교 영어 선생 / 현) ELC 스텝",
     "assemblyMonth": "2026.4.24~27",
     "inviter": "Abdissa Ketema",
     "inviterRelation": "이웃",
@@ -912,7 +912,7 @@ const DEFAULT_MEMBERS = [
     "youtube": "https://youtu.be/p2XkuZsoFpU?si=7lhiS8-C74kpjavU",
     "testimony": "",
     "registeredYear": 2026,
-    "jobEn": "전) 초등학교 영어 선생 / 현) elc 스텝",
+    "jobEn": "전) 초등학교 영어 선생 / 현) ELC 스텝",
     "inviterRelationEn": "이웃"
   },
   {
@@ -1737,7 +1737,7 @@ const DEFAULT_HISTORY = [
       "images/history/hist-hist-107-0.jpg",
       "images/history/hist-hist-108-0.jpg"
     ],
-    "desc": "한국 수양회를 마친 후 가나로 돌아가기 전 에티오피아에 들른 김재원 형제는 「7언약」 책자 내용을 중심으로 주말 모임을 이어갔으며, 한 차례의 소집회도 진행하였습니다. 함께 도울 스태프가 없는 상황에서 홀로 남아 여러 어려움 속에서도 모임을 이어갔던 시간이었습니다.",
+    "desc": "한국 수양회를 마친 후 가나로 돌아가기 전 에티오피아에 들른 김재원 형제는 「일곱 언약」 책자 내용을 중심으로 주말 모임을 이어갔으며, 한 차례의 소집회도 진행하였습니다. 함께 도울 스태프가 없는 상황에서 홀로 남아 여러 어려움 속에서도 모임을 이어갔던 시간이었습니다.",
     "titleEn": "First Baptism Service in Ethiopia (4 Sisters Baptized)",
     "descEn": "On September 14, 2025, the historic first Baptism Service was conducted in Ethiopia, baptizing 4 saved sisters into the Lord."
   },
@@ -1778,7 +1778,7 @@ const DEFAULT_HISTORY = [
       "images/history/hist-hist-126-0.jpg",
       "images/history/hist-hist-127-0.jpg"
     ],
-    "desc": "이정훈 형제가 11월 3일 에티오피아에 입국하여 먼저 구원받은 식구들과 매주 \"성경은 사실이다\" 말씀을 중심으로 교제를 이어가며 전도집회를 계획하고 준비하였습니다. 이 과정에서 의사 일을 모두 내려놓고 elc 스태프로 함께하게 된 피크루 형제가 동행하며 함께 집회를 준비하였습니다.",
+    "desc": "이정훈 형제가 11월 3일 에티오피아에 입국하여 먼저 구원받은 식구들과 매주 \"성경은 사실이다\" 말씀을 중심으로 교제를 이어가며 전도집회를 계획하고 준비하였습니다. 이 과정에서 의사 일을 모두 내려놓고 ELC 스태프로 함께하게 된 피크루 형제가 동행하며 함께 집회를 준비하였습니다.",
     "titleEn": "First Evangelical Seminar in Bishoftu",
     "descEn": "Conducted the first Evangelical Seminar in Bishoftu from Dec 12 to Dec 14, 2025, gathering local seekers and sharing the Gospel of salvation."
   },
@@ -1916,7 +1916,7 @@ const DEFAULT_HISTORY = [
       "images/hist_auto_4.jpg",
       "images/hist_auto_5.jpg"
     ],
-    "desc": "4월 전도집회를 통해 당시 영어 교사로 재직 중이던 Abenezer Tadese 형제가 구원받았으며, 현재는 elc 스태프로 합류하여 함께 일하고 있습니다.",
+    "desc": "4월 전도집회를 통해 당시 영어 교사로 재직 중이던 Abenezer Tadese 형제가 구원받았으며, 현재는 ELC 스태프로 합류하여 함께 일하고 있습니다.",
     "titleEn": "Evangelical Seminar",
     "descEn": "Conducted an Evangelical Seminar from May 15 to May 18, 2026, continuing to spread the truth of salvation."
   },
@@ -2077,8 +2077,94 @@ const DEFAULT_ASSEMBLIES = [
   }
 ];
 
+// Default Ethiopia Mission Calendar Events
+const DEFAULT_EVENTS = [
+  {
+    "id": "evt-20250528",
+    "date": "2025-05-28",
+    "endDate": "2025-06-01",
+    "title": "에티오피아 첫 오프라인 전도집회",
+    "category": "assembly",
+    "location": "Vibes Hotel, 아디스아바바",
+    "desc": "에티오피아에서 열린 첫 오프라인 전도집회 (성경은 사실이다 강연)"
+  },
+  {
+    "id": "evt-20250914",
+    "date": "2025-09-14",
+    "endDate": "2025-09-14",
+    "title": "에티오피아 첫 침례식",
+    "category": "baptism",
+    "location": "모임집, 아디스아바바",
+    "desc": "구원받은 4명의 식구가 침례를 받았습니다."
+  },
+  {
+    "id": "evt-20251212",
+    "date": "2025-12-12",
+    "endDate": "2025-12-14",
+    "title": "모임집에서의 첫 전도집회",
+    "category": "assembly",
+    "location": "아디스아바바 모임집",
+    "desc": "아디스아바바 모임집에서 열린 전도집회"
+  },
+  {
+    "id": "evt-20251221",
+    "date": "2025-12-21",
+    "endDate": "2025-12-21",
+    "title": "침례식",
+    "category": "baptism",
+    "location": "아디스아바바 모임집",
+    "desc": "모임집 침례식"
+  },
+  {
+    "id": "evt-20260117",
+    "date": "2026-01-17",
+    "endDate": "2026-01-19",
+    "title": "1월 전도집회",
+    "category": "assembly",
+    "location": "아디스아바바 모임집",
+    "desc": "1월 정기 전도집회"
+  },
+  {
+    "id": "evt-20260201",
+    "date": "2026-02-01",
+    "endDate": "2026-02-01",
+    "title": "침례식",
+    "category": "baptism",
+    "location": "아디스아바바 모임집",
+    "desc": "1월 집회 후 침례식"
+  },
+  {
+    "id": "evt-20260206",
+    "date": "2026-02-06",
+    "endDate": "2026-02-08",
+    "title": "구디나 전도집회",
+    "category": "assembly",
+    "location": "구디나",
+    "desc": "구디나 지역 전도집회"
+  },
+  {
+    "id": "evt-20260816",
+    "date": "2026-08-16",
+    "endDate": "2026-08-16",
+    "title": "침례식",
+    "category": "baptism",
+    "location": "아디스아바바 모임집",
+    "desc": "8월 침례식 (28명 침례)"
+  },
+  {
+    "id": "evt-20260820",
+    "date": "2026-08-20",
+    "endDate": "2026-08-24",
+    "title": "8월 전도집회",
+    "category": "assembly",
+    "location": "아디스아바바 모임집",
+    "desc": "8월 전도집회"
+  }
+];
+
 if (typeof window !== 'undefined') {
   window.DEFAULT_MEMBERS = DEFAULT_MEMBERS;
   window.DEFAULT_HISTORY = DEFAULT_HISTORY;
   window.DEFAULT_ASSEMBLIES = DEFAULT_ASSEMBLIES;
+  window.DEFAULT_EVENTS = DEFAULT_EVENTS;
 }

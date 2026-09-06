@@ -2,6 +2,15 @@
  * 에티오피아 선교 아카이브 - 메인 애플리케이션 진입점
  */
 
+window.ETHIOPIA_DATA_VERSION = "20260907_V5001";
+window.formatImageUrl = function(url) {
+  if (!url || typeof url !== "string") return url || "";
+  if (url.startsWith("data:") || url.startsWith("blob:")) return url;
+  const version = window.ETHIOPIA_DATA_VERSION || "20260907_V5001";
+  const separator = url.includes("?") ? "&" : "?";
+  return `${url}${separator}v=${version}`;
+};
+
 // 1. Single-Execution Main Content Initializer (Global Scope)
 let mainContentInitialized = false;
 

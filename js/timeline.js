@@ -1258,6 +1258,7 @@ class TimelineComponent {
     }
   }
 
+
   // In-Place Smooth Transition (No DOM Destruction = NO LAG, NO JUMPING!)
   transitionTo(targetId) {
     const historyList = this.getFilteredAndSortedHistory();
@@ -1330,11 +1331,11 @@ class TimelineComponent {
         cardWrapper.innerHTML = this.renderCardInner(targetItem, targetIndex, totalCount, historyList);
         this.hydrateCardImages(targetId);
 
-        requestAnimationFrame(() => {
+        setTimeout(() => {
           cardWrapper.style.transition = "opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1), transform 0.45s cubic-bezier(0.16, 1, 0.3, 1)";
           cardWrapper.style.opacity = "1";
           cardWrapper.style.transform = "translateY(0)";
-        });
+        }, 20);
       }, 160);
     } else {
       this.render();
@@ -1411,7 +1412,7 @@ class TimelineComponent {
               const resolvedSrc = this.getThumbnailImageSrc(img, activeItem.id, imgIdx);
               return `
                 <div class="gallery-image-box" onclick="window.timelineComponent.openPhotoLightboxById('${activeItem.id}', ${imgIdx})" style="width:100% !important; height:100% !important; border-radius:16px !important; overflow:hidden !important; position:relative !important; cursor:pointer !important; background:#ffffff !important; border:1px solid var(--border-color) !important; box-shadow:0 4px 14px rgba(0,0,0,0.08) !important; scroll-snap-align:start !important;">
-                  <img src="${resolvedSrc}" data-img-idx="${imgIdx}" alt="${activeItem.title}"
+                  <img src="${window.formatImageUrl ? window.formatImageUrl(resolvedSrc) : resolvedSrc}" data-img-idx="${imgIdx}" alt="${activeItem.title}"
                        style="width:100% !important; height:100% !important; object-fit:cover !important; object-position:center 20% !important; border-radius:16px !important; display:block !important; transition:transform 0.3s ease !important;" class="insta-hover-img" />
                   <div class="image-hover-overlay" style="position:absolute; bottom:8px; right:8px; background:rgba(15,23,42,0.85); color:#fff; padding:5px 12px; border-radius:14px; font-size:12px; font-weight:700; pointer-events:none; display:flex; align-items:center; gap:5px; box-shadow:0 3px 10px rgba(0,0,0,0.25);">
                     <i class="fa-solid fa-magnifying-glass-plus" style="color:var(--accent-gold);"></i> <span>${isEn ? 'Enlarge' : '확대보기'}</span>
@@ -1456,8 +1457,12 @@ class TimelineComponent {
     if (!this.container) return;
 
     let rawList = this.getStoredHistory();
-
     const historyList = this.getFilteredAndSortedHistory();
+
+    if (!historyList || historyList.length === 0) {
+      this.container.innerHTML = `<div style="padding: 3rem; text-align: center; color: var(--text-muted); font-size: 1.05rem; font-weight: 700;">📜 역사 기록 데이터를 불러오는 중입니다...</div>`;
+      return;
+    }
 
     // Extract all unique years dynamically for the Year Filter Selector Bar
     const allYears = Array.from(new Set(rawList.map(item => {
@@ -1680,6 +1685,13 @@ class TimelineComponent {
     const members = (window.db && typeof window.db.getMembers === 'function') ? window.db.getMembers() : (window.DEFAULT_MEMBERS || (typeof DEFAULT_MEMBERS !== 'undefined' ? DEFAULT_MEMBERS : []));
     if (!historyItem || !historyItem.date) return [];
 
+    // Baptism events (침례식) are not salvation events (members were saved in prior seminars)
+    const titleLower = String(historyItem.title || "").toLowerCase();
+    const titleEnLower = String(historyItem.titleEn || "").toLowerCase();
+    if (titleLower.includes("침례") || titleEnLower.includes("baptism") || historyItem.type === "baptism") {
+      return [];
+    }
+
     const hDateClean = String(historyItem.date).replace(/\s+/g, '');
     const hNumbers = hDateClean.match(/\d+/g) || [];
     const hYear = hNumbers[0];
@@ -1776,7 +1788,7 @@ class TimelineComponent {
                 <div>
                   <div style="display:flex; align-items:center; gap:1rem; margin-bottom:0.8rem;">
                     <div style="width:70px; height:70px; border-radius:16px; overflow:hidden; border:1px solid var(--border-color); flex-shrink:0; background:#fff;">
-                      <img src="${photoUrl}" alt="${m.name}" style="width:100%; height:100%; object-fit:cover;" />
+                      <img src="${window.formatImageUrl ? window.formatImageUrl(photoUrl) : photoUrl}" alt="${m.name}" style="width:100%; height:100%; object-fit:cover;" />
                     </div>
                     <div style="overflow:hidden;">
                       <h4 style="font-size:1.15rem; font-weight:800; margin:0 0 0.2rem 0; color:var(--text-primary); text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${m.name}</h4>
