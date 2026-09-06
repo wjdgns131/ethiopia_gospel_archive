@@ -9,6 +9,7 @@ class DirectoryComponent {
     this.activeRegion = null;
     this.searchQuery = "";
     this.tempMemberPhoto = "";
+    this.renderedCount = 20;
     this.container = document.getElementById("memberGrid");
     this.activeFiltersBadge = document.getElementById("activeFilterBar");
 
@@ -160,6 +161,7 @@ class DirectoryComponent {
         tabs.forEach(t => t.classList.remove("active"));
         tab.classList.add("active");
         this.activeCategory = tab.getAttribute("data-category") || "all";
+        this.renderedCount = 20;
         this.render();
       });
     });
@@ -169,6 +171,7 @@ class DirectoryComponent {
     if (searchInput) {
       searchInput.addEventListener("input", (e) => {
         this.searchQuery = e.target.value.trim().toLowerCase();
+        this.renderedCount = 20;
         this.render();
       });
     }
@@ -180,6 +183,7 @@ class DirectoryComponent {
         const val = e.target.value;
         const selectedRegion = (!val || val === "all") ? null : val;
         this.activeRegion = selectedRegion;
+        this.renderedCount = 20;
         if (window.mapComponent) {
           window.mapComponent.selectRegion(selectedRegion);
         } else {
@@ -193,6 +197,7 @@ class DirectoryComponent {
     this.activeCategory = "all";
     this.activeRegion = null;
     this.searchQuery = "";
+    this.renderedCount = 20;
     
     const searchInput = document.getElementById("searchInput");
     if (searchInput) searchInput.value = "";
@@ -290,6 +295,7 @@ class DirectoryComponent {
   }
 
   render() {
+    if (document.body.classList.contains("site-locked")) return;
     if (!this.container) this.container = document.getElementById("memberGrid");
     if (!this.container) return;
 
@@ -307,11 +313,42 @@ class DirectoryComponent {
       return;
     }
 
-    // Safe DOM Element Construction (No string concatenation bugs!)
-    filtered.forEach(m => {
+    const count = this.renderedCount || 20;
+    const batch = filtered.slice(0, count);
+
+    // Safe DOM Element Construction for current batch
+    batch.forEach(m => {
       const cardEl = this.createMemberCardDOM(m);
       this.container.appendChild(cardEl);
     });
+
+    if (filtered.length > batch.length) {
+      this.attachSentinel(filtered.length);
+    }
+  }
+
+  attachSentinel(totalCount) {
+    let sentinel = document.getElementById("directorySentinel");
+    if (sentinel) sentinel.remove();
+
+    sentinel = document.createElement("div");
+    sentinel.id = "directorySentinel";
+    sentinel.style.cssText = "grid-column:1/-1; text-align:center; padding:1.2rem; color:var(--text-muted); font-weight:600;";
+    const isEn = window.i18n && window.i18n.getLang() === "en";
+    const currentCount = Math.min(this.renderedCount || 20, totalCount);
+    sentinel.innerText = isEn ? `Loading more members... (${currentCount} / ${totalCount})` : `식구 목록 더 불러오는 중... (${currentCount} / ${totalCount})`;
+    this.container.appendChild(sentinel);
+
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+          observer.disconnect();
+          this.renderedCount = (this.renderedCount || 20) + 20;
+          this.render();
+        }
+      }, { rootMargin: "300px" });
+      observer.observe(sentinel);
+    }
   }
 
   createMemberCardDOM(rawM) {
@@ -335,6 +372,9 @@ class DirectoryComponent {
     img.src = photoUrl;
     img.alt = m.name || (isEn ? "Member" : "식구");
     img.loading = "lazy";
+    img.decoding = "async";
+    img.width = 170;
+    img.height = 170;
     img.style.cssText = "width:100%; height:100%; object-fit:cover; display:block;";
     photoFrame.appendChild(img);
 
@@ -1019,7 +1059,3 @@ class DirectoryComponent {
   }
 }
 
-// Global Singleton Instant Access
-if (typeof window !== 'undefined') {
-  window.directoryComponent = new DirectoryComponent();
-}

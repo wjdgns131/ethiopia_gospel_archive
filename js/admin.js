@@ -181,6 +181,9 @@ class AdminComponent {
     }
 
     this.updateUiForRole();
+    if (typeof window.initializeMainContent === 'function') {
+      window.initializeMainContent();
+    }
   }
 
   logout() {
@@ -223,9 +226,11 @@ class AdminComponent {
       }
     }
 
-    if (window.directoryComponent) window.directoryComponent.render();
-    if (window.timelineComponent) window.timelineComponent.render();
-    if (window.fellowshipComponent) window.fellowshipComponent.render();
+    if (!document.body.classList.contains("site-locked")) {
+      if (window.directoryComponent) window.directoryComponent.render();
+      if (window.timelineComponent) window.timelineComponent.render();
+      if (window.fellowshipComponent) window.fellowshipComponent.render();
+    }
   }
 }
 

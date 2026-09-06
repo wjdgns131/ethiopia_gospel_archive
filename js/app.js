@@ -80,46 +80,58 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch(e) { console.error("DB force sync error:", e); }
   }
 
-  try {
-    window.directoryComponent = new DirectoryComponent();
-  } catch (e) { console.error("DirectoryComponent init error:", e); }
+  let mainContentInitialized = false;
 
-  try {
-    window.mapComponent = new EthiopiaMapComponent(
-      "ethiopiaMapContainer",
-      "regionPillsList",
-      (regionId) => {
-        if (window.directoryComponent) {
-          window.directoryComponent.activeRegion = regionId;
-          window.directoryComponent.render();
+  window.initializeMainContent = function() {
+    if (mainContentInitialized) return;
+    mainContentInitialized = true;
+
+    try {
+      window.directoryComponent = new DirectoryComponent();
+    } catch (e) { console.error("DirectoryComponent init error:", e); }
+
+    try {
+      window.mapComponent = new EthiopiaMapComponent(
+        "ethiopiaMapContainer",
+        "regionPillsList",
+        (regionId) => {
+          if (window.directoryComponent) {
+            window.directoryComponent.activeRegion = regionId;
+            window.directoryComponent.render();
+          }
         }
-      }
-    );
-  } catch (e) { console.error("EthiopiaMapComponent init error:", e); }
+      );
+    } catch (e) { console.error("EthiopiaMapComponent init error:", e); }
 
-  try {
-    window.timelineComponent = new TimelineComponent();
-  } catch (e) { console.error("TimelineComponent init error:", e); }
+    try {
+      window.timelineComponent = new TimelineComponent();
+    } catch (e) { console.error("TimelineComponent init error:", e); }
 
-  try {
-    window.fellowshipComponent = new FellowshipComponent();
-    window.assembliesComponent = window.fellowshipComponent;
-  } catch (e) { console.error("FellowshipComponent init error:", e); }
+    try {
+      window.fellowshipComponent = new FellowshipComponent();
+      window.assembliesComponent = window.fellowshipComponent;
+    } catch (e) { console.error("FellowshipComponent init error:", e); }
 
-  try {
-    window.calendarComponent = new CalendarComponent("calendarContainer");
-  } catch (e) { console.error("CalendarComponent init error:", e); }
+    try {
+      window.calendarComponent = new CalendarComponent("calendarContainer");
+    } catch (e) { console.error("CalendarComponent init error:", e); }
+
+    // Initial Render of All Tabs Safely ONCE on Authentication
+    try { if (window.directoryComponent) window.directoryComponent.render(); } catch (e) { console.error("Directory render error:", e); }
+    try { if (window.mapComponent) window.mapComponent.render((window.db && typeof window.db.getMembers === 'function') ? window.db.getMembers() : (window.DEFAULT_MEMBERS || (typeof DEFAULT_MEMBERS !== 'undefined' ? DEFAULT_MEMBERS : []))); } catch (e) { console.error("Map render error:", e); }
+    try { if (window.timelineComponent) window.timelineComponent.render(); } catch (e) { console.error("Timeline render error:", e); }
+    try { if (window.assembliesComponent) window.assembliesComponent.render(); } catch (e) { console.error("Assemblies render error:", e); }
+    try { if (window.calendarComponent) window.calendarComponent.render(); } catch (e) { console.error("Calendar render error:", e); }
+  };
 
   try {
     window.adminComponent = new AdminComponent();
   } catch (e) { console.error("AdminComponent init error:", e); }
 
-  // Initial Render of All Tabs Safely
-  try { if (window.directoryComponent) window.directoryComponent.render(); } catch (e) { console.error("Directory render error:", e); }
-  try { if (window.mapComponent) window.mapComponent.render((window.db && typeof window.db.getMembers === 'function') ? window.db.getMembers() : (window.DEFAULT_MEMBERS || (typeof DEFAULT_MEMBERS !== 'undefined' ? DEFAULT_MEMBERS : []))); } catch (e) { console.error("Map render error:", e); }
-  try { if (window.timelineComponent) window.timelineComponent.render(); } catch (e) { console.error("Timeline render error:", e); }
-  try { if (window.assembliesComponent) window.assembliesComponent.render(); } catch (e) { console.error("Assemblies render error:", e); }
-  try { if (window.calendarComponent) window.calendarComponent.render(); } catch (e) { console.error("Calendar render error:", e); }
+  // If already unlocked (e.g. valid token verified synchronously/immediately), initialize main content
+  if (!document.body.classList.contains("site-locked")) {
+    window.initializeMainContent();
+  }
 
   // 4. Modal Close Handlers
   try {
@@ -171,4 +183,27 @@ window.showToast = function(message, type = "success") {
       toast.remove();
     }, 300);
   }, 3200);
+};
+
+// On-demand Lazy Loader for Tesseract.js OCR Engine
+let tesseractLoadPromise = null;
+window.ensureTesseractLoaded = function() {
+  if (window.Tesseract) {
+    return Promise.resolve(window.Tesseract);
+  }
+  if (tesseractLoadPromise) {
+    return tesseractLoadPromise;
+  }
+  tesseractLoadPromise = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
+    script.onload = () => resolve(window.Tesseract);
+    script.onerror = (err) => {
+      tesseractLoadPromise = null;
+      console.error("Tesseract.js load failed:", err);
+      reject(err);
+    };
+    document.head.appendChild(script);
+  });
+  return tesseractLoadPromise;
 };

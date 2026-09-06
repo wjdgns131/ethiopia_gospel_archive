@@ -383,6 +383,7 @@ class TimelineComponent {
                   }
                   return img;
                 });
+                mod.images = modImages;
 
                 const hasCorruptedPath = modImages.some(img => {
                   const s = typeof img === 'string' ? img : (img ? (img.highres || img.thumbnail || '') : '');
@@ -1450,6 +1451,7 @@ class TimelineComponent {
   }
 
   render() {
+    if (document.body.classList.contains("site-locked")) return;
     this.container = document.getElementById("timelineContainer") || document.getElementById("timelineList");
     if (!this.container) return;
 
