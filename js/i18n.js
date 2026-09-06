@@ -288,6 +288,7 @@
     { ko: /친구/g, en: "friend" },
 
     // Cities
+    { ko: /모임집/g, en: "Moim House" },
     { ko: /아디스아바바\s*\([^)]*\)/g, en: "Addis Ababa" },
     { ko: /비쇼프투\s*\([^)]*\)/g, en: "Bishoftu" },
     { ko: /아다마\s*\([^)]*\)/g, en: "Adama" },
@@ -1225,6 +1226,29 @@ A total of 28 people were baptized.`
       };
     }
 
+    translateLocation(loc) {
+      if (!loc || typeof loc !== "string") return loc || "";
+      const trimmed = loc.trim();
+      if (!trimmed) return "";
+      if (typeof REGION_EN_MAP !== "undefined" && REGION_EN_MAP[trimmed]) {
+        return REGION_EN_MAP[trimmed];
+      }
+
+      let result = trimmed;
+      result = result.replace(/모임집/g, "Moim House");
+      result = result.replace(/아디스아바바/g, "Addis Ababa");
+      result = result.replace(/비쇼프투/g, "Bishoftu");
+      result = result.replace(/아다마/g, "Adama");
+      result = result.replace(/세베타/g, "Sebeta");
+      result = result.replace(/모조/g, "Mojo");
+      result = result.replace(/네켐테/g, "Nekemte");
+      result = result.replace(/하와사/g, "Hawassa");
+      result = result.replace(/아르바민치/g, "Arba Minch");
+      result = result.replace(/알렘테나|알렘\s+테나/g, "Alem Tena");
+      result = result.replace(/에티오피아/g, "Ethiopia");
+      return result;
+    }
+
     getTranslatedHistory(historyItem) {
       if (!historyItem) return historyItem;
       if (this.currentLang === "ko") return historyItem;
@@ -1234,7 +1258,7 @@ A total of 28 people were baptized.`
       const mapEn = (idKey && typeof HISTORY_EN_MAP !== "undefined" && HISTORY_EN_MAP[idKey]) ? HISTORY_EN_MAP[idKey] : {};
 
       const translatedTitle = mapEn.title || (historyItem.titleEn && historyItem.titleEn.trim() && !containsKorean(historyItem.titleEn) ? historyItem.titleEn : (historyItem.title ? this.translateContent(historyItem.title, true) : historyItem.title));
-      const translatedLocation = mapEn.location || (historyItem.locationEn && historyItem.locationEn.trim() && !containsKorean(historyItem.locationEn) ? historyItem.locationEn : (historyItem.location ? this.translateContent(historyItem.location, true) : historyItem.location));
+      const translatedLocation = mapEn.location || (historyItem.locationEn && historyItem.locationEn.trim() && !containsKorean(historyItem.locationEn) ? historyItem.locationEn : (historyItem.location ? this.translateLocation(historyItem.location) : historyItem.location));
       const translatedDesc = mapEn.desc || (historyItem.descEn && historyItem.descEn.trim() && !containsKorean(historyItem.descEn) ? historyItem.descEn : historyItem.desc);
       const translatedDate = mapEn.date || historyItem.dateEn || historyItem.date;
 

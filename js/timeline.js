@@ -1087,12 +1087,12 @@ class TimelineComponent {
 
   async syncHistoryToWorker(allHistory) {
     try {
-      const token = sessionStorage.getItem("ethiopia_auth_token");
-      if (!token) return;
+      const token = sessionStorage.getItem("ethiopia_auth_token") || localStorage.getItem("ethiopia_archive_auth_token") || "";
+      if (!token) return { ok: false, error: "No auth token" };
       const workerUrl = window.CF_WORKER_UPLOAD_URL || "https://ethiopia-archive-proxy.wjdgns131.workers.dev";
       const syncEndpoint = `${workerUrl.replace(/\/+$/, '')}/sync`;
 
-      await fetch(syncEndpoint, {
+      const res = await fetch(syncEndpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -1102,8 +1102,19 @@ class TimelineComponent {
           action: "sync_history",
           history: allHistory
         })
-      }).catch(() => {});
-    } catch(e) {}
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.ok) {
+          return { ok: true, synced: true };
+        }
+        return { ok: false, error: data.error || "Sync error" };
+      }
+      return { ok: false, error: `HTTP ${res.status}` };
+    } catch(e) {
+      return { ok: false, error: e.message || "Network error" };
+    }
   }
 
   async saveHistoryFromForm() {
@@ -1256,67 +1267,76 @@ class TimelineComponent {
         }
       }, 80);
 
-      // Step 2: Background Async Translation
+      // Step 2: Background Async Translation & Sync
       (async () => {
+        let translateSuccess = false;
         try {
           const toTranslate = {};
           if (translationMeta.titleEn === "auto" && historyData.title && (!historyData.titleEn || historyData.title !== existing.title)) {
             toTranslate.titleEn = historyData.title;
           }
           if (translationMeta.locationEn === "auto" && historyData.location && (!historyData.locationEn || historyData.location !== existing.location)) {
-            toTranslate.locationEn = historyData.location;
+            const detLoc = (window.i18n && typeof window.i18n.translateLocation === "function") ? window.i18n.translateLocation(historyData.location) : "";
+            if (detLoc && !/[가-힣]/.test(detLoc)) {
+              historyData.locationEn = detLoc;
+            } else {
+              toTranslate.locationEn = historyData.location;
+            }
           }
           if (translationMeta.descEn === "auto" && historyData.desc && (!historyData.descEn || historyData.desc !== existing.desc)) {
             toTranslate.descEn = historyData.desc;
           }
 
           const containsKorean = (str) => typeof str === "string" && /[가-힣]/.test(str);
+          let hasQualityTranslation = true;
 
           if (Object.keys(toTranslate).length > 0 && window.i18n && typeof window.i18n.translateKoreanFields === "function") {
             const res = await window.i18n.translateKoreanFields(toTranslate);
-            let hasQualityTranslation = true;
 
-            if (translationMeta.titleEn === "auto") {
+            if (translationMeta.titleEn === "auto" && toTranslate.titleEn) {
               if (res.titleEn && !containsKorean(res.titleEn) && res.titleEn.trim() !== (historyData.title || "").trim()) {
                 historyData.titleEn = res.titleEn;
-              } else if (toTranslate.titleEn) {
+              } else {
                 historyData.titleEn = "";
                 hasQualityTranslation = false;
               }
             }
-            if (translationMeta.locationEn === "auto") {
+            if (translationMeta.locationEn === "auto" && toTranslate.locationEn) {
               if (res.locationEn && !containsKorean(res.locationEn) && res.locationEn.trim() !== (historyData.location || "").trim()) {
                 historyData.locationEn = res.locationEn;
-              } else if (toTranslate.locationEn) {
+              } else {
                 historyData.locationEn = "";
                 hasQualityTranslation = false;
               }
             }
-            if (translationMeta.descEn === "auto") {
+            if (translationMeta.descEn === "auto" && toTranslate.descEn) {
               if (res.descEn && !containsKorean(res.descEn) && res.descEn.trim() !== (historyData.desc || "").trim()) {
                 historyData.descEn = res.descEn;
-              } else if (toTranslate.descEn) {
+              } else {
                 historyData.descEn = "";
                 hasQualityTranslation = false;
               }
             }
 
-            historyData.translationStatus = hasQualityTranslation ? "translated" : "pending";
+            translateSuccess = hasQualityTranslation;
           } else {
-            historyData.translationStatus = "translated";
+            translateSuccess = true;
           }
         } catch(err) {
           console.warn("Background history translation failed:", err);
-          historyData.translationStatus = "pending";
+          translateSuccess = false;
         }
 
+        historyData.translationStatus = translateSuccess ? "translated" : "pending";
         this.saveStoredHistory(historyData);
         const currentList = this.getStoredHistory();
-        await this.syncHistoryToWorker(currentList);
+        const syncRes = await this.syncHistoryToWorker(currentList);
         this.render();
 
-        if (historyData.translationStatus === "translated") {
-          if (window.showToast) window.showToast("🌐 복음 역사 영어 번역이 생성되고 중앙 동기화되었습니다!");
+        if (translateSuccess && syncRes && syncRes.ok) {
+          if (window.showToast) window.showToast("🌐 영어 번역이 생성되고 중앙 동기화되었습니다!");
+        } else if (translateSuccess && (!syncRes || !syncRes.ok)) {
+          if (window.showToast) window.showToast("⚠️ 영어 번역은 완료되었지만 중앙 동기화에 실패했습니다.");
         } else {
           if (window.showToast) window.showToast("ℹ️ 한국어 역사 기록 저장은 완료되었으며, 영어 번역은 보류(Pending) 상태입니다.");
         }
@@ -1484,47 +1504,68 @@ class TimelineComponent {
 
     const toTranslate = {};
     if (item.title) toTranslate.titleEn = item.title;
-    if (item.location) toTranslate.locationEn = item.location;
+    if (item.location) {
+      const detLoc = (window.i18n && typeof window.i18n.translateLocation === "function") ? window.i18n.translateLocation(item.location) : "";
+      if (detLoc && !/[가-힣]/.test(detLoc)) {
+        item.locationEn = detLoc;
+      } else {
+        toTranslate.locationEn = item.location;
+      }
+    }
     if (item.desc) toTranslate.descEn = item.desc;
 
     item.translationStatus = "translating";
     this.saveStoredHistory(item);
     this.render();
 
+    let translateSuccess = false;
     try {
       if (Object.keys(toTranslate).length > 0 && window.i18n && typeof window.i18n.translateKoreanFields === "function") {
         const res = await window.i18n.translateKoreanFields(toTranslate);
         const containsKorean = (str) => typeof str === "string" && /[가-힣]/.test(str);
         let hasQualityTranslation = true;
 
-        if (res.titleEn && !containsKorean(res.titleEn) && res.titleEn.trim() !== (item.title || "").trim()) {
-          item.titleEn = res.titleEn;
+        if (toTranslate.titleEn) {
+          if (res.titleEn && !containsKorean(res.titleEn) && res.titleEn.trim() !== (item.title || "").trim()) {
+            item.titleEn = res.titleEn;
+          } else {
+            hasQualityTranslation = false;
+          }
         }
-        if (res.locationEn && !containsKorean(res.locationEn) && res.locationEn.trim() !== (item.location || "").trim()) {
-          item.locationEn = res.locationEn;
+        if (toTranslate.locationEn) {
+          if (res.locationEn && !containsKorean(res.locationEn) && res.locationEn.trim() !== (item.location || "").trim()) {
+            item.locationEn = res.locationEn;
+          } else {
+            hasQualityTranslation = false;
+          }
         }
-        if (res.descEn && !containsKorean(res.descEn) && res.descEn.trim() !== (item.desc || "").trim()) {
-          item.descEn = res.descEn;
-        } else if (toTranslate.descEn) {
-          item.descEn = "";
-          hasQualityTranslation = false;
+        if (toTranslate.descEn) {
+          if (res.descEn && !containsKorean(res.descEn) && res.descEn.trim() !== (item.desc || "").trim()) {
+            item.descEn = res.descEn;
+          } else {
+            item.descEn = "";
+            hasQualityTranslation = false;
+          }
         }
 
-        item.translationStatus = hasQualityTranslation ? "translated" : "pending";
+        translateSuccess = hasQualityTranslation;
       } else {
-        item.translationStatus = "translated";
+        translateSuccess = true;
       }
     } catch(err) {
       console.warn("Retry history translation failed:", err);
-      item.translationStatus = "pending";
+      translateSuccess = false;
     }
 
+    item.translationStatus = translateSuccess ? "translated" : "pending";
     this.saveStoredHistory(item);
-    await this.syncHistoryToWorker(this.getStoredHistory());
+    const syncRes = await this.syncHistoryToWorker(this.getStoredHistory());
     this.render();
 
-    if (item.translationStatus === "translated") {
-      if (window.showToast) window.showToast("✨ 복음 역사 영어 번역이 성공적으로 완료 및 저장되었습니다!");
+    if (translateSuccess && syncRes && syncRes.ok) {
+      if (window.showToast) window.showToast("🌐 복음 역사 영어 번역이 성공적으로 생성되고 동기화되었습니다!");
+    } else if (translateSuccess && (!syncRes || !syncRes.ok)) {
+      if (window.showToast) window.showToast("⚠️ 영어 번역은 완료되었지만 중앙 동기화에 실패했습니다.");
     } else {
       if (window.showToast) window.showToast("ℹ️ 영어 번역이 보류(Pending) 상태입니다.");
     }

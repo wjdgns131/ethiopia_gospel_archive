@@ -807,12 +807,12 @@ class DirectoryComponent {
 
   async syncMembersToWorker(allMembers) {
     try {
-      const token = sessionStorage.getItem("ethiopia_auth_token");
-      if (!token) return;
+      const token = sessionStorage.getItem("ethiopia_auth_token") || localStorage.getItem("ethiopia_archive_auth_token") || "";
+      if (!token) return { ok: false, error: "No auth token" };
       const workerUrl = window.CF_WORKER_UPLOAD_URL || "https://ethiopia-archive-proxy.wjdgns131.workers.dev";
       const syncEndpoint = `${workerUrl.replace(/\/+$/, '')}/sync`;
 
-      await fetch(syncEndpoint, {
+      const res = await fetch(syncEndpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -822,8 +822,19 @@ class DirectoryComponent {
           action: "sync_members",
           members: allMembers
         })
-      }).catch(() => {});
-    } catch(e) {}
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.ok) {
+          return { ok: true, synced: true };
+        }
+        return { ok: false, error: data.error || "Sync error" };
+      }
+      return { ok: false, error: `HTTP ${res.status}` };
+    } catch(e) {
+      return { ok: false, error: e.message || "Network error" };
+    }
   }
 
   saveMemberFromForm() {
@@ -940,32 +951,36 @@ class DirectoryComponent {
             }
           }
 
-          memberData.translationStatus = hasQualityTranslation ? "translated" : "pending";
-        } else {
-          memberData.translationStatus = "translated";
-        }
-      } catch (err) {
-        console.warn("Background member translation failed:", err);
-        memberData.translationStatus = "pending";
-      }
-
-      const latestMembers = this.getStoredMembers();
-      const idx = latestMembers.findIndex(x => x && String(x.id) === String(idVal));
-      if (idx >= 0) latestMembers[idx] = memberData;
-      else latestMembers.push(memberData);
-
-      localStorage.setItem("ethiopia_members", JSON.stringify(latestMembers));
-      window.DEFAULT_MEMBERS = latestMembers;
-
-      this.render();
-      await this.syncMembersToWorker(latestMembers);
-
-      if (memberData.translationStatus === "translated") {
-        if (window.showToast) window.showToast(`🌐 ${nameVal} 님의 영어 번역이 생성되고 중앙 동기화되었습니다!`);
+        translateSuccess = hasQualityTranslation;
       } else {
-        if (window.showToast) window.showToast(`ℹ️ ${nameVal} 님의 한국어 정보 저장은 완료되었으며, 영어 번역은 보류(Pending) 상태입니다.`);
+        translateSuccess = true;
       }
-    })();
+    } catch (err) {
+      console.warn("Background member translation failed:", err);
+      translateSuccess = false;
+    }
+
+    memberData.translationStatus = translateSuccess ? "translated" : "pending";
+
+    const latestMembers = this.getStoredMembers();
+    const idx = latestMembers.findIndex(x => x && String(x.id) === String(idVal));
+    if (idx >= 0) latestMembers[idx] = memberData;
+    else latestMembers.push(memberData);
+
+    localStorage.setItem("ethiopia_members", JSON.stringify(latestMembers));
+    window.DEFAULT_MEMBERS = latestMembers;
+
+    this.render();
+    const syncRes = await this.syncMembersToWorker(latestMembers);
+
+    if (translateSuccess && syncRes && syncRes.ok) {
+      if (window.showToast) window.showToast(`🌐 ${nameVal} 님의 영어 번역이 생성되고 중앙 동기화되었습니다!`);
+    } else if (translateSuccess && (!syncRes || !syncRes.ok)) {
+      if (window.showToast) window.showToast(`⚠️ ${nameVal} 님의 영어 번역은 완료되었지만 중앙 동기화에 실패했습니다.`);
+    } else {
+      if (window.showToast) window.showToast(`ℹ️ ${nameVal} 님의 한국어 정보 저장은 완료되었으며, 영어 번역은 보류(Pending) 상태입니다.`);
+    }
+  })();
   }
 
   async retryMemberTranslation(id) {
@@ -990,33 +1005,46 @@ class DirectoryComponent {
     window.DEFAULT_MEMBERS = members;
     this.render();
 
+    let translateSuccess = false;
     try {
       if (Object.keys(toTranslate).length > 0 && window.i18n && typeof window.i18n.translateKoreanFields === "function") {
         const res = await window.i18n.translateKoreanFields(toTranslate);
         const containsKorean = (str) => typeof str === "string" && /[가-힣]/.test(str);
         let hasQualityTranslation = true;
 
-        if (res.jobEn && !containsKorean(res.jobEn) && res.jobEn.trim() !== (member.job || "").trim()) {
-          member.jobEn = res.jobEn;
+        if (toTranslate.jobEn) {
+          if (res.jobEn && !containsKorean(res.jobEn) && res.jobEn.trim() !== (member.job || "").trim()) {
+            member.jobEn = res.jobEn;
+          } else {
+            hasQualityTranslation = false;
+          }
         }
-        if (res.inviterRelationEn && !containsKorean(res.inviterRelationEn) && res.inviterRelationEn.trim() !== (member.inviterRelation || "").trim()) {
-          member.inviterRelationEn = res.inviterRelationEn;
+        if (toTranslate.inviterRelationEn) {
+          if (res.inviterRelationEn && !containsKorean(res.inviterRelationEn) && res.inviterRelationEn.trim() !== (member.inviterRelation || "").trim()) {
+            member.inviterRelationEn = res.inviterRelationEn;
+          } else {
+            hasQualityTranslation = false;
+          }
         }
-        if (res.testimonyEn && !containsKorean(res.testimonyEn) && res.testimonyEn.trim() !== (member.testimony || "").trim()) {
-          member.testimonyEn = res.testimonyEn;
-        } else if (toTranslate.testimonyEn) {
-          member.testimonyEn = "";
-          hasQualityTranslation = false;
+        if (toTranslate.testimonyEn) {
+          if (res.testimonyEn && !containsKorean(res.testimonyEn) && res.testimonyEn.trim() !== (member.testimony || "").trim()) {
+            member.testimonyEn = res.testimonyEn;
+          } else {
+            member.testimonyEn = "";
+            hasQualityTranslation = false;
+          }
         }
 
-        member.translationStatus = hasQualityTranslation ? "translated" : "pending";
+        translateSuccess = hasQualityTranslation;
       } else {
-        member.translationStatus = "translated";
+        translateSuccess = true;
       }
     } catch(err) {
       console.warn("Retry member translation failed:", err);
-      member.translationStatus = "pending";
+      translateSuccess = false;
     }
+
+    member.translationStatus = translateSuccess ? "translated" : "pending";
 
     const latestMembers = this.getStoredMembers();
     const latestIdx = latestMembers.findIndex(m => m && String(m.id) === String(id));
@@ -1025,10 +1053,12 @@ class DirectoryComponent {
     window.DEFAULT_MEMBERS = latestMembers;
 
     this.render();
-    await this.syncMembersToWorker(latestMembers);
+    const syncRes = await this.syncMembersToWorker(latestMembers);
 
-    if (member.translationStatus === "translated") {
-      if (window.showToast) window.showToast(`✨ ${member.name} 님의 영어 번역이 완료되었습니다!`);
+    if (translateSuccess && syncRes && syncRes.ok) {
+      if (window.showToast) window.showToast(`🌐 ${member.name} 님의 영어 번역이 성공적으로 완료되고 중앙 동기화되었습니다!`);
+    } else if (translateSuccess && (!syncRes || !syncRes.ok)) {
+      if (window.showToast) window.showToast(`⚠️ ${member.name} 님의 영어 번역은 완료되었지만 중앙 동기화에 실패했습니다.`);
     } else {
       if (window.showToast) window.showToast(`ℹ️ 영어 번역이 보류(Pending) 상태입니다.`);
     }
