@@ -1060,7 +1060,42 @@ class DirectoryComponent {
     } else if (translateSuccess && (!syncRes || !syncRes.ok)) {
       if (window.showToast) window.showToast(`⚠️ ${member.name} 님의 영어 번역은 완료되었지만 중앙 동기화에 실패했습니다.`);
     } else {
+      member.syncStatus = "pending";
       if (window.showToast) window.showToast(`ℹ️ 영어 번역이 보류(Pending) 상태입니다.`);
+    }
+    localStorage.setItem("ethiopia_members", JSON.stringify(latestMembers));
+    this.render();
+  }
+
+  async retryMemberSync(id) {
+    if (window.checkAdminPermission && !window.checkAdminPermission()) return;
+    const members = this.getStoredMembers();
+    const member = members.find(m => m && String(m.id) === String(id));
+    if (!member) return;
+
+    if (window.showToast) {
+      window.showToast(`🌐 ${member.name} 님의 중앙 동기화를 다시 시도 중입니다...`);
+    }
+
+    const latestMembers = this.getStoredMembers();
+    const syncRes = await this.syncMembersToWorker(latestMembers);
+
+    if (syncRes && syncRes.ok) {
+      member.syncStatus = "synced";
+      const idx = latestMembers.findIndex(m => m && String(m.id) === String(id));
+      if (idx >= 0) latestMembers[idx] = member;
+      localStorage.setItem("ethiopia_members", JSON.stringify(latestMembers));
+      window.DEFAULT_MEMBERS = latestMembers;
+      this.render();
+      if (window.showToast) window.showToast(`✨ ${member.name} 님의 중앙 동기화가 성공적으로 완료되었습니다!`);
+    } else {
+      member.syncStatus = "failed";
+      const idx = latestMembers.findIndex(m => m && String(m.id) === String(id));
+      if (idx >= 0) latestMembers[idx] = member;
+      localStorage.setItem("ethiopia_members", JSON.stringify(latestMembers));
+      window.DEFAULT_MEMBERS = latestMembers;
+      this.render();
+      if (window.showToast) window.showToast("⚠️ 중앙 동기화에 실패했습니다. 네트워크 또는 권한을 확인해 주세요.");
     }
   }
 
@@ -1122,6 +1157,10 @@ class DirectoryComponent {
           ${(rawM.translationStatus === "pending" || !rawM.testimonyEn) ? `
             <button type="button" class="btn btn-primary btn-sm" onclick="event.stopPropagation(); window.directoryComponent.retryMemberTranslation('${m.id}')" style="background:#0284c7; color:#ffffff; border:none; padding:0.4rem 0.9rem; font-weight:700; border-radius:8px; display:inline-flex; align-items:center; gap:0.4rem; cursor:pointer;">
               <i class="fa-solid fa-language"></i> ${isEn ? 'Retry Translation' : '영어 번역 다시 시도'}
+            </button>
+          ` : (rawM.syncStatus === "failed" || rawM.syncStatus === "pending") ? `
+            <button type="button" class="btn btn-warning btn-sm" onclick="event.stopPropagation(); window.directoryComponent.retryMemberSync('${m.id}')" style="background:#d97706; color:#ffffff; border:none; padding:0.4rem 0.9rem; font-weight:700; border-radius:8px; display:inline-flex; align-items:center; gap:0.4rem; cursor:pointer;">
+              <i class="fa-solid fa-cloud-arrow-up"></i> ${isEn ? 'Retry Central Sync' : '중앙 동기화 다시 시도'}
             </button>
           ` : ''}
           <button type="button" class="btn btn-secondary btn-sm" data-action="open-edit-member" data-id="${m.id}" style="padding:0.4rem 0.9rem; font-weight:700;">

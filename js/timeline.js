@@ -1571,6 +1571,32 @@ class TimelineComponent {
     }
   }
 
+  async retryHistorySync(id) {
+    if (window.checkAdminPermission && !window.checkAdminPermission()) return;
+    const historyList = this.getStoredHistory();
+    const item = historyList.find(h => h && String(h.id) === String(id));
+    if (!item) return;
+
+    if (window.showToast) {
+      window.showToast("🌐 중앙 동기화를 다시 시도 중입니다...");
+    }
+
+    const currentList = this.getStoredHistory();
+    const syncRes = await this.syncHistoryToWorker(currentList);
+
+    if (syncRes && syncRes.ok) {
+      item.syncStatus = "synced";
+      this.saveStoredHistory(item);
+      this.render();
+      if (window.showToast) window.showToast("✨ 중앙 동기화가 성공적으로 완료되었습니다!");
+    } else {
+      item.syncStatus = "failed";
+      this.saveStoredHistory(item);
+      this.render();
+      if (window.showToast) window.showToast("⚠️ 중앙 동기화에 실패했습니다. 네트워크 또는 권한을 확인해 주세요.");
+    }
+  }
+
   renderCardInner(rawActiveItem, activeIndex, totalCount, historyList) {
     const prevItem = activeIndex > 0 ? historyList[activeIndex - 1] : null;
     const nextItem = activeIndex < totalCount - 1 ? historyList[activeIndex + 1] : null;
@@ -1597,6 +1623,10 @@ class TimelineComponent {
           ${(rawActiveItem.translationStatus === "pending" || !rawActiveItem.descEn) ? `
             <button type="button" class="btn btn-primary btn-sm" onclick="event.stopPropagation(); window.timelineComponent.retryHistoryTranslation('${activeItem.id}')" title="${isEn ? 'Retry Translation' : '영어 번역 다시 시도'}" style="background:#0284c7; color:#ffffff; border:none; padding:0.35rem 0.85rem; border-radius:8px; font-size:0.82rem; font-weight:700; display:inline-flex; align-items:center; gap:0.4rem; cursor:pointer; box-shadow:0 2px 6px rgba(2,132,199,0.3);">
               <i class="fa-solid fa-language"></i> ${isEn ? 'Retry Translation' : '영어 번역 다시 시도'}
+            </button>
+          ` : (rawActiveItem.syncStatus === "failed" || rawActiveItem.syncStatus === "pending") ? `
+            <button type="button" class="btn btn-warning btn-sm" onclick="event.stopPropagation(); window.timelineComponent.retryHistorySync('${activeItem.id}')" title="${isEn ? 'Retry Central Sync' : '중앙 동기화 다시 시도'}" style="background:#d97706; color:#ffffff; border:none; padding:0.35rem 0.85rem; border-radius:8px; font-size:0.82rem; font-weight:700; display:inline-flex; align-items:center; gap:0.4rem; cursor:pointer; box-shadow:0 2px 6px rgba(217,119,6,0.3);">
+              <i class="fa-solid fa-cloud-arrow-up"></i> ${isEn ? 'Retry Central Sync' : '중앙 동기화 다시 시도'}
             </button>
           ` : ''}
           <button type="button" class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); window.timelineComponent.openEditModal('${activeItem.id}')" title="Edit">

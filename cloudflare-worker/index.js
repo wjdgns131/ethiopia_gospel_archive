@@ -316,7 +316,7 @@ Return a valid JSON object mapping each input field key to its translated Englis
     }
 
     // 3.5 Shared Data Sync Endpoint (POST /sync)
-    const isSyncReq = url.pathname === "/sync" || url.pathname.endsWith("/sync") || (jsonBody && (jsonBody.action === "sync_events" || jsonBody.action === "sync_members" || jsonBody.action === "sync_history" || jsonBody.action === "sync_data"));
+    const isSyncReq = url.pathname === "/sync" || url.pathname === "/sync/" || url.pathname.endsWith("/sync") || (jsonBody && (jsonBody.action === "sync_events" || jsonBody.action === "sync_members" || jsonBody.action === "sync_history" || jsonBody.action === "sync_data"));
     if (isSyncReq) {
       if (!env.AUTH_SESSION_SECRET) {
         return new Response(JSON.stringify({ error: "Server Configuration Error: AUTH_SESSION_SECRET missing." }), { status: 500, headers: corsHeaders });
@@ -350,17 +350,27 @@ Return a valid JSON object mapping each input field key to its translated Englis
 
       if (repoPath && commitData) {
         const githubPat = env.GITHUB_PAT || env.GITHUB_TOKEN;
-        if (githubPat) {
-          const githubApiUrl = `https://api.github.com/repos/wjdgns131/ethiopia_gospel_archive/contents/${repoPath}`;
-          
+        if (!githubPat) {
+          return new Response(JSON.stringify({ error: "Server Configuration Error: GITHUB_PAT missing." }), { status: 500, headers: corsHeaders });
+        }
+
+        const githubApiUrl = `https://api.github.com/repos/wjdgns131/ethiopia_gospel_archive/contents/${repoPath}`;
+        let commitSuccess = false;
+        let lastErrorMsg = "";
+
+        for (let attempt = 0; attempt < 3; attempt++) {
           let sha = "";
           try {
             const getRes = await fetch(githubApiUrl, {
-              headers: { "Authorization": `Bearer ${githubPat}`, "User-Agent": "Ethiopia-Archive-Worker" }
+              headers: {
+                "Authorization": `Bearer ${githubPat}`,
+                "User-Agent": "Ethiopia-Archive-Worker",
+                "Accept": "application/vnd.github.v3+json"
+              }
             });
             if (getRes.ok) {
               const getData = await getRes.json();
-              sha = getData.sha;
+              sha = getData.sha || "";
             }
           } catch(e) {}
 
@@ -384,18 +394,36 @@ Return a valid JSON object mapping each input field key to its translated Englis
             headers: {
               "Authorization": `Bearer ${githubPat}`,
               "Content-Type": "application/json",
-              "User-Agent": "Ethiopia-Archive-Worker"
+              "User-Agent": "Ethiopia-Archive-Worker",
+              "Accept": "application/vnd.github.v3+json"
             },
             body: JSON.stringify(commitBody)
           });
 
-          if (!putRes.ok) {
-            const errTxt = await putRes.text();
-            return new Response(JSON.stringify({ error: `GitHub Sync Failed: ${errTxt}` }), { status: 502, headers: corsHeaders });
+          if (putRes.ok) {
+            commitSuccess = true;
+            break;
+          }
+
+          const errTxt = await putRes.text();
+          lastErrorMsg = errTxt;
+
+          if (putRes.status === 409 || putRes.status === 422) {
+            await new Promise(r => setTimeout(r, 500));
+            continue;
+          } else {
+            break;
           }
         }
+
+        if (!commitSuccess) {
+          return new Response(JSON.stringify({ error: `GitHub Sync Failed: ${lastErrorMsg}` }), { status: 502, headers: corsHeaders });
+        }
+
         return new Response(JSON.stringify({ ok: true, synced: true }), { status: 200, headers: corsHeaders });
       }
+
+      return new Response(JSON.stringify({ error: "Bad Request: Invalid sync action or payload." }), { status: 400, headers: corsHeaders });
     }
 
     // 4. Image Upload Proxy Endpoint (Requires Valid Admin Session Token)
