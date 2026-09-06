@@ -615,11 +615,18 @@ class TimelineComponent {
     if (!file) return null;
 
     const workerUrl = window.CF_WORKER_UPLOAD_URL || "https://ethiopia-archive-proxy.wjdgns131.workers.dev";
-    const adminPasscode = sessionStorage.getItem("ethiopia_admin_passcode") || sessionStorage.getItem("ethiopia_admin_role") || "";
+    const adminPasscode = sessionStorage.getItem("ethiopia_admin_passcode") || "";
+
+    if (!adminPasscode) {
+      alert("관리자 인증 정보가 없습니다. 다시 로그인해 주세요.");
+      return null;
+    }
+
+    const cleanHistoryId = String(historyId).replace(/^hist-/, "");
 
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("historyId", historyId);
+    formData.append("historyId", cleanHistoryId);
     formData.append("subFolder", subFolder);
     if (extOverride) {
       formData.append("extOverride", extOverride);
@@ -1034,7 +1041,18 @@ class TimelineComponent {
                 this.inMemoryBlobMap[thumbPath || highresPath] = thumbPreviewUrl;
               }
             } else {
-              // Fallback for local/offline testing: create clean relative paths and map object URLs
+              // Production protection: If upload to GitHub failed, DO NOT create virtual fallback paths and DO NOT save to localStorage!
+              const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+              if (!isLocalhost) {
+                alert("❌ GitHub에 사진을 업로드하지 못했습니다. (관리자 인증 실패 또는 네트워크 오류)\n\n기존 사진 데이터가 안전하게 보존됩니다.");
+                if (saveBtn) {
+                  saveBtn.disabled = false;
+                  saveBtn.innerHTML = `<i class="fa-solid fa-check"></i> 저장하기`;
+                }
+                return;
+              }
+
+              // Fallback for local/offline testing ONLY on localhost:
               const ext = (item.file.name && item.file.name.includes('.')) ? item.file.name.split('.').pop().toLowerCase() : 'jpg';
               const timeStamp = Date.now();
               const cleanId = String(historyTargetId).startsWith('hist-') ? historyTargetId : `hist-${historyTargetId}`;

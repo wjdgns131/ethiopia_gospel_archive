@@ -83,6 +83,7 @@ export default {
       const extMatch = file.name.match(/\.[a-zA-Z0-9]+$/);
       const ext = extOverride || (extMatch ? extMatch[0].toLowerCase() : ".jpg");
       const cleanHistoryId = String(historyId).replace(/[^a-zA-Z0-9_-]/g, "");
+      const normalizedId = cleanHistoryId.startsWith("hist-") ? cleanHistoryId.substring(5) : cleanHistoryId;
 
       const subFolder = formData.get("subFolder");
       let folderPath = "images/history";
@@ -90,7 +91,7 @@ export default {
         folderPath = `images/history/${subFolder}`;
       }
 
-      const filename = `hist-${cleanHistoryId}-${timestamp}-${randomHash}${ext}`;
+      const filename = `hist-${normalizedId}-${timestamp}-${randomHash}${ext}`;
       const repoPath = `${folderPath}/${filename}`;
 
       // 9. Convert Original File ArrayBuffer to Base64 for GitHub API

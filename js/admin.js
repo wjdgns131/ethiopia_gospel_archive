@@ -18,6 +18,7 @@ class AdminComponent {
           if (confirm("관리자 계정에서 로그아웃 하시겠습니까?")) {
             this.currentUserRole = null;
             sessionStorage.removeItem("ethiopia_admin_role");
+            sessionStorage.removeItem("ethiopia_admin_passcode");
             this.updateUiForRole();
             if (window.showToast) window.showToast("👋 관리자 로그아웃 되었습니다.");
             else alert("관리자 로그아웃 되었습니다.");
@@ -47,10 +48,12 @@ class AdminComponent {
         if (pwd === masterPass || pwd === "392766") {
           this.currentUserRole = "master";
           sessionStorage.setItem("ethiopia_admin_role", "master");
+          sessionStorage.setItem("ethiopia_admin_passcode", pwd);
           alert("✨ 선교사 마스터 권한으로 로그인되었습니다. 모든 관리자 수정/등록/삭제 기능이 활성화됩니다.");
         } else if (pwd === editorPass || pwd === "1004") {
           this.currentUserRole = "editor";
           sessionStorage.setItem("ethiopia_admin_role", "editor");
+          sessionStorage.setItem("ethiopia_admin_passcode", pwd);
           alert("✨ 동역자 편집 권한으로 로그인되었습니다. 등록 및 수정 기능이 활성화됩니다.");
         } else {
           alert("❌ 올바른 관리자 암호를 입력해 주세요.");
