@@ -246,3 +246,26 @@ window.checkAdminPermission = function() {
   return false;
 };
 
+// Safe Auth Gate bootstrap initialization
+function initializeAuthGate() {
+  if (window.__authGateInitialized) return;
+
+  try {
+    const instance = new AdminComponent();
+    window.adminComponent = instance;
+    window.__authGateInitialized = true;
+
+    const submitBtn = document.getElementById("siteGateSubmitBtn");
+    if (submitBtn) submitBtn.disabled = false;
+  } catch (e) {
+    window.__authGateInitialized = false;
+    console.error("AdminComponent init error:", e);
+  }
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initializeAuthGate, { once: true });
+} else {
+  initializeAuthGate();
+}
+

@@ -124,29 +124,12 @@ document.addEventListener("DOMContentLoaded", () => {
     try { if (window.calendarComponent) window.calendarComponent.render(); } catch (e) { console.error("Calendar render error:", e); }
   };
 
-// Auth Gate safe initialization (DOMContentLoaded Race Condition guard)
-function initializeAuthGate() {
-  if (window.__authGateInitialized) return;
-  window.__authGateInitialized = true;
-  try {
-    window.adminComponent = new AdminComponent();
-  } catch (e) {
-    console.error("AdminComponent init error:", e);
-  }
-
-  // If already unlocked (e.g. valid token verified synchronously/immediately), initialize main content
+  // If site was already unlocked (e.g., token verified by admin.js), initialize main content
   if (!document.body.classList.contains("site-locked")) {
-    if (typeof window.initializeMainContent === 'function') {
+    if (typeof window.initializeMainContent === "function") {
       window.initializeMainContent();
     }
   }
-}
-
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", initializeAuthGate, { once: true });
-} else {
-  initializeAuthGate();
-}
 
   // 4. Modal Close Handlers
   try {
