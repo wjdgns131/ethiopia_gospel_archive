@@ -718,8 +718,8 @@ class TimelineComponent {
                  ondragleave="event.stopPropagation(); window.timelineComponent.handlePhotoDragLeave(event)"
                  ondrop="event.preventDefault(); event.stopPropagation(); window.timelineComponent.handlePhotoDrop(event, ${idx})"
                  ondragend="event.stopPropagation(); window.timelineComponent.handlePhotoDragEnd(event)"
-                 style="position:relative; width:98px; height:98px; border-radius:12px; overflow:hidden; border:2px solid var(--border-color); box-shadow:0 4px 12px rgba(0,0,0,0.15); cursor:grab; transition:all 0.2s; background:var(--bg-card); user-select:none; -webkit-user-select:none;"
-                 class="photo-preview-item">
+                  style="position:relative; width:98px; height:98px; border-radius:12px; overflow:hidden; border:2px solid var(--border-color); box-shadow:0 4px 12px rgba(0,0,0,0.15); cursor:grab; transition:all 0.2s; background:var(--bg-card); user-select:none; -webkit-user-select:none; -webkit-user-drag:element; touch-action:none;"
+                  class="photo-preview-item">
               <img src="${imgSrc}" style="width:100%; height:100%; object-fit:cover; pointer-events:none; -webkit-user-drag:none;" />
 
               <span style="position:absolute; top:4px; left:4px; background:rgba(2,132,199,0.9); color:#fff; font-size:10px; font-weight:800; padding:1px 6px; border-radius:10px; box-shadow:0 2px 4px rgba(0,0,0,0.4); pointer-events:none;">
@@ -756,6 +756,7 @@ class TimelineComponent {
       e.dataTransfer.effectAllowed = 'move';
       try {
         e.dataTransfer.setData('text/plain', String(idx));
+        e.dataTransfer.setData('text', String(idx));
       } catch(ex) {}
     }
     const card = e.currentTarget || (e.target ? e.target.closest('.photo-preview-item') : null);
@@ -802,7 +803,7 @@ class TimelineComponent {
     let fromIdx = this._draggedPhotoIdx;
     if (fromIdx === undefined || fromIdx === null || isNaN(fromIdx)) {
       try {
-        const dtData = e.dataTransfer ? e.dataTransfer.getData('text/plain') : null;
+        const dtData = e.dataTransfer ? (e.dataTransfer.getData('text/plain') || e.dataTransfer.getData('text')) : null;
         if (dtData !== null && dtData !== '') {
           fromIdx = parseInt(dtData, 10);
         }
