@@ -617,6 +617,8 @@ class TimelineComponent {
         e.preventDefault();
       }
     });
+
+    this.setupPhotoPointerReorder();
   }
 
   async uploadSinglePhotoToWorker(file, historyId, subFolder = "original", extOverride = null) {
@@ -711,15 +713,9 @@ class TimelineComponent {
         ${this.tempHistoryItems.map((item, idx) => {
           const imgSrc = item.type === 'new_file' ? item.previewUrl : this.getThumbnailImageSrc(item.src);
           return `
-            <div draggable="true"
-                 ondragstart="event.stopPropagation(); window.timelineComponent.handlePhotoDragStart(event, ${idx})"
-                 ondragover="event.preventDefault(); event.stopPropagation(); window.timelineComponent.handlePhotoDragOver(event)"
-                 ondragenter="event.preventDefault(); event.stopPropagation(); window.timelineComponent.handlePhotoDragEnter(event)"
-                 ondragleave="event.stopPropagation(); window.timelineComponent.handlePhotoDragLeave(event)"
-                 ondrop="event.preventDefault(); event.stopPropagation(); window.timelineComponent.handlePhotoDrop(event, ${idx})"
-                 ondragend="event.stopPropagation(); window.timelineComponent.handlePhotoDragEnd(event)"
-                  style="position:relative; width:98px; height:98px; border-radius:12px; overflow:hidden; border:2px solid var(--border-color); box-shadow:0 4px 12px rgba(0,0,0,0.15); cursor:grab; transition:all 0.2s; background:var(--bg-card); user-select:none; -webkit-user-select:none; -webkit-user-drag:element; touch-action:none;"
-                  class="photo-preview-item">
+            <div data-photo-index="${idx}"
+                 style="position:relative; width:98px; height:98px; border-radius:12px; overflow:hidden; border:2px solid var(--border-color); box-shadow:0 4px 12px rgba(0,0,0,0.15); cursor:grab; transition:all 0.2s; background:var(--bg-card); user-select:none; -webkit-user-select:none; touch-action:none;"
+                 class="photo-preview-item">
               <img src="${imgSrc}" style="width:100%; height:100%; object-fit:cover; pointer-events:none; -webkit-user-drag:none;" />
 
               <span style="position:absolute; top:4px; left:4px; background:rgba(2,132,199,0.9); color:#fff; font-size:10px; font-weight:800; padding:1px 6px; border-radius:10px; box-shadow:0 2px 4px rgba(0,0,0,0.4); pointer-events:none;">
@@ -749,87 +745,136 @@ class TimelineComponent {
     `;
   }
 
-  handlePhotoDragStart(e, idx) {
-    if (e.stopPropagation) e.stopPropagation();
-    this._draggedPhotoIdx = idx;
-    if (e.dataTransfer) {
-      e.dataTransfer.effectAllowed = 'move';
-      try {
-        e.dataTransfer.setData('text/plain', String(idx));
-        e.dataTransfer.setData('text', String(idx));
-      } catch(ex) {}
-    }
-    const card = e.currentTarget || (e.target ? e.target.closest('.photo-preview-item') : null);
-    if (card) {
-      card.style.opacity = '0.4';
-      card.style.transform = 'scale(0.95)';
-      card.style.cursor = 'grabbing';
-    }
+  setupPhotoPointerReorder() {
+    if (this._photoPointerReorderInitialized) return;
+    this._photoPointerReorderInitialized = true;
+    this._photoPointerDrag = null;
+
+    document.addEventListener("pointerdown", (e) => this.handlePhotoPointerDown(e));
+    document.addEventListener("pointermove", (e) => this.handlePhotoPointerMove(e));
+    document.addEventListener("pointerup", (e) => this.handlePhotoPointerUp(e));
+    document.addEventListener("pointercancel", (e) => this.handlePhotoPointerCancel(e));
   }
 
-  handlePhotoDragOver(e) {
-    if (e.preventDefault) e.preventDefault();
-    if (e.stopPropagation) e.stopPropagation();
-    if (e.dataTransfer) {
-      e.dataTransfer.dropEffect = 'move';
-    }
+  handlePhotoPointerDown(e) {
+    const modal = document.getElementById("historyEditModal");
+    if (!modal || modal.classList.contains("hidden")) return;
+
+    // Exclude button clicks (Delete X and Arrow buttons)
+    if (e.target && e.target.closest('button')) return;
+
+    const card = e.target ? e.target.closest('.photo-preview-item') : null;
+    if (!card) return;
+
+    const idxStr = card.getAttribute('data-photo-index');
+    if (idxStr === null || idxStr === undefined) return;
+    const fromIdx = parseInt(idxStr, 10);
+    if (isNaN(fromIdx)) return;
+
+    this._photoPointerDrag = {
+      cardEl: card,
+      fromIdx: fromIdx,
+      targetIdx: fromIdx,
+      pointerId: e.pointerId,
+      startX: e.clientX,
+      startY: e.clientY,
+      isDragging: false
+    };
+    console.log(`[PhotoPointerDrag] pointerdown: fromIdx=${fromIdx}, pointerId=${e.pointerId}`);
   }
 
-  handlePhotoDragEnter(e) {
-    if (e.preventDefault) e.preventDefault();
-    if (e.stopPropagation) e.stopPropagation();
-    const item = e.currentTarget || (e.target ? e.target.closest('.photo-preview-item') : null);
-    if (item) {
-      item.style.border = '2px solid #0284c7';
-      item.style.boxShadow = '0 0 16px rgba(2, 132, 199, 0.6)';
-      item.style.transform = 'scale(1.04)';
+  handlePhotoPointerMove(e) {
+    const drag = this._photoPointerDrag;
+    if (!drag || e.pointerId !== drag.pointerId) return;
+
+    if (!drag.isDragging) {
+      const dx = e.clientX - drag.startX;
+      const dy = e.clientY - drag.startY;
+      if (Math.hypot(dx, dy) < 6) return;
+      drag.isDragging = true;
+      if (drag.cardEl && drag.cardEl.setPointerCapture) {
+        try {
+          drag.cardEl.setPointerCapture(e.pointerId);
+        } catch(ex) {}
+      }
+      console.log(`[PhotoPointerDrag] pointermove drag started (moved > 6px)`);
     }
-  }
 
-  handlePhotoDragLeave(e) {
-    if (e.stopPropagation) e.stopPropagation();
-    const item = e.currentTarget || (e.target ? e.target.closest('.photo-preview-item') : null);
-    if (item && (!e.relatedTarget || !item.contains(e.relatedTarget))) {
-      item.style.border = '2px solid var(--border-color)';
-      item.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-      item.style.transform = 'scale(1.0)';
+    if (drag.cardEl) {
+      drag.cardEl.style.opacity = '0.45';
+      drag.cardEl.style.transform = 'scale(0.94)';
+      drag.cardEl.style.cursor = 'grabbing';
+      drag.cardEl.style.zIndex = '99';
     }
-  }
 
-  handlePhotoDrop(e, targetIdx) {
-    if (e.preventDefault) e.preventDefault();
-    if (e.stopPropagation) e.stopPropagation();
+    const elementUnderPoint = document.elementFromPoint(e.clientX, e.clientY);
+    const targetCard = elementUnderPoint ? elementUnderPoint.closest('.photo-preview-item') : null;
+    if (targetCard) {
+      const tIdxStr = targetCard.getAttribute('data-photo-index');
+      if (tIdxStr !== null && tIdxStr !== undefined) {
+        const tIdx = parseInt(tIdxStr, 10);
+        if (!isNaN(tIdx)) {
+          if (drag.targetIdx !== tIdx) {
+            console.log(`[PhotoPointerDrag] target index change: ${drag.targetIdx} -> ${tIdx}`);
+          }
+          drag.targetIdx = tIdx;
 
-    let fromIdx = this._draggedPhotoIdx;
-    if (fromIdx === undefined || fromIdx === null || isNaN(fromIdx)) {
-      try {
-        const dtData = e.dataTransfer ? (e.dataTransfer.getData('text/plain') || e.dataTransfer.getData('text')) : null;
-        if (dtData !== null && dtData !== '') {
-          fromIdx = parseInt(dtData, 10);
+          document.querySelectorAll('.photo-preview-item').forEach((item) => {
+            const itemIdxStr = item.getAttribute('data-photo-index');
+            const itemIdx = itemIdxStr !== null ? parseInt(itemIdxStr, 10) : -1;
+            if (itemIdx === tIdx && itemIdx !== drag.fromIdx) {
+              item.style.border = '2px solid #0284c7';
+              item.style.boxShadow = '0 0 16px rgba(2, 132, 199, 0.6)';
+              item.style.transform = 'scale(1.04)';
+            } else if (itemIdx !== drag.fromIdx) {
+              item.style.border = '2px solid var(--border-color)';
+              item.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+              item.style.transform = 'scale(1.0)';
+            }
+          });
         }
+      }
+    }
+  }
+
+  handlePhotoPointerUp(e) {
+    const drag = this._photoPointerDrag;
+    if (!drag || e.pointerId !== drag.pointerId) return;
+
+    console.log(`[PhotoPointerDrag] pointerup: fromIdx=${drag.fromIdx}, targetIdx=${drag.targetIdx}, isDragging=${drag.isDragging}`);
+
+    if (drag.cardEl && drag.cardEl.releasePointerCapture) {
+      try {
+        drag.cardEl.releasePointerCapture(e.pointerId);
       } catch(ex) {}
     }
 
-    if (fromIdx !== undefined && fromIdx !== null && !isNaN(fromIdx) && fromIdx !== targetIdx && this.tempHistoryItems) {
-      const movedItem = this.tempHistoryItems.splice(fromIdx, 1)[0];
-      this.tempHistoryItems.splice(targetIdx, 0, movedItem);
-      setTimeout(() => {
-        this.renderHistoryPhotoPreviews();
-        if (window.showToast) window.showToast("↔️ 사진 순서가 수월하게 변경되었습니다!");
-      }, 0);
+    if (drag.isDragging && drag.fromIdx !== undefined && drag.targetIdx !== undefined && drag.fromIdx !== drag.targetIdx && this.tempHistoryItems) {
+      const movedItem = this.tempHistoryItems.splice(drag.fromIdx, 1)[0];
+      this.tempHistoryItems.splice(drag.targetIdx, 0, movedItem);
+      this.renderHistoryPhotoPreviews();
+      if (window.showToast) window.showToast("↔️ 사진 순서가 수월하게 변경되었습니다!");
+    } else if (drag.isDragging) {
+      this.renderHistoryPhotoPreviews();
     }
-    this._draggedPhotoIdx = undefined;
+
+    this._photoPointerDrag = null;
   }
 
-  handlePhotoDragEnd(e) {
-    if (e.stopPropagation) e.stopPropagation();
-    const card = e.currentTarget || (e.target ? e.target.closest('.photo-preview-item') : null);
-    if (card) {
-      card.style.opacity = '1.0';
-      card.style.transform = 'scale(1.0)';
-      card.style.cursor = 'grab';
+  handlePhotoPointerCancel(e) {
+    const drag = this._photoPointerDrag;
+    if (drag && drag.pointerId === e.pointerId) {
+      console.log(`[PhotoPointerDrag] pointercancel triggered`);
+      if (drag.cardEl && drag.cardEl.releasePointerCapture) {
+        try {
+          drag.cardEl.releasePointerCapture(e.pointerId);
+        } catch(ex) {}
+      }
+      if (drag.isDragging) {
+        this.renderHistoryPhotoPreviews();
+      }
+      this._photoPointerDrag = null;
     }
-    this._draggedPhotoIdx = undefined;
   }
 
   moveHistoryPhoto(fromIdx, toIdx) {
