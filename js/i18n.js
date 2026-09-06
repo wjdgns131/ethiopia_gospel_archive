@@ -955,7 +955,9 @@ During this second seminar, Brother Fikru, a doctor working in the same hospital
     location: "Addis Ababa, Ethiopia",
     desc: `In late October 2024, Samonim said that she hoped the brothers and sisters in Ethiopia who had received salvation could be given a more detailed explanation of the precious blood of Jesus. Brother Eunwoo Lee and his wife, together with Brother Jaewon Kim from the West Africa team, stopped in Ethiopia on their way back after completing seminar schedules in Tanzania and Congo.
 
-During this visit, they shared The Bible Is True once again with Brother Fikru and his wife, Nathinael, an anesthesiologist, and Mark, and spent time explaining the precious blood of Jesus to them in greater detail.`
+During this visit, they shared The Bible Is True once again with Brother Fikru and his wife, Nathinael, an anesthesiologist, and Mark, and spent time explaining the precious blood of Jesus to them in greater detail.
+
+After receiving salvation himself, Brother Fikru continued to encourage his wife, Sister Eden, to listen to the Word. When the West Africa team visited Ethiopia, he also brought her so that she could hear the Word. At that time, Sister Eden had not yet received salvation. Later, however, after listening to the “The Bible Is True” lecture recordings about five times, she came to receive salvation.`
   },
 
   "hist-202412": {
