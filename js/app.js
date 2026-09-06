@@ -68,6 +68,67 @@ window.initializeMainContent = function() {
   try { if (window.calendarComponent) window.calendarComponent.render(); } catch (e) { console.error("Calendar render error:", e); }
 };
 
+// 2. Global Event Delegation for Main Navigation Tabs & Theme Toggle
+(function setupNavAndThemeDelegation() {
+  try {
+    const savedTheme = localStorage.getItem("ethiopia_theme") || "dark";
+    const html = document.documentElement;
+    if (savedTheme === "light") {
+      html.classList.remove("dark");
+    } else {
+      html.classList.add("dark");
+    }
+  } catch(e) {}
+
+  document.addEventListener("click", (e) => {
+    // A. Main Navigation Tabs
+    const navTab = e.target ? e.target.closest(".nav-tab") : null;
+    if (navTab) {
+      const target = navTab.getAttribute("data-tab");
+      if (target) {
+        const navTabs = document.querySelectorAll(".nav-tab");
+        const tabPages = document.querySelectorAll(".tab-page");
+
+        navTabs.forEach(t => t.classList.remove("active"));
+        navTab.classList.add("active");
+
+        tabPages.forEach(page => {
+          if (page.id === `tab-${target}`) {
+            page.classList.add("active");
+          } else {
+            page.classList.remove("active");
+          }
+        });
+
+        if (target === "directory" && window.directoryComponent) {
+          window.directoryComponent.render();
+        } else if (target === "timeline" && window.timelineComponent) {
+          window.timelineComponent.render();
+        } else if (target === "assemblies" && (window.fellowshipComponent || window.assembliesComponent)) {
+          const comp = window.fellowshipComponent || window.assembliesComponent;
+          if (typeof comp.render === "function") comp.render();
+        }
+      }
+      return;
+    }
+
+    // B. Theme Toggle Button
+    const themeToggle = e.target ? e.target.closest("#themeToggle") : null;
+    if (themeToggle) {
+      const html = document.documentElement;
+      if (html.classList.contains("dark")) {
+        html.classList.remove("dark");
+        localStorage.setItem("ethiopia_theme", "light");
+        themeToggle.innerHTML = `<i class="fa-solid fa-sun"></i>`;
+      } else {
+        html.classList.add("dark");
+        localStorage.setItem("ethiopia_theme", "dark");
+        themeToggle.innerHTML = `<i class="fa-solid fa-moon"></i>`;
+      }
+    }
+  });
+})();
+
 // Pending main content recovery on app.js evaluate
 const siteUnlocked = !document.body.classList.contains("site-locked");
 if (window.__pendingMainContentInit || siteUnlocked) {
