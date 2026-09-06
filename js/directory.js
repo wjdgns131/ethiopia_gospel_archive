@@ -909,12 +909,38 @@ class DirectoryComponent {
           toTranslate.testimonyEn = memberData.testimony;
         }
 
+        const containsKorean = (str) => typeof str === "string" && /[가-힣]/.test(str);
+
         if (Object.keys(toTranslate).length > 0 && window.i18n && typeof window.i18n.translateKoreanFields === "function") {
           const res = await window.i18n.translateKoreanFields(toTranslate);
-          if (res.jobEn && translationMeta.jobEn === "auto" && res.jobEn.trim() !== (memberData.job || "").trim()) memberData.jobEn = res.jobEn;
-          if (res.inviterRelationEn && translationMeta.inviterRelationEn === "auto" && res.inviterRelationEn.trim() !== (memberData.inviterRelation || "").trim()) memberData.inviterRelationEn = res.inviterRelationEn;
-          if (res.testimonyEn && translationMeta.testimonyEn === "auto" && res.testimonyEn.trim() !== (memberData.testimony || "").trim()) memberData.testimonyEn = res.testimonyEn;
-          memberData.translationStatus = "translated";
+          let hasQualityTranslation = true;
+
+          if (translationMeta.jobEn === "auto") {
+            if (res.jobEn && !containsKorean(res.jobEn) && res.jobEn.trim() !== (memberData.job || "").trim()) {
+              memberData.jobEn = res.jobEn;
+            } else if (toTranslate.jobEn) {
+              memberData.jobEn = "";
+              hasQualityTranslation = false;
+            }
+          }
+          if (translationMeta.inviterRelationEn === "auto") {
+            if (res.inviterRelationEn && !containsKorean(res.inviterRelationEn) && res.inviterRelationEn.trim() !== (memberData.inviterRelation || "").trim()) {
+              memberData.inviterRelationEn = res.inviterRelationEn;
+            } else if (toTranslate.inviterRelationEn) {
+              memberData.inviterRelationEn = "";
+              hasQualityTranslation = false;
+            }
+          }
+          if (translationMeta.testimonyEn === "auto") {
+            if (res.testimonyEn && !containsKorean(res.testimonyEn) && res.testimonyEn.trim() !== (memberData.testimony || "").trim()) {
+              memberData.testimonyEn = res.testimonyEn;
+            } else if (toTranslate.testimonyEn) {
+              memberData.testimonyEn = "";
+              hasQualityTranslation = false;
+            }
+          }
+
+          memberData.translationStatus = hasQualityTranslation ? "translated" : "pending";
         } else {
           memberData.translationStatus = "translated";
         }

@@ -247,61 +247,72 @@ export default {
     // 3.4 Translation Endpoint (POST /translate)
     const isTranslateReq = url.pathname === "/translate" || url.pathname.endsWith("/translate") || (jsonBody && jsonBody.action === "translate");
     if (isTranslateReq) {
-      const fields = (jsonBody && jsonBody.fields && typeof jsonBody.fields === "object") ? jsonBody.fields : {};
-      
-      const systemPrompt = `You are a translator for an Ethiopian Christian mission archive. Translate the following Korean text snippet(s) into clear, natural, professional English suited for a mission archive.
-
-Strict Terminology Rules:
-- 전도집회 -> Evangelical Seminar
-- 구원 -> salvation
-- 구원받다 / 구원을 받다 -> receive salvation / be saved
-- 구원 간증 -> salvation testimony
-- 침례 -> baptism
-- 침례를 받다 -> be baptized
-- 복음을 전하다 -> preach the gospel / share the gospel
-- ELC -> ELC
-- WELC -> WELC
-- Keep proper names & places in standard English (e.g. Fikru, Abenezer Tadese, Addis Ababa, Adama, Bishoftu, Hawassa).
-- Do NOT translate URLs.
-- Return a valid JSON object mapping each input field key to its translated English string.`;
-
-      let translations = {};
       try {
-        if (env.AI) {
-          const promptInput = `${systemPrompt}\n\nInput JSON to translate:\n${JSON.stringify(fields)}`;
-          const aiRes = await env.AI.run("@cf/meta/llama-3.1-8b-instruct", {
-            messages: [{ role: "user", content: promptInput }]
-          });
-          const rawText = (aiRes && aiRes.response) ? aiRes.response : "";
-          const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-          if (jsonMatch) {
-            translations = JSON.parse(jsonMatch[0]);
+        const fields = (jsonBody && jsonBody.fields && typeof jsonBody.fields === "object") ? jsonBody.fields : {};
+        
+        const systemPrompt = `You are translating Korean content into natural English for a Christian mission archive.
+
+Translate the entire Korean text into fluent, natural English.
+Do not leave Korean words or Korean grammar in the output.
+Do not perform word-for-word substitution.
+Return only the English translation.
+
+Use the following terminology consistently:
+- 전도집회 = Evangelical Seminar
+- 구원 = salvation
+- 구원받다 = be saved / receive salvation according to context
+- 구원 간증 = salvation testimony
+- 침례 = baptism
+- 침례를 받다 = be baptized
+- 복음을 전하다 = preach the gospel / share the gospel
+- ELC = ELC
+- WELC = WELC
+
+Preserve personal names and established place names.
+Write clear, natural English suitable for a mission history archive.
+Return a valid JSON object mapping each input field key to its translated English string.`;
+
+        let translations = {};
+        try {
+          if (env.AI) {
+            const promptInput = `${systemPrompt}\n\nInput JSON to translate:\n${JSON.stringify(fields)}`;
+            const aiRes = await env.AI.run("@cf/meta/llama-3.1-8b-instruct", {
+              messages: [{ role: "user", content: promptInput }]
+            });
+            const rawText = (aiRes && aiRes.response) ? aiRes.response : "";
+            const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+              translations = JSON.parse(jsonMatch[0]);
+            }
+          }
+        } catch(e) {
+          console.error("Workers AI translation error:", e);
+        }
+
+        const finalTranslations = {};
+        for (const [key, rawVal] of Object.entries(fields)) {
+          if (typeof rawVal !== "string" || !rawVal.trim()) {
+            finalTranslations[key] = rawVal || "";
+            continue;
+          }
+          if (rawVal.startsWith("http://") || rawVal.startsWith("https://")) {
+            finalTranslations[key] = rawVal;
+            continue;
+          }
+
+          let translated = translations[key];
+          if (translated && typeof translated === "string" && !/[가-힣]/.test(translated)) {
+            finalTranslations[key] = postProcessDomainTerms(translated);
+          } else {
+            // Free-form fields should remain empty if AI translation fails or contains Korean
+            finalTranslations[key] = "";
           }
         }
-      } catch(e) {
-        console.error("Workers AI translation error:", e);
+
+        return new Response(JSON.stringify({ ok: true, translations: finalTranslations }), { status: 200, headers: corsHeaders });
+      } catch (err) {
+        return new Response(JSON.stringify({ ok: false, error: err.message || "Translation processing error" }), { status: 200, headers: corsHeaders });
       }
-
-      // Fallback domain glossary application for missing keys
-      const finalTranslations = {};
-      for (const [key, rawVal] of Object.entries(fields)) {
-        if (typeof rawVal !== "string" || !rawVal.trim()) {
-          finalTranslations[key] = rawVal || "";
-          continue;
-        }
-        if (rawVal.startsWith("http://") || rawVal.startsWith("https://")) {
-          finalTranslations[key] = rawVal;
-          continue;
-        }
-
-        let translated = translations[key];
-        if (!translated || typeof translated !== "string" || translated === rawVal) {
-          translated = applyFallbackDomainGlossary(rawVal);
-        }
-        finalTranslations[key] = postProcessDomainTerms(translated);
-      }
-
-      return new Response(JSON.stringify({ ok: true, translations: finalTranslations }), { status: 200, headers: corsHeaders });
     }
 
     // 3.5 Shared Data Sync Endpoint (POST /sync)

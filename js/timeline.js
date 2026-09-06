@@ -1270,12 +1270,38 @@ class TimelineComponent {
             toTranslate.descEn = historyData.desc;
           }
 
+          const containsKorean = (str) => typeof str === "string" && /[가-힣]/.test(str);
+
           if (Object.keys(toTranslate).length > 0 && window.i18n && typeof window.i18n.translateKoreanFields === "function") {
             const res = await window.i18n.translateKoreanFields(toTranslate);
-            if (res.titleEn && translationMeta.titleEn === "auto" && res.titleEn.trim() !== (historyData.title || "").trim()) historyData.titleEn = res.titleEn;
-            if (res.locationEn && translationMeta.locationEn === "auto" && res.locationEn.trim() !== (historyData.location || "").trim()) historyData.locationEn = res.locationEn;
-            if (res.descEn && translationMeta.descEn === "auto" && res.descEn.trim() !== (historyData.desc || "").trim()) historyData.descEn = res.descEn;
-            historyData.translationStatus = "translated";
+            let hasQualityTranslation = true;
+
+            if (translationMeta.titleEn === "auto") {
+              if (res.titleEn && !containsKorean(res.titleEn) && res.titleEn.trim() !== (historyData.title || "").trim()) {
+                historyData.titleEn = res.titleEn;
+              } else if (toTranslate.titleEn) {
+                historyData.titleEn = "";
+                hasQualityTranslation = false;
+              }
+            }
+            if (translationMeta.locationEn === "auto") {
+              if (res.locationEn && !containsKorean(res.locationEn) && res.locationEn.trim() !== (historyData.location || "").trim()) {
+                historyData.locationEn = res.locationEn;
+              } else if (toTranslate.locationEn) {
+                historyData.locationEn = "";
+                hasQualityTranslation = false;
+              }
+            }
+            if (translationMeta.descEn === "auto") {
+              if (res.descEn && !containsKorean(res.descEn) && res.descEn.trim() !== (historyData.desc || "").trim()) {
+                historyData.descEn = res.descEn;
+              } else if (toTranslate.descEn) {
+                historyData.descEn = "";
+                hasQualityTranslation = false;
+              }
+            }
+
+            historyData.translationStatus = hasQualityTranslation ? "translated" : "pending";
           } else {
             historyData.translationStatus = "translated";
           }
