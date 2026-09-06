@@ -1472,6 +1472,64 @@ class TimelineComponent {
     }
   }
 
+  async retryHistoryTranslation(id) {
+    if (window.checkAdminPermission && !window.checkAdminPermission()) return;
+    const historyList = this.getStoredHistory();
+    const item = historyList.find(h => h && String(h.id) === String(id));
+    if (!item) return;
+
+    if (window.showToast) {
+      window.showToast("🌐 복음 역사 영어 번역을 다시 시도 중입니다...");
+    }
+
+    const toTranslate = {};
+    if (item.title) toTranslate.titleEn = item.title;
+    if (item.location) toTranslate.locationEn = item.location;
+    if (item.desc) toTranslate.descEn = item.desc;
+
+    item.translationStatus = "translating";
+    this.saveStoredHistory(item);
+    this.render();
+
+    try {
+      if (Object.keys(toTranslate).length > 0 && window.i18n && typeof window.i18n.translateKoreanFields === "function") {
+        const res = await window.i18n.translateKoreanFields(toTranslate);
+        const containsKorean = (str) => typeof str === "string" && /[가-힣]/.test(str);
+        let hasQualityTranslation = true;
+
+        if (res.titleEn && !containsKorean(res.titleEn) && res.titleEn.trim() !== (item.title || "").trim()) {
+          item.titleEn = res.titleEn;
+        }
+        if (res.locationEn && !containsKorean(res.locationEn) && res.locationEn.trim() !== (item.location || "").trim()) {
+          item.locationEn = res.locationEn;
+        }
+        if (res.descEn && !containsKorean(res.descEn) && res.descEn.trim() !== (item.desc || "").trim()) {
+          item.descEn = res.descEn;
+        } else if (toTranslate.descEn) {
+          item.descEn = "";
+          hasQualityTranslation = false;
+        }
+
+        item.translationStatus = hasQualityTranslation ? "translated" : "pending";
+      } else {
+        item.translationStatus = "translated";
+      }
+    } catch(err) {
+      console.warn("Retry history translation failed:", err);
+      item.translationStatus = "pending";
+    }
+
+    this.saveStoredHistory(item);
+    await this.syncHistoryToWorker(this.getStoredHistory());
+    this.render();
+
+    if (item.translationStatus === "translated") {
+      if (window.showToast) window.showToast("✨ 복음 역사 영어 번역이 성공적으로 완료 및 저장되었습니다!");
+    } else {
+      if (window.showToast) window.showToast("ℹ️ 영어 번역이 보류(Pending) 상태입니다.");
+    }
+  }
+
   renderCardInner(rawActiveItem, activeIndex, totalCount, historyList) {
     const prevItem = activeIndex > 0 ? historyList[activeIndex - 1] : null;
     const nextItem = activeIndex < totalCount - 1 ? historyList[activeIndex + 1] : null;
@@ -1494,7 +1552,12 @@ class TimelineComponent {
         </div>
 
         <!-- Right Side: Edit & Delete Buttons -->
-        <div class="timeline-action-buttons" style="margin-left:auto;">
+        <div class="timeline-action-buttons" style="margin-left:auto; display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+          ${(rawActiveItem.translationStatus === "pending" || !rawActiveItem.descEn) ? `
+            <button type="button" class="btn btn-primary btn-sm" onclick="event.stopPropagation(); window.timelineComponent.retryHistoryTranslation('${activeItem.id}')" title="${isEn ? 'Retry Translation' : '영어 번역 다시 시도'}" style="background:#0284c7; color:#ffffff; border:none; padding:0.35rem 0.85rem; border-radius:8px; font-size:0.82rem; font-weight:700; display:inline-flex; align-items:center; gap:0.4rem; cursor:pointer; box-shadow:0 2px 6px rgba(2,132,199,0.3);">
+              <i class="fa-solid fa-language"></i> ${isEn ? 'Retry Translation' : '영어 번역 다시 시도'}
+            </button>
+          ` : ''}
           <button type="button" class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); window.timelineComponent.openEditModal('${activeItem.id}')" title="Edit">
             <i class="fa-solid fa-pen-to-square"></i> ${isEn ? 'Edit' : '문구 및 사진 수정'}
           </button>

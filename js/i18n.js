@@ -1247,6 +1247,14 @@ A total of 28 people were baptized.`
       };
     }
 
+    postProcessDomainTerms(text) {
+      if (!text || typeof text !== "string") return text || "";
+      let result = text;
+      result = result.replace(/evangelism meeting|gospel rally|gospel meeting|evangelistic meeting/gi, "Evangelical Seminar");
+      result = result.replace(/salvation testimony/gi, "salvation testimony");
+      return result;
+    }
+
     async translateKoreanFields(fieldsObj) {
       if (!fieldsObj || typeof fieldsObj !== "object" || Object.keys(fieldsObj).length === 0) return {};
       const workerUrl = window.CF_WORKER_UPLOAD_URL || "https://ethiopia-archive-proxy.wjdgns131.workers.dev";
@@ -1277,15 +1285,42 @@ A total of 28 people were baptized.`
           }
         }
       } catch (e) {
-        console.warn("Background translation fetch failed:", e);
+        console.warn("Background translation fetch failed, initiating secondary AI sentence translation fallback:", e);
       }
 
-      // Never perform dictionary replacement on free-form text as fallback
+      // Secondary Fallback: Full AI Sentence Translation Service with Domain Post-Processing
       const fallbackTranslations = {};
-      for (const [key, val] of Object.entries(fieldsObj)) {
+      for (const [key, rawVal] of Object.entries(fieldsObj)) {
+        if (!rawVal || typeof rawVal !== "string" || !rawVal.trim()) {
+          fallbackTranslations[key] = "";
+          continue;
+        }
+        if (rawVal.startsWith("http://") || rawVal.startsWith("https://")) {
+          fallbackTranslations[key] = rawVal;
+          continue;
+        }
+
+        try {
+          const gUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=ko&tl=en&dt=t&q=${encodeURIComponent(rawVal)}`;
+          const gRes = await fetch(gUrl);
+          if (gRes.ok) {
+            const gData = await gRes.json();
+            if (Array.isArray(gData) && Array.isArray(gData[0])) {
+              const fullText = gData[0].map(part => part[0] || "").join("");
+              const processed = this.postProcessDomainTerms(fullText);
+              if (processed && typeof processed === "string" && !/[가-힣]/.test(processed)) {
+                fallbackTranslations[key] = processed.trim();
+                continue;
+              }
+            }
+          }
+        } catch (gErr) {
+          console.warn(`Secondary AI sentence translation failed for ${key}:`, gErr);
+        }
+
         // Only fixed short fields use dictionary fallback if clean
         if (key.includes("Job") || key.includes("Relation") || key.includes("Location")) {
-          const dictRes = this.translateContent(val, true);
+          const dictRes = this.translateContent(rawVal, true);
           fallbackTranslations[key] = (typeof dictRes === "string" && !/[가-힣]/.test(dictRes)) ? dictRes : "";
         } else {
           fallbackTranslations[key] = "";

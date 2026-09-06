@@ -963,9 +963,75 @@ class DirectoryComponent {
       if (memberData.translationStatus === "translated") {
         if (window.showToast) window.showToast(`🌐 ${nameVal} 님의 영어 번역이 생성되고 중앙 동기화되었습니다!`);
       } else {
-        if (window.showToast) window.showToast(`ℹ️ ${nameVal} 님의 정보 저장은 완료되었으며, 영어 번역은 보류(Pending) 상태입니다.`);
+        if (window.showToast) window.showToast(`ℹ️ ${nameVal} 님의 한국어 정보 저장은 완료되었으며, 영어 번역은 보류(Pending) 상태입니다.`);
       }
     })();
+  }
+
+  async retryMemberTranslation(id) {
+    if (window.checkAdminPermission && !window.checkAdminPermission()) return;
+    const members = this.getStoredMembers();
+    const member = members.find(m => m && String(m.id) === String(id));
+    if (!member) return;
+
+    if (window.showToast) {
+      window.showToast(`🌐 ${member.name} 님의 영어 번역을 다시 시도 중입니다...`);
+    }
+
+    const toTranslate = {};
+    if (member.job) toTranslate.jobEn = member.job;
+    if (member.inviterRelation) toTranslate.inviterRelationEn = member.inviterRelation;
+    if (member.testimony) toTranslate.testimonyEn = member.testimony;
+
+    member.translationStatus = "translating";
+    const idx = members.findIndex(m => m && String(m.id) === String(id));
+    if (idx >= 0) members[idx] = member;
+    localStorage.setItem("ethiopia_members", JSON.stringify(members));
+    window.DEFAULT_MEMBERS = members;
+    this.render();
+
+    try {
+      if (Object.keys(toTranslate).length > 0 && window.i18n && typeof window.i18n.translateKoreanFields === "function") {
+        const res = await window.i18n.translateKoreanFields(toTranslate);
+        const containsKorean = (str) => typeof str === "string" && /[가-힣]/.test(str);
+        let hasQualityTranslation = true;
+
+        if (res.jobEn && !containsKorean(res.jobEn) && res.jobEn.trim() !== (member.job || "").trim()) {
+          member.jobEn = res.jobEn;
+        }
+        if (res.inviterRelationEn && !containsKorean(res.inviterRelationEn) && res.inviterRelationEn.trim() !== (member.inviterRelation || "").trim()) {
+          member.inviterRelationEn = res.inviterRelationEn;
+        }
+        if (res.testimonyEn && !containsKorean(res.testimonyEn) && res.testimonyEn.trim() !== (member.testimony || "").trim()) {
+          member.testimonyEn = res.testimonyEn;
+        } else if (toTranslate.testimonyEn) {
+          member.testimonyEn = "";
+          hasQualityTranslation = false;
+        }
+
+        member.translationStatus = hasQualityTranslation ? "translated" : "pending";
+      } else {
+        member.translationStatus = "translated";
+      }
+    } catch(err) {
+      console.warn("Retry member translation failed:", err);
+      member.translationStatus = "pending";
+    }
+
+    const latestMembers = this.getStoredMembers();
+    const latestIdx = latestMembers.findIndex(m => m && String(m.id) === String(id));
+    if (latestIdx >= 0) latestMembers[latestIdx] = member;
+    localStorage.setItem("ethiopia_members", JSON.stringify(latestMembers));
+    window.DEFAULT_MEMBERS = latestMembers;
+
+    this.render();
+    await this.syncMembersToWorker(latestMembers);
+
+    if (member.translationStatus === "translated") {
+      if (window.showToast) window.showToast(`✨ ${member.name} 님의 영어 번역이 완료되었습니다!`);
+    } else {
+      if (window.showToast) window.showToast(`ℹ️ 영어 번역이 보류(Pending) 상태입니다.`);
+    }
   }
 
   openMemberDetailModal(memberId) {
@@ -1023,6 +1089,11 @@ class DirectoryComponent {
         ` : ''}
 
         <div style="display:flex; justify-content:flex-end; gap:0.6rem; margin-top:1rem; padding-top:0.8rem; border-top:1px solid var(--border-color);">
+          ${(rawM.translationStatus === "pending" || !rawM.testimonyEn) ? `
+            <button type="button" class="btn btn-primary btn-sm" onclick="event.stopPropagation(); window.directoryComponent.retryMemberTranslation('${m.id}')" style="background:#0284c7; color:#ffffff; border:none; padding:0.4rem 0.9rem; font-weight:700; border-radius:8px; display:inline-flex; align-items:center; gap:0.4rem; cursor:pointer;">
+              <i class="fa-solid fa-language"></i> ${isEn ? 'Retry Translation' : '영어 번역 다시 시도'}
+            </button>
+          ` : ''}
           <button type="button" class="btn btn-secondary btn-sm" data-action="open-edit-member" data-id="${m.id}" style="padding:0.4rem 0.9rem; font-weight:700;">
             <i class="fa-solid fa-pen"></i> ${isEn ? 'Edit' : '수정하기'}
           </button>
