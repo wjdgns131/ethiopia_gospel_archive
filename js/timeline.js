@@ -1518,21 +1518,7 @@ class TimelineComponent {
                 const nodePercent = totalCount > 1 ? (idx / (totalCount - 1)) * 100 : 0;
                 const isActive = item.id === this.activeId;
 
-                let shortDate = item.date;
-                if (shortDate.includes('년') && shortDate.includes('월')) {
-                  const yr = shortDate.split('년')[0].trim();
-                  const moStr = shortDate.split('년')[1].split('월')[0].trim();
-                  shortDate = `${yr}.${moStr.padStart(2, '0')}`;
-                } else {
-                  const matches = shortDate.match(/\d+/g);
-                  if (matches && matches.length >= 2) {
-                    const yr = matches[0];
-                    const mo = matches[1].padStart(2, '0');
-                    shortDate = `${yr}.${mo}`;
-                  } else if (shortDate.length > 10) {
-                    shortDate = shortDate.substring(0, 7);
-                  }
-                }
+                let shortDate = this.formatTimelineMarkerDate(rawItem, item, isEn);
 
                 return `
                   <div id="hz-node-${item.id}" class="${isActive ? 'hz-node-active' : ''}" onclick="event.stopPropagation(); window.timelineComponent.setActive('${item.id}')" style="position:absolute; left:${nodePercent}%; top:50%; transform:translate(-50%, -50%); cursor:pointer; z-index:${isActive ? '10' : '5'}; display:flex; flex-direction:column; align-items:center;" title="${item.date}: ${item.title}">
@@ -1588,6 +1574,87 @@ class TimelineComponent {
     requestAnimationFrame(() => {
       this.autoScrollToActiveNode(this.activeId);
     });
+  }
+
+  formatTimelineMarkerDate(rawItem, item, isEn) {
+    if (!isEn) {
+      let shortDate = item ? item.date : "";
+      if (shortDate.includes('년') && shortDate.includes('월')) {
+        const yr = shortDate.split('년')[0].trim();
+        const moStr = shortDate.split('년')[1].split('월')[0].trim();
+        return `${yr}.${moStr.padStart(2, '0')}`;
+      } else {
+        const matches = shortDate.match(/\d+/g);
+        if (matches && matches.length >= 2) {
+          const yr = matches[0];
+          const mo = matches[1].padStart(2, '0');
+          return `${yr}.${mo}`;
+        } else if (shortDate.length > 10) {
+          return shortDate.substring(0, 7);
+        }
+      }
+      return shortDate;
+    }
+
+    // English mode: ALWAYS format strictly as YYYY.MM
+    const krDate = rawItem && rawItem.date ? String(rawItem.date) : "";
+    if (krDate) {
+      if (krDate.includes('년') && krDate.includes('월')) {
+        const yr = krDate.split('년')[0].trim();
+        const moStr = krDate.split('년')[1].split('월')[0].trim();
+        if (yr && moStr) {
+          return `${yr}.${moStr.padStart(2, '0')}`;
+        }
+      }
+      const matches = krDate.match(/\d+/g);
+      if (matches && matches.length >= 2) {
+        const yr = matches[0];
+        const mo = matches[1].padStart(2, '0');
+        if (yr.length === 4 && parseInt(mo, 10) >= 1 && parseInt(mo, 10) <= 12) {
+          return `${yr}.${mo}`;
+        }
+      }
+    }
+
+    const enDate = item && item.date ? String(item.date) : "";
+    const monthsMap = {
+      january: '01', jan: '01',
+      february: '02', feb: '02',
+      march: '03', mar: '03',
+      april: '04', apr: '04',
+      may: '05',
+      june: '06', jun: '06',
+      july: '07', jul: '07',
+      august: '08', aug: '08',
+      september: '09', sep: '09', sept: '09',
+      october: '10', oct: '10',
+      november: '11', nov: '11',
+      december: '12', dec: '12'
+    };
+
+    const yrMatch = enDate.match(/\b(20\d{2})\b/);
+    const yr = yrMatch ? yrMatch[1] : null;
+
+    let mo = null;
+    const words = enDate.toLowerCase().match(/[a-z]+/g) || [];
+    for (const w of words) {
+      if (monthsMap[w]) {
+        mo = monthsMap[w];
+        break;
+      }
+    }
+
+    if (yr && mo) {
+      return `${yr}.${mo}`;
+    }
+
+    const histId = rawItem && rawItem.id ? String(rawItem.id) : "";
+    const idMatch = histId.match(/hist-(\d{4})(\d{2})/);
+    if (idMatch) {
+      return `${idMatch[1]}.${idMatch[2]}`;
+    }
+
+    return item ? item.date : "";
   }
 
   parseTimelineDate(dateStr) {
