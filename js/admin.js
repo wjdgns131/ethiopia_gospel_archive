@@ -246,7 +246,7 @@ window.checkAdminPermission = function() {
   return false;
 };
 
-// Safe Auth Gate bootstrap initialization
+// Safe Auth Gate bootstrap initialization (Runs immediately when admin.js is evaluated)
 function initializeAuthGate() {
   if (window.__authGateInitialized) return;
 
@@ -263,9 +263,6 @@ function initializeAuthGate() {
   }
 }
 
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", initializeAuthGate, { once: true });
-} else {
-  initializeAuthGate();
-}
+// Execute immediately without waiting for heavy main-content scripts or DOMContentLoaded
+initializeAuthGate();
 
