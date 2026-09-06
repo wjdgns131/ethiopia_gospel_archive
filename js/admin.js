@@ -181,8 +181,10 @@ class AdminComponent {
     }
 
     this.updateUiForRole();
-    if (typeof window.initializeMainContent === 'function') {
+    if (typeof window.initializeMainContent === "function") {
       window.initializeMainContent();
+    } else {
+      window.__pendingMainContentInit = true;
     }
   }
 

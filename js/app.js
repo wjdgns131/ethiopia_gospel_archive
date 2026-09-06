@@ -2,7 +2,13 @@
  * 에티오피아 선교 아카이브 - 메인 애플리케이션 진입점
  */
 
-document.addEventListener("DOMContentLoaded", () => {
+// 1. Single-Execution Main Content Initializer (Global Scope)
+let mainContentInitialized = false;
+
+window.initializeMainContent = function() {
+  if (mainContentInitialized) return;
+  mainContentInitialized = true;
+
   // 0. Auto-healing storage check: Ensure valid array structure without deleting user data
   try {
     const mems = JSON.parse(localStorage.getItem("ethiopia_members") || "[]");
@@ -14,63 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
       localStorage.removeItem("ethiopia_history");
     }
   } catch(e) {}
-  // 1. Theme Toggle Management
-  try {
-    const themeToggle = document.getElementById("themeToggle");
-    const html = document.documentElement;
 
-    const savedTheme = localStorage.getItem("ethiopia_theme") || "dark";
-    if (savedTheme === "light") {
-      html.classList.remove("dark");
-      if (themeToggle) themeToggle.innerHTML = `<i class="fa-solid fa-sun"></i>`;
-    } else {
-      html.classList.add("dark");
-      if (themeToggle) themeToggle.innerHTML = `<i class="fa-solid fa-moon"></i>`;
-    }
-
-    if (themeToggle) {
-      themeToggle.addEventListener("click", () => {
-        if (html.classList.contains("dark")) {
-          html.classList.remove("dark");
-          localStorage.setItem("ethiopia_theme", "light");
-          themeToggle.innerHTML = `<i class="fa-solid fa-sun"></i>`;
-        } else {
-          html.classList.add("dark");
-          localStorage.setItem("ethiopia_theme", "dark");
-          themeToggle.innerHTML = `<i class="fa-solid fa-moon"></i>`;
-        }
-      });
-    }
-  } catch (e) {
-    console.error("Theme toggle error:", e);
-  }
-
-  // 2. Main Navigation Tabs
-  try {
-    const navTabs = document.querySelectorAll(".nav-tab");
-    const tabPages = document.querySelectorAll(".tab-page");
-
-    navTabs.forEach(tab => {
-      tab.addEventListener("click", () => {
-        const target = tab.getAttribute("data-tab");
-
-        navTabs.forEach(t => t.classList.remove("active"));
-        tab.classList.add("active");
-
-        tabPages.forEach(page => {
-          if (page.id === `tab-${target}`) {
-            page.classList.add("active");
-          } else {
-            page.classList.remove("active");
-          }
-        });
-      });
-    });
-  } catch (e) {
-    console.error("Navigation error:", e);
-  }
-
-  // 3. Initialize Data & Components Defensively
   if (window.db) {
     try {
       const currentHistory = localStorage.getItem("ethiopia_history");
@@ -80,56 +30,52 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch(e) { console.error("DB force sync error:", e); }
   }
 
-  let mainContentInitialized = false;
+  try {
+    window.directoryComponent = new DirectoryComponent();
+  } catch (e) { console.error("DirectoryComponent init error:", e); }
 
-  window.initializeMainContent = function() {
-    if (mainContentInitialized) return;
-    mainContentInitialized = true;
-
-    try {
-      window.directoryComponent = new DirectoryComponent();
-    } catch (e) { console.error("DirectoryComponent init error:", e); }
-
-    try {
-      window.mapComponent = new EthiopiaMapComponent(
-        "ethiopiaMapContainer",
-        "regionPillsList",
-        (regionId) => {
-          if (window.directoryComponent) {
-            window.directoryComponent.activeRegion = regionId;
-            window.directoryComponent.render();
-          }
+  try {
+    window.mapComponent = new EthiopiaMapComponent(
+      "ethiopiaMapContainer",
+      "regionPillsList",
+      (regionId) => {
+        if (window.directoryComponent) {
+          window.directoryComponent.activeRegion = regionId;
+          window.directoryComponent.render();
         }
-      );
-    } catch (e) { console.error("EthiopiaMapComponent init error:", e); }
+      }
+    );
+  } catch (e) { console.error("EthiopiaMapComponent init error:", e); }
 
-    try {
-      window.timelineComponent = new TimelineComponent();
-    } catch (e) { console.error("TimelineComponent init error:", e); }
+  try {
+    window.timelineComponent = new TimelineComponent();
+  } catch (e) { console.error("TimelineComponent init error:", e); }
 
-    try {
-      window.fellowshipComponent = new FellowshipComponent();
-      window.assembliesComponent = window.fellowshipComponent;
-    } catch (e) { console.error("FellowshipComponent init error:", e); }
+  try {
+    window.fellowshipComponent = new FellowshipComponent();
+    window.assembliesComponent = window.fellowshipComponent;
+  } catch (e) { console.error("FellowshipComponent init error:", e); }
 
-    try {
-      window.calendarComponent = new CalendarComponent("calendarContainer");
-    } catch (e) { console.error("CalendarComponent init error:", e); }
+  try {
+    window.calendarComponent = new CalendarComponent("calendarContainer");
+  } catch (e) { console.error("CalendarComponent init error:", e); }
 
-    // Initial Render of All Tabs Safely ONCE on Authentication
-    try { if (window.directoryComponent) window.directoryComponent.render(); } catch (e) { console.error("Directory render error:", e); }
-    try { if (window.mapComponent) window.mapComponent.render((window.db && typeof window.db.getMembers === 'function') ? window.db.getMembers() : (window.DEFAULT_MEMBERS || (typeof DEFAULT_MEMBERS !== 'undefined' ? DEFAULT_MEMBERS : []))); } catch (e) { console.error("Map render error:", e); }
-    try { if (window.timelineComponent) window.timelineComponent.render(); } catch (e) { console.error("Timeline render error:", e); }
-    try { if (window.assembliesComponent) window.assembliesComponent.render(); } catch (e) { console.error("Assemblies render error:", e); }
-    try { if (window.calendarComponent) window.calendarComponent.render(); } catch (e) { console.error("Calendar render error:", e); }
-  };
+  // Initial Render of All Tabs Safely ONCE on Authentication
+  try { if (window.directoryComponent) window.directoryComponent.render(); } catch (e) { console.error("Directory render error:", e); }
+  try { if (window.mapComponent) window.mapComponent.render((window.db && typeof window.db.getMembers === 'function') ? window.db.getMembers() : (window.DEFAULT_MEMBERS || (typeof DEFAULT_MEMBERS !== 'undefined' ? DEFAULT_MEMBERS : []))); } catch (e) { console.error("Map render error:", e); }
+  try { if (window.timelineComponent) window.timelineComponent.render(); } catch (e) { console.error("Timeline render error:", e); }
+  try { if (window.assembliesComponent) window.assembliesComponent.render(); } catch (e) { console.error("Assemblies render error:", e); }
+  try { if (window.calendarComponent) window.calendarComponent.render(); } catch (e) { console.error("Calendar render error:", e); }
+};
 
-  // If site was already unlocked (e.g., token verified by admin.js), initialize main content
-  if (!document.body.classList.contains("site-locked")) {
-    if (typeof window.initializeMainContent === "function") {
-      window.initializeMainContent();
-    }
-  }
+// Pending main content recovery on app.js evaluate
+const siteUnlocked = !document.body.classList.contains("site-locked");
+if (window.__pendingMainContentInit || siteUnlocked) {
+  window.__pendingMainContentInit = false;
+  window.initializeMainContent();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
 
   // 4. Modal Close Handlers
   try {
