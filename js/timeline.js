@@ -356,6 +356,8 @@ class TimelineComponent {
         if (overrides && typeof overrides === 'object') {
           const { modified = {}, added = [], deleted = [] } = overrides;
 
+          let overridesDirty = false;
+
           if (Array.isArray(deleted) && deleted.length > 0) {
             historyList = historyList.filter(item => item && !deleted.includes(item.id));
           }
@@ -363,10 +365,26 @@ class TimelineComponent {
           historyList = historyList.map(item => {
             if (item && modified[item.id]) {
               const mod = modified[item.id];
+              let modImages = mod.images;
+
+              // Self-healing: if mod.images contains corrupted 'hist-hist-' phantom paths, purge the corrupted image override
+              if (Array.isArray(modImages)) {
+                const hasCorruptedPath = modImages.some(img => {
+                  const s = typeof img === 'string' ? img : (img ? (img.highres || img.thumbnail || '') : '');
+                  return typeof s === 'string' && s.includes('hist-hist-');
+                });
+                if (hasCorruptedPath) {
+                  console.warn(`✨ Self-healing: Purged corrupted 'hist-hist-' image override for ${item.id}`);
+                  delete mod.images;
+                  modImages = undefined;
+                  overridesDirty = true;
+                }
+              }
+
               return {
                 ...item,
                 ...mod,
-                images: mod.images !== undefined ? mod.images : (item.images ? [...item.images] : [])
+                images: modImages !== undefined ? modImages : (item.images ? [...item.images] : [])
               };
             }
             return item;
@@ -375,6 +393,16 @@ class TimelineComponent {
           if (Array.isArray(added) && added.length > 0) {
             added.forEach(newItem => {
               if (newItem && newItem.id) {
+                // Sanitize added items if they contain hist-hist-
+                if (Array.isArray(newItem.images)) {
+                  newItem.images = newItem.images.map(img => {
+                    if (typeof img === 'string' && img.includes('hist-hist-')) {
+                      overridesDirty = true;
+                      return img.replace(/hist-hist-/g, 'hist-');
+                    }
+                    return img;
+                  });
+                }
                 const idx = historyList.findIndex(h => h && h.id === newItem.id);
                 if (idx !== -1) {
                   historyList[idx] = newItem;
@@ -383,6 +411,12 @@ class TimelineComponent {
                 }
               }
             });
+          }
+
+          if (overridesDirty) {
+            try {
+              localStorage.setItem("ethiopia_history_overrides", JSON.stringify(overrides));
+            } catch(ex) {}
           }
 
           return historyList;
@@ -1003,9 +1037,10 @@ class TimelineComponent {
               // Fallback for local/offline testing: create clean relative paths and map object URLs
               const ext = (item.file.name && item.file.name.includes('.')) ? item.file.name.split('.').pop().toLowerCase() : 'jpg';
               const timeStamp = Date.now();
-              const fallbackHighPath = `images/history/highres/hist-${historyTargetId}-${timeStamp}-${i + 1}.${ext}`;
+              const cleanId = String(historyTargetId).startsWith('hist-') ? historyTargetId : `hist-${historyTargetId}`;
+              const fallbackHighPath = `images/history/highres/${cleanId}-${timeStamp}-${i + 1}.${ext}`;
               const thumbExt = (thumbBlob && thumbBlob.type.includes("webp")) ? "webp" : "jpg";
-              const fallbackThumbPath = `images/history/thumb/hist-${historyTargetId}-${timeStamp}-${i + 1}.${thumbExt}`;
+              const fallbackThumbPath = `images/history/thumb/${cleanId}-${timeStamp}-${i + 1}.${thumbExt}`;
 
               if (item.previewUrl) {
                 this.inMemoryBlobMap[fallbackHighPath] = item.previewUrl;
