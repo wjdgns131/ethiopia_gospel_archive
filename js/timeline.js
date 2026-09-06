@@ -704,15 +704,15 @@ class TimelineComponent {
           const imgSrc = item.type === 'new_file' ? item.previewUrl : this.getThumbnailImageSrc(item.src);
           return `
             <div draggable="true"
-                 ondragstart="window.timelineComponent.handlePhotoDragStart(event, ${idx})"
-                 ondragover="window.timelineComponent.handlePhotoDragOver(event)"
-                 ondragenter="window.timelineComponent.handlePhotoDragEnter(event)"
-                 ondragleave="window.timelineComponent.handlePhotoDragLeave(event)"
-                 ondrop="window.timelineComponent.handlePhotoDrop(event, ${idx})"
-                 ondragend="window.timelineComponent.handlePhotoDragEnd(event)"
-                 style="position:relative; width:98px; height:98px; border-radius:12px; overflow:hidden; border:2px solid var(--border-color); box-shadow:0 4px 12px rgba(0,0,0,0.15); cursor:grab; transition:all 0.2s; background:var(--bg-card);"
+                 ondragstart="event.stopPropagation(); window.timelineComponent.handlePhotoDragStart(event, ${idx})"
+                 ondragover="event.preventDefault(); event.stopPropagation(); window.timelineComponent.handlePhotoDragOver(event)"
+                 ondragenter="event.preventDefault(); event.stopPropagation(); window.timelineComponent.handlePhotoDragEnter(event)"
+                 ondragleave="event.stopPropagation(); window.timelineComponent.handlePhotoDragLeave(event)"
+                 ondrop="event.preventDefault(); event.stopPropagation(); window.timelineComponent.handlePhotoDrop(event, ${idx})"
+                 ondragend="event.stopPropagation(); window.timelineComponent.handlePhotoDragEnd(event)"
+                 style="position:relative; width:98px; height:98px; border-radius:12px; overflow:hidden; border:2px solid var(--border-color); box-shadow:0 4px 12px rgba(0,0,0,0.15); cursor:grab; transition:all 0.2s; background:var(--bg-card); user-select:none; -webkit-user-select:none;"
                  class="photo-preview-item">
-              <img src="${imgSrc}" style="width:100%; height:100%; object-fit:cover; pointer-events:none;" />
+              <img src="${imgSrc}" style="width:100%; height:100%; object-fit:cover; pointer-events:none; -webkit-user-drag:none;" />
 
               <span style="position:absolute; top:4px; left:4px; background:rgba(2,132,199,0.9); color:#fff; font-size:10px; font-weight:800; padding:1px 6px; border-radius:10px; box-shadow:0 2px 4px rgba(0,0,0,0.4); pointer-events:none;">
                 #${idx + 1}
@@ -742,33 +742,45 @@ class TimelineComponent {
   }
 
   handlePhotoDragStart(e, idx) {
+    if (e.stopPropagation) e.stopPropagation();
     this._draggedPhotoIdx = idx;
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/plain', idx);
-    if (e.currentTarget) {
-      e.currentTarget.style.opacity = '0.5';
-      e.currentTarget.style.transform = 'scale(0.95)';
+    if (e.dataTransfer) {
+      e.dataTransfer.effectAllowed = 'move';
+      try {
+        e.dataTransfer.setData('text/plain', String(idx));
+      } catch(ex) {}
+    }
+    const card = e.currentTarget || (e.target ? e.target.closest('.photo-preview-item') : null);
+    if (card) {
+      card.style.opacity = '0.4';
+      card.style.transform = 'scale(0.95)';
+      card.style.cursor = 'grabbing';
     }
   }
 
   handlePhotoDragOver(e) {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
+    if (e.preventDefault) e.preventDefault();
+    if (e.stopPropagation) e.stopPropagation();
+    if (e.dataTransfer) {
+      e.dataTransfer.dropEffect = 'move';
+    }
   }
 
   handlePhotoDragEnter(e) {
-    e.preventDefault();
-    const item = e.currentTarget || e.target.closest('.photo-preview-item');
+    if (e.preventDefault) e.preventDefault();
+    if (e.stopPropagation) e.stopPropagation();
+    const item = e.currentTarget || (e.target ? e.target.closest('.photo-preview-item') : null);
     if (item) {
       item.style.border = '2px solid #0284c7';
-      item.style.boxShadow = '0 0 15px rgba(2, 132, 199, 0.5)';
-      item.style.transform = 'scale(1.05)';
+      item.style.boxShadow = '0 0 16px rgba(2, 132, 199, 0.6)';
+      item.style.transform = 'scale(1.04)';
     }
   }
 
   handlePhotoDragLeave(e) {
-    const item = e.currentTarget || e.target.closest('.photo-preview-item');
-    if (item) {
+    if (e.stopPropagation) e.stopPropagation();
+    const item = e.currentTarget || (e.target ? e.target.closest('.photo-preview-item') : null);
+    if (item && (!e.relatedTarget || !item.contains(e.relatedTarget))) {
       item.style.border = '2px solid var(--border-color)';
       item.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
       item.style.transform = 'scale(1.0)';
@@ -776,20 +788,35 @@ class TimelineComponent {
   }
 
   handlePhotoDrop(e, targetIdx) {
-    e.preventDefault();
-    const fromIdx = this._draggedPhotoIdx !== undefined ? this._draggedPhotoIdx : parseInt(e.dataTransfer.getData('text/plain'), 10);
-    if (fromIdx !== undefined && !isNaN(fromIdx) && fromIdx !== targetIdx && this.tempHistoryItems) {
+    if (e.preventDefault) e.preventDefault();
+    if (e.stopPropagation) e.stopPropagation();
+
+    let fromIdx = this._draggedPhotoIdx;
+    if (fromIdx === undefined || fromIdx === null || isNaN(fromIdx)) {
+      try {
+        const dtData = e.dataTransfer ? e.dataTransfer.getData('text/plain') : null;
+        if (dtData !== null && dtData !== '') {
+          fromIdx = parseInt(dtData, 10);
+        }
+      } catch(ex) {}
+    }
+
+    if (fromIdx !== undefined && fromIdx !== null && !isNaN(fromIdx) && fromIdx !== targetIdx && this.tempHistoryItems) {
       const movedItem = this.tempHistoryItems.splice(fromIdx, 1)[0];
       this.tempHistoryItems.splice(targetIdx, 0, movedItem);
       this.renderHistoryPhotoPreviews();
       if (window.showToast) window.showToast("↔️ 사진 순서가 수월하게 변경되었습니다!");
     }
+    this._draggedPhotoIdx = undefined;
   }
 
   handlePhotoDragEnd(e) {
-    if (e.currentTarget) {
-      e.currentTarget.style.opacity = '1.0';
-      e.currentTarget.style.transform = 'scale(1.0)';
+    if (e.stopPropagation) e.stopPropagation();
+    const card = e.currentTarget || (e.target ? e.target.closest('.photo-preview-item') : null);
+    if (card) {
+      card.style.opacity = '1.0';
+      card.style.transform = 'scale(1.0)';
+      card.style.cursor = 'grab';
     }
     this._draggedPhotoIdx = undefined;
   }
