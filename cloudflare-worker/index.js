@@ -8,25 +8,19 @@
 
 export default {
   async fetch(request, env, ctx) {
-    const allowedOrigin = "https://wjdgns131.github.io";
     const origin = request.headers.get("Origin");
+    const allowedOrigin = (origin && (origin.includes("localhost") || origin.includes("127.0.0.1"))) 
+      ? origin 
+      : "https://wjdgns131.github.io";
 
-    // 1. Strict Origin Validation (Reject unauthorized origins with 403)
-    if (origin && origin !== allowedOrigin) {
-      return new Response(JSON.stringify({ error: "Forbidden: Origin not allowed." }), {
-        status: 403,
-        headers: { "Content-Type": "application/json; charset=utf-8" }
-      });
-    }
-
-    // 2. CORS Preflight (OPTIONS) Handling
+    // 1. CORS Preflight (OPTIONS) Handling
     if (request.method === "OPTIONS") {
       return new Response(null, {
         status: 204,
         headers: {
           "Access-Control-Allow-Origin": allowedOrigin,
-          "Access-Control-Allow-Methods": "POST, OPTIONS",
-          "Access-Control-Allow-Headers": "Content-Type, X-Admin-Passcode",
+          "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type, X-Admin-Passcode, Authorization",
           "Access-Control-Max-Age": "86400"
         }
       });
@@ -41,6 +35,38 @@ export default {
       return new Response(JSON.stringify({ error: "Method Not Allowed" }), { status: 405, headers: corsHeaders });
     }
 
+    const url = new URL(request.url);
+    const contentType = request.headers.get("Content-Type") || "";
+
+    // 2. Auth Endpoint (POST /auth or JSON body with passcode / action="auth")
+    let jsonBody = null;
+    if (contentType.includes("application/json")) {
+      try {
+        jsonBody = await request.clone().json();
+      } catch (ex) {}
+    }
+
+    const isAuthReq = url.pathname === "/auth" || (jsonBody && (jsonBody.action === "auth" || jsonBody.passcode !== undefined || jsonBody.password !== undefined));
+
+    if (isAuthReq) {
+      const passcode = jsonBody ? (jsonBody.passcode || jsonBody.password || "") : "";
+      const cleanPasscode = String(passcode).trim();
+
+      const validAdminPasscode = env.ADMIN_PASSCODE || env.ADMIN_PASSWORD || env.X_ADMIN_PASSCODE;
+      const validCoworkerPasscode = env.COWORKER_PASSCODE || "0000";
+
+      if (validAdminPasscode && cleanPasscode === String(validAdminPasscode).trim()) {
+        return new Response(JSON.stringify({ ok: true, role: "admin" }), { status: 200, headers: corsHeaders });
+      }
+
+      if (cleanPasscode === String(validCoworkerPasscode).trim()) {
+        return new Response(JSON.stringify({ ok: true, role: "coworker" }), { status: 200, headers: corsHeaders });
+      }
+
+      return new Response(JSON.stringify({ ok: false, error: "Invalid passcode" }), { status: 200, headers: corsHeaders });
+    }
+
+    // 3. Image Upload Proxy Endpoint (Requires Admin Passcode)
     try {
       // 3. Admin Passcode Secret Configuration Check
       const validPasscode = env.ADMIN_PASSCODE || env.ADMIN_PASSWORD || env.X_ADMIN_PASSCODE;

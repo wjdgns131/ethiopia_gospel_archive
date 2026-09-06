@@ -57,6 +57,34 @@
 
 </head>
 <body>
+  <!-- Site-Wide Auth Gate Overlay & Central Modal -->
+  <div id="siteGateOverlay" class="site-gate-overlay">
+    <div class="site-gate-card">
+      <div class="site-gate-header">
+        <div class="site-gate-icon">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <h2>WELC Ethiopia Archive</h2>
+        <p class="site-gate-subtitle">관리자 또는 동역자 전용 페이지입니다.</p>
+      </div>
+
+      <form id="siteGateForm" autocomplete="off">
+        <div class="site-gate-input-group">
+          <i class="fa-solid fa-lock input-icon"></i>
+          <input type="password" id="gatePasswordInput" placeholder="비밀번호를 입력하세요" required autofocus />
+        </div>
+
+        <div id="gateErrorMessage" class="site-gate-error hidden">
+          <i class="fa-solid fa-triangle-exclamation"></i> 비밀번호가 올바르지 않습니다.
+        </div>
+
+        <button type="submit" id="siteGateSubmitBtn" class="site-gate-btn">
+          <i class="fa-solid fa-right-to-bracket"></i> 로그인
+        </button>
+      </form>
+    </div>
+  </div>
+
   <!-- Header / Navigation Bar -->
   <header class="site-header">
     <div class="header-container">
@@ -2579,7 +2607,7 @@
           <p class="subtitle" data-i18n="timelineSubtitle">에티오피아 복음 전파의 발자취와 하나님의 놀라운 역사 기록입니다.</p>
         </div>
         <div class="heading-right" style="display:flex; gap:0.5rem; align-items:center;">
-          <button id="openAddHistoryBtn" class="btn btn-primary" onclick="window.timelineComponent.openEditModal()">
+          <button id="openAddHistoryBtn" class="btn btn-primary admin-only" onclick="window.timelineComponent.openEditModal()">
             <i class="fa-solid fa-plus"></i> <span data-i18n="addHistoryBtn">새 역사 기록 추가</span>
           </button>
         </div>
@@ -2598,7 +2626,7 @@
           <h2 data-i18n="fellowshipTitle">교제 & 선교 활동 아카이브</h2>
         </div>
         <div class="heading-right">
-          <button id="addNewFellowshipBtn" class="btn btn-primary" onclick="window.fellowshipComponent.openEditModal()">
+          <button id="addNewFellowshipBtn" class="btn btn-primary admin-only" onclick="window.fellowshipComponent.openEditModal()">
             <i class="fa-solid fa-plus"></i> <span data-i18n="addFellowshipBtn">새 활동 소식 작성하기</span>
           </button>
         </div>
