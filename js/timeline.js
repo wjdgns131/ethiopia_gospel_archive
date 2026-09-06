@@ -48,6 +48,15 @@ class TimelineComponent {
     return this.getHighResImageSrc(imageItem, historyId, imgIdx);
   }
 
+  sanitizeLegacyPath(srcPath) {
+    if (typeof srcPath !== 'string' || !srcPath) return '';
+    let clean = srcPath.replace(/^\/+/, '');
+    if (clean.startsWith('images/history/highres/') || clean.startsWith('images/history/thumb/')) {
+      clean = clean.replace('images/history/highres/', 'images/history/').replace('images/history/thumb/', 'images/history/');
+    }
+    return clean;
+  }
+
   getThumbnailImageSrc(imageItem, historyId = null, imgIdx = 0) {
     if (!imageItem) return '';
     if (typeof imageItem === 'object') {
@@ -90,9 +99,8 @@ class TimelineComponent {
     if (this.inMemoryBlobMap && this.inMemoryBlobMap[src]) {
       return this.inMemoryBlobMap[src];
     }
-    // Priority C: Relative path (images/history/ or any relative path) -> Return clean relative path for same-origin loading
-    const cleanPath = src.replace(/^\/+/, '');
-    return cleanPath;
+    // Priority C: Relative path -> Sanitize legacy 404 paths only and return clean relative path
+    return this.sanitizeLegacyPath(src);
   }
 
   dataURLtoBlob(dataurl) {
@@ -804,8 +812,10 @@ class TimelineComponent {
     if (fromIdx !== undefined && fromIdx !== null && !isNaN(fromIdx) && fromIdx !== targetIdx && this.tempHistoryItems) {
       const movedItem = this.tempHistoryItems.splice(fromIdx, 1)[0];
       this.tempHistoryItems.splice(targetIdx, 0, movedItem);
-      this.renderHistoryPhotoPreviews();
-      if (window.showToast) window.showToast("↔️ 사진 순서가 수월하게 변경되었습니다!");
+      setTimeout(() => {
+        this.renderHistoryPhotoPreviews();
+        if (window.showToast) window.showToast("↔️ 사진 순서가 수월하게 변경되었습니다!");
+      }, 0);
     }
     this._draggedPhotoIdx = undefined;
   }
