@@ -487,6 +487,12 @@ class TimelineComponent {
           location: savedItem.location,
           desc: savedItem.desc
         };
+        if (savedItem.titleEn !== undefined) modObj.titleEn = savedItem.titleEn;
+        if (savedItem.locationEn !== undefined) modObj.locationEn = savedItem.locationEn;
+        if (savedItem.descEn !== undefined) modObj.descEn = savedItem.descEn;
+        if (savedItem.dateEn !== undefined) modObj.dateEn = savedItem.dateEn;
+        if (savedItem.translationMeta !== undefined) modObj.translationMeta = savedItem.translationMeta;
+        if (savedItem.translationStatus !== undefined) modObj.translationStatus = savedItem.translationStatus;
 
         const baseImagesJson = JSON.stringify(baseItem.images || []);
         const savedImagesJson = JSON.stringify(savedItem.images || []);
@@ -1254,21 +1260,21 @@ class TimelineComponent {
       (async () => {
         try {
           const toTranslate = {};
-          if (translationMeta.titleEn === "auto" && historyData.title && historyData.title !== existing.title) {
+          if (translationMeta.titleEn === "auto" && historyData.title && (!historyData.titleEn || historyData.title !== existing.title)) {
             toTranslate.titleEn = historyData.title;
           }
-          if (translationMeta.locationEn === "auto" && historyData.location && historyData.location !== existing.location) {
+          if (translationMeta.locationEn === "auto" && historyData.location && (!historyData.locationEn || historyData.location !== existing.location)) {
             toTranslate.locationEn = historyData.location;
           }
-          if (translationMeta.descEn === "auto" && historyData.desc && historyData.desc !== existing.desc) {
+          if (translationMeta.descEn === "auto" && historyData.desc && (!historyData.descEn || historyData.desc !== existing.desc)) {
             toTranslate.descEn = historyData.desc;
           }
 
           if (Object.keys(toTranslate).length > 0 && window.i18n && typeof window.i18n.translateKoreanFields === "function") {
             const res = await window.i18n.translateKoreanFields(toTranslate);
-            if (res.titleEn && translationMeta.titleEn === "auto") historyData.titleEn = res.titleEn;
-            if (res.locationEn && translationMeta.locationEn === "auto") historyData.locationEn = res.locationEn;
-            if (res.descEn && translationMeta.descEn === "auto") historyData.descEn = res.descEn;
+            if (res.titleEn && translationMeta.titleEn === "auto" && res.titleEn.trim() !== (historyData.title || "").trim()) historyData.titleEn = res.titleEn;
+            if (res.locationEn && translationMeta.locationEn === "auto" && res.locationEn.trim() !== (historyData.location || "").trim()) historyData.locationEn = res.locationEn;
+            if (res.descEn && translationMeta.descEn === "auto" && res.descEn.trim() !== (historyData.desc || "").trim()) historyData.descEn = res.descEn;
             historyData.translationStatus = "translated";
           } else {
             historyData.translationStatus = "translated";

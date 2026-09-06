@@ -1207,10 +1207,10 @@ A total of 28 people were baptized.`
       // 4th priority: raw Korean text
       const translatedName = mapEn.name || member.nameEn || member.name;
       const translatedRegion = mapEn.region || member.regionEn || (member.region ? (REGION_EN_MAP[member.region] || this.getRegionTranslation(member.region)) : member.region);
-      const translatedJob = mapEn.job || (member.jobEn && member.jobEn.trim() ? member.jobEn : (member.job ? (occupationTranslations[member.job.trim()] || this.translateContent(member.job)) : member.job));
+      const translatedJob = mapEn.job || (member.jobEn && member.jobEn.trim() && member.jobEn.trim() !== member.job?.trim() ? member.jobEn : (member.job ? (occupationTranslations[member.job.trim()] || this.translateContent(member.job, true)) : member.job));
       const translatedInviter = mapEn.inviter || member.inviterEn || member.inviter;
-      const translatedInviterRelation = mapEn.inviterRelation || (member.inviterRelationEn && member.inviterRelationEn.trim() ? member.inviterRelationEn : (member.inviterRelation ? this.translateContent(member.inviterRelation) : member.inviterRelation));
-      const translatedTestimony = mapEn.testimony || (member.testimonyEn && member.testimonyEn.trim() ? member.testimonyEn : member.testimony);
+      const translatedInviterRelation = mapEn.inviterRelation || (member.inviterRelationEn && member.inviterRelationEn.trim() && member.inviterRelationEn.trim() !== member.inviterRelation?.trim() ? member.inviterRelationEn : (member.inviterRelation ? this.translateContent(member.inviterRelation, true) : member.inviterRelation));
+      const translatedTestimony = mapEn.testimony || (member.testimonyEn && member.testimonyEn.trim() && member.testimonyEn.trim() !== member.testimony?.trim() ? member.testimonyEn : (member.testimony ? this.translateContent(member.testimony, true) : member.testimony));
 
       return {
         ...member,
@@ -1230,9 +1230,9 @@ A total of 28 people were baptized.`
       const idKey = historyItem.id;
       const mapEn = (idKey && typeof HISTORY_EN_MAP !== "undefined" && HISTORY_EN_MAP[idKey]) ? HISTORY_EN_MAP[idKey] : {};
 
-      const translatedTitle = mapEn.title || (historyItem.titleEn && historyItem.titleEn.trim() ? historyItem.titleEn : this.translateContent(historyItem.title));
-      const translatedLocation = mapEn.location || (historyItem.locationEn && historyItem.locationEn.trim() ? historyItem.locationEn : (historyItem.location ? this.translateContent(historyItem.location) : historyItem.location));
-      const translatedDesc = mapEn.desc || (historyItem.descEn && historyItem.descEn.trim() ? historyItem.descEn : historyItem.desc);
+      const translatedTitle = mapEn.title || (historyItem.titleEn && historyItem.titleEn.trim() && historyItem.titleEn.trim() !== historyItem.title?.trim() ? historyItem.titleEn : (historyItem.title ? this.translateContent(historyItem.title, true) : historyItem.title));
+      const translatedLocation = mapEn.location || (historyItem.locationEn && historyItem.locationEn.trim() && historyItem.locationEn.trim() !== historyItem.location?.trim() ? historyItem.locationEn : (historyItem.location ? this.translateContent(historyItem.location, true) : historyItem.location));
+      const translatedDesc = mapEn.desc || (historyItem.descEn && historyItem.descEn.trim() && historyItem.descEn.trim() !== historyItem.desc?.trim() ? historyItem.descEn : (historyItem.desc ? this.translateContent(historyItem.desc, true) : historyItem.desc));
       const translatedDate = mapEn.date || historyItem.dateEn || historyItem.date;
 
       return {
@@ -1251,7 +1251,7 @@ A total of 28 people were baptized.`
 
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 4000);
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
 
         const res = await fetch(endpoint, {
           method: "POST",
@@ -1273,15 +1273,15 @@ A total of 28 people were baptized.`
 
       const fallbackTranslations = {};
       for (const [key, val] of Object.entries(fieldsObj)) {
-        fallbackTranslations[key] = this.translateContent(val);
+        fallbackTranslations[key] = this.translateContent(val, true);
       }
       return fallbackTranslations;
     }
 
     // Dynamic Live Translator Engine
-    translateContent(text) {
+    translateContent(text, forceTranslate = false) {
       if (!text || typeof text !== "string") return text;
-      if (this.currentLang === "ko") return text;
+      if (!forceTranslate && this.currentLang === "ko") return text;
 
       const trimmed = text.trim();
       // Check direct occupation dictionary match first!

@@ -899,21 +899,21 @@ class DirectoryComponent {
     (async () => {
       try {
         const toTranslate = {};
-        if (translationMeta.jobEn === "auto" && memberData.job && memberData.job !== existing.job) {
+        if (translationMeta.jobEn === "auto" && memberData.job && (!memberData.jobEn || memberData.job !== existing.job)) {
           toTranslate.jobEn = memberData.job;
         }
-        if (translationMeta.inviterRelationEn === "auto" && memberData.inviterRelation && memberData.inviterRelation !== existing.inviterRelation) {
+        if (translationMeta.inviterRelationEn === "auto" && memberData.inviterRelation && (!memberData.inviterRelationEn || memberData.inviterRelation !== existing.inviterRelation)) {
           toTranslate.inviterRelationEn = memberData.inviterRelation;
         }
-        if (translationMeta.testimonyEn === "auto" && memberData.testimony && memberData.testimony !== existing.testimony) {
+        if (translationMeta.testimonyEn === "auto" && memberData.testimony && (!memberData.testimonyEn || memberData.testimony !== existing.testimony)) {
           toTranslate.testimonyEn = memberData.testimony;
         }
 
         if (Object.keys(toTranslate).length > 0 && window.i18n && typeof window.i18n.translateKoreanFields === "function") {
           const res = await window.i18n.translateKoreanFields(toTranslate);
-          if (res.jobEn && translationMeta.jobEn === "auto") memberData.jobEn = res.jobEn;
-          if (res.inviterRelationEn && translationMeta.inviterRelationEn === "auto") memberData.inviterRelationEn = res.inviterRelationEn;
-          if (res.testimonyEn && translationMeta.testimonyEn === "auto") memberData.testimonyEn = res.testimonyEn;
+          if (res.jobEn && translationMeta.jobEn === "auto" && res.jobEn.trim() !== (memberData.job || "").trim()) memberData.jobEn = res.jobEn;
+          if (res.inviterRelationEn && translationMeta.inviterRelationEn === "auto" && res.inviterRelationEn.trim() !== (memberData.inviterRelation || "").trim()) memberData.inviterRelationEn = res.inviterRelationEn;
+          if (res.testimonyEn && translationMeta.testimonyEn === "auto" && res.testimonyEn.trim() !== (memberData.testimony || "").trim()) memberData.testimonyEn = res.testimonyEn;
           memberData.translationStatus = "translated";
         } else {
           memberData.translationStatus = "translated";
