@@ -1,12 +1,14 @@
 /**
  * 에티오피아 선교 아카이브 - 사이트 전체 게이트 인증 및 권한(Admin / Coworker) 통합 모듈
+ * Cloudflare Worker HMAC-SHA256 세션 토큰 기반 인증
  */
 
 class AdminComponent {
   constructor() {
-    this.currentUserRole = sessionStorage.getItem("ethiopia_auth_role") || null; // null | 'admin' | 'coworker'
+    this.currentUserRole = null;
+    document.body.classList.add("site-locked");
     this.initEvents();
-    setTimeout(() => this.initGate(), 50);
+    this.initGate();
   }
 
   initEvents() {
@@ -38,6 +40,7 @@ class AdminComponent {
   async loginWithPasscode(passcode) {
     const errorMsg = document.getElementById("gateErrorMessage");
     const submitBtn = document.getElementById("siteGateSubmitBtn");
+    const input = document.getElementById("gatePasswordInput");
     const cleanPasscode = passcode ? String(passcode).trim() : "";
 
     if (errorMsg) errorMsg.classList.add("hidden");
@@ -51,44 +54,26 @@ class AdminComponent {
       const authEndpoint = `${workerUrl.replace(/\/+$/, '')}/auth`;
 
       let data = null;
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 1500);
-        const response = await fetch(authEndpoint, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "auth", passcode: passcode }),
-          signal: controller.signal
-        });
-        clearTimeout(timeoutId);
-        if (response.ok) {
-          data = await response.json();
-        }
-      } catch(ex) {
-        console.warn("[AdminAuth] Worker /auth fetch failed or timed out:", ex);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000);
+      const response = await fetch(authEndpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "auth", passcode: cleanPasscode }),
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+
+      if (response.ok) {
+        data = await response.json();
       }
 
-      if (!data) {
-        // Local dev / offline fallback
-        if (cleanPasscode === "0000") {
-          data = { ok: true, role: "coworker" };
-        } else if (cleanPasscode === "392766" || cleanPasscode === "7777") {
-          data = { ok: true, role: "admin" };
-        }
-      }
+      if (input) input.value = "";
 
-      if (data && data.ok && (data.role === "admin" || data.role === "coworker")) {
+      if (data && data.ok && data.token && (data.role === "admin" || data.role === "coworker")) {
         this.currentUserRole = data.role;
+        sessionStorage.setItem("ethiopia_auth_token", data.token);
         sessionStorage.setItem("ethiopia_auth_role", data.role);
-
-        if (data.role === "admin") {
-          sessionStorage.setItem("ethiopia_admin_passcode", passcode);
-        } else {
-          sessionStorage.removeItem("ethiopia_admin_passcode");
-        }
-
-        const input = document.getElementById("gatePasswordInput");
-        if (input) input.value = "";
 
         this.unlockSite();
         if (window.showToast) {
@@ -102,16 +87,13 @@ class AdminComponent {
         } else {
           alert("❌ 비밀번호가 올바르지 않습니다.");
         }
-        const input = document.getElementById("gatePasswordInput");
-        if (input) {
-          input.value = "";
-          input.focus();
-        }
+        if (input) input.focus();
       }
     } catch(err) {
       console.error("[AdminAuth] Login error:", err);
+      if (input) input.value = "";
       if (errorMsg) {
-        errorMsg.textContent = "인증 중 오류가 발생했습니다. 다시 시도해 주세요.";
+        errorMsg.textContent = "인증 서버 접속 또는 승인 중 오류가 발생했습니다.";
         errorMsg.classList.remove("hidden");
       }
     } finally {
@@ -122,19 +104,51 @@ class AdminComponent {
     }
   }
 
-  initGate() {
-    this.currentUserRole = sessionStorage.getItem("ethiopia_auth_role") || null;
-    if (this.currentUserRole === "admin" || this.currentUserRole === "coworker") {
-      this.unlockSite();
-    } else {
+  async initGate() {
+    const token = sessionStorage.getItem("ethiopia_auth_token");
+
+    if (!token) {
+      this.lockSite();
+      return;
+    }
+
+    try {
+      const workerUrl = window.CF_WORKER_UPLOAD_URL || "https://ethiopia-archive-proxy.wjdgns131.workers.dev";
+      const verifyEndpoint = `${workerUrl.replace(/\/+$/, '')}/auth/verify`;
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000);
+      const response = await fetch(verifyEndpoint, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`
+        },
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data && data.ok && (data.role === "admin" || data.role === "coworker")) {
+          this.currentUserRole = data.role;
+          sessionStorage.setItem("ethiopia_auth_role", data.role);
+          this.unlockSite();
+          return;
+        }
+      }
+      
+      // Token verification failed / expired / fake
+      this.lockSite();
+    } catch(err) {
+      console.warn("[AdminAuth] Token verification failed or server offline:", err);
       this.lockSite();
     }
   }
 
   lockSite() {
     this.currentUserRole = null;
+    sessionStorage.removeItem("ethiopia_auth_token");
     sessionStorage.removeItem("ethiopia_auth_role");
-    sessionStorage.removeItem("ethiopia_admin_passcode");
 
     document.body.classList.add("site-locked");
     document.body.classList.remove("admin-mode");

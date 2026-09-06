@@ -625,9 +625,9 @@ class TimelineComponent {
     if (!file) return null;
 
     const workerUrl = window.CF_WORKER_UPLOAD_URL || "https://ethiopia-archive-proxy.wjdgns131.workers.dev";
-    const adminPasscode = sessionStorage.getItem("ethiopia_admin_passcode") || "";
+    const authToken = sessionStorage.getItem("ethiopia_auth_token") || "";
 
-    if (!adminPasscode) {
+    if (!authToken) {
       alert("관리자 인증 정보가 없습니다. 다시 로그인해 주세요.");
       return null;
     }
@@ -647,7 +647,7 @@ class TimelineComponent {
       const response = await fetch(workerUrl, {
         method: "POST",
         headers: {
-          "X-Admin-Passcode": adminPasscode
+          "Authorization": `Bearer ${authToken}`
         },
         body: formData
       });
