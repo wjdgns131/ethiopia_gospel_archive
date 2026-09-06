@@ -50,11 +50,7 @@ class TimelineComponent {
 
   sanitizeLegacyPath(srcPath) {
     if (typeof srcPath !== 'string' || !srcPath) return '';
-    let clean = srcPath.replace(/^\/+/, '');
-    if (clean.startsWith('images/history/highres/') || clean.startsWith('images/history/thumb/')) {
-      clean = clean.replace('images/history/highres/', 'images/history/').replace('images/history/thumb/', 'images/history/');
-    }
-    return clean;
+    return srcPath.replace(/^\/+/, '');
   }
 
   getThumbnailImageSrc(imageItem, historyId = null, imgIdx = 0) {
@@ -377,6 +373,17 @@ class TimelineComponent {
 
               // Self-healing: if mod.images contains corrupted 'hist-hist-' phantom paths, purge the corrupted image override
               if (Array.isArray(modImages)) {
+                modImages = modImages.map(img => {
+                  if (typeof img === 'string' && img.includes('hist-202308-20260906095910-ppmq.webp')) {
+                    overridesDirty = true;
+                    return {
+                      highres: "images/history/highres/hist-202308-20260906095910-ppmq.webp",
+                      thumbnail: "images/history/thumb/hist-202308-20260906095912-tut3.webp"
+                    };
+                  }
+                  return img;
+                });
+
                 const hasCorruptedPath = modImages.some(img => {
                   const s = typeof img === 'string' ? img : (img ? (img.highres || img.thumbnail || '') : '');
                   return typeof s === 'string' && s.includes('hist-hist-');
