@@ -15,6 +15,7 @@ class TimelineComponent {
     this.pendingLegacyConversions = {};
     this.activeYear = null; // Filter state for Year 구분
     this.initEvents();
+    this.fetchRemoteHistory();
   }
 
   getHighResImageSrc(imageItem, historyId = null, imgIdx = 0) {
@@ -1046,6 +1047,13 @@ class TimelineComponent {
     document.getElementById("fieldHistoryLocation").value = item ? item.location || "" : "";
     document.getElementById("fieldHistoryDesc").value = item ? item.desc || "" : "";
 
+    const titleEnEl = document.getElementById("fieldHistoryTitleEn");
+    if (titleEnEl) titleEnEl.value = item ? item.titleEn || "" : "";
+    const locEnEl = document.getElementById("fieldHistoryLocationEn");
+    if (locEnEl) locEnEl.value = item ? item.locationEn || "" : "";
+    const descEnEl = document.getElementById("fieldHistoryDescEn");
+    if (descEnEl) descEnEl.value = item ? item.descEn || "" : "";
+
     this.tempHistoryItems = (item && item.images)
       ? item.images.map(img => ({ type: 'existing', src: img }))
       : [];
@@ -1056,6 +1064,40 @@ class TimelineComponent {
     }
 
     modal.classList.remove("hidden");
+  }
+
+  async fetchRemoteHistory() {
+    try {
+      const res = await fetch(`data/history.json?t=${Date.now()}`);
+      if (res.ok) {
+        const remoteHistory = await res.json();
+        if (Array.isArray(remoteHistory) && remoteHistory.length > 0) {
+          window.DEFAULT_HISTORY = remoteHistory;
+          this.render();
+        }
+      }
+    } catch(e) {}
+  }
+
+  async syncHistoryToWorker(allHistory) {
+    try {
+      const token = sessionStorage.getItem("ethiopia_auth_token");
+      if (!token) return;
+      const workerUrl = window.CF_WORKER_UPLOAD_URL || "https://ethiopia-archive-proxy.wjdgns131.workers.dev";
+      const syncEndpoint = `${workerUrl.replace(/\/+$/, '')}/sync`;
+
+      await fetch(syncEndpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          action: "sync_history",
+          history: allHistory
+        })
+      }).catch(() => {});
+    } catch(e) {}
   }
 
   async saveHistoryFromForm() {
@@ -1085,7 +1127,6 @@ class TimelineComponent {
         for (let i = 0; i < this.tempHistoryItems.length; i++) {
           const item = this.tempHistoryItems[i];
           if (item.type === "new_file" && item.file) {
-            // 1. Generate High-res Blob (max long side 2560px, quality 0.90) & Thumbnail Blob (max long side 800px, quality 0.85)
             let highresBlob = null;
             let thumbBlob = null;
             try {
@@ -1099,7 +1140,6 @@ class TimelineComponent {
               console.warn("Thumbnail generation fallback to original file:", tErr);
             }
 
-            // 2. Upload High-res Photo
             let highresPath = null;
             if (highresBlob) {
               const hExt = highresBlob.type.includes("webp") ? ".webp" : ".jpg";
@@ -1109,7 +1149,6 @@ class TimelineComponent {
               highresPath = await this.uploadSinglePhotoToWorker(item.file, historyTargetId, "highres");
             }
 
-            // 3. Upload Thumbnail Photo
             let thumbPath = null;
             if (thumbBlob) {
               const thumbExt = thumbBlob.type.includes("webp") ? ".webp" : ".jpg";
@@ -1132,7 +1171,6 @@ class TimelineComponent {
                 this.inMemoryBlobMap[thumbPath || highresPath] = thumbPreviewUrl;
               }
             } else {
-              // Production protection: If upload to GitHub failed, DO NOT create virtual fallback paths and DO NOT save to localStorage!
               const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
               if (!isLocalhost) {
                 alert("❌ GitHub에 사진을 업로드하지 못했습니다. (관리자 인증 실패 또는 네트워크 오류)\n\n기존 사진 데이터가 안전하게 보존됩니다.");
@@ -1143,7 +1181,6 @@ class TimelineComponent {
                 return;
               }
 
-              // Fallback for local/offline testing ONLY on localhost:
               const ext = (item.file.name && item.file.name.includes('.')) ? item.file.name.split('.').pop().toLowerCase() : 'jpg';
               const timeStamp = Date.now();
               const cleanId = String(historyTargetId).startsWith('hist-') ? historyTargetId : `hist-${historyTargetId}`;
@@ -1171,19 +1208,40 @@ class TimelineComponent {
         }
       }
 
-      const historyData = {
-        id: historyTargetId,
-        date, title, location, desc,
-        images: finalImagePaths
+      const historyList = this.getStoredHistory();
+      const existing = historyList.find(h => h && String(h.id) === String(historyTargetId)) || {};
+
+      const manualTitleEn = document.getElementById("fieldHistoryTitleEn")?.value.trim();
+      const manualLocationEn = document.getElementById("fieldHistoryLocationEn")?.value.trim();
+      const manualDescEn = document.getElementById("fieldHistoryDescEn")?.value.trim();
+
+      const prevMeta = existing.translationMeta || {};
+      const translationMeta = {
+        titleEn: manualTitleEn ? "manual" : (prevMeta.titleEn || "auto"),
+        locationEn: manualLocationEn ? "manual" : (prevMeta.locationEn || "auto"),
+        descEn: manualDescEn ? "manual" : (prevMeta.descEn || "auto")
       };
 
+      const historyData = {
+        ...existing,
+        id: historyTargetId,
+        date, title, location, desc,
+        images: finalImagePaths,
+        titleEn: manualTitleEn || existing.titleEn || "",
+        locationEn: manualLocationEn || existing.locationEn || "",
+        descEn: manualDescEn || existing.descEn || "",
+        translationMeta: translationMeta,
+        translationStatus: "translating"
+      };
+
+      // Step 1: Immediate Korean Save (0.01s UI update)
       this.saveStoredHistory(historyData);
       this.activeId = historyTargetId;
       this.activeYear = null;
 
       document.getElementById("historyEditModal")?.classList.add("hidden");
       if (window.showToast) {
-        window.showToast(id ? "✨ 역사 기록 및 원본 사진이 영구 저장되었습니다!" : "✨ 새 역사 기록 및 원본 사진이 영구 등록되었습니다!");
+        window.showToast("✨ 복음 역사 기록이 즉시 저장되었습니다! (영어 번역 진행 중...)");
       }
       this.render();
       setTimeout(() => {
@@ -1191,6 +1249,46 @@ class TimelineComponent {
           this.autoScrollToActiveNode(this.activeId);
         }
       }, 80);
+
+      // Step 2: Background Async Translation
+      (async () => {
+        try {
+          const toTranslate = {};
+          if (translationMeta.titleEn === "auto" && historyData.title && historyData.title !== existing.title) {
+            toTranslate.titleEn = historyData.title;
+          }
+          if (translationMeta.locationEn === "auto" && historyData.location && historyData.location !== existing.location) {
+            toTranslate.locationEn = historyData.location;
+          }
+          if (translationMeta.descEn === "auto" && historyData.desc && historyData.desc !== existing.desc) {
+            toTranslate.descEn = historyData.desc;
+          }
+
+          if (Object.keys(toTranslate).length > 0 && window.i18n && typeof window.i18n.translateKoreanFields === "function") {
+            const res = await window.i18n.translateKoreanFields(toTranslate);
+            if (res.titleEn && translationMeta.titleEn === "auto") historyData.titleEn = res.titleEn;
+            if (res.locationEn && translationMeta.locationEn === "auto") historyData.locationEn = res.locationEn;
+            if (res.descEn && translationMeta.descEn === "auto") historyData.descEn = res.descEn;
+            historyData.translationStatus = "translated";
+          } else {
+            historyData.translationStatus = "translated";
+          }
+        } catch(err) {
+          console.warn("Background history translation failed:", err);
+          historyData.translationStatus = "pending";
+        }
+
+        this.saveStoredHistory(historyData);
+        const currentList = this.getStoredHistory();
+        await this.syncHistoryToWorker(currentList);
+        this.render();
+
+        if (historyData.translationStatus === "translated") {
+          if (window.showToast) window.showToast("🌐 복음 역사 영어 번역이 생성되고 중앙 동기화되었습니다!");
+        } else {
+          if (window.showToast) window.showToast("ℹ️ 한국어 역사 기록 저장은 완료되었으며, 영어 번역은 보류(Pending) 상태입니다.");
+        }
+      })();
     } catch (err) {
       console.error("Save history error:", err);
       alert("저장 중 오류가 발생했습니다: " + (err.message || err));

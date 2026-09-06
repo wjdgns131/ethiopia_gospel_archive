@@ -8,6 +8,51 @@
  * - env.GITHUB_PAT: GitHub Fine-grained Personal Access Token
  */
 
+function applyFallbackDomainGlossary(text) {
+  if (!text || typeof text !== "string") return text || "";
+  if (text.startsWith("http://") || text.startsWith("https://")) return text;
+
+  let result = text;
+  const termsMap = [
+    { kr: "전도집회", en: "Evangelical Seminar" },
+    { kr: "구원받다", en: "receive salvation" },
+    { kr: "구원을 받다", en: "receive salvation" },
+    { kr: "구원 간증", en: "salvation testimony" },
+    { kr: "구원간증", en: "salvation testimony" },
+    { kr: "구원", en: "salvation" },
+    { kr: "침례를 받다", en: "be baptized" },
+    { kr: "침례를받다", en: "be baptized" },
+    { kr: "침례", en: "baptism" },
+    { kr: "복음을 전하다", en: "preach the gospel" },
+    { kr: "복음을전하다", en: "preach the gospel" },
+    { kr: "초등학생", en: "Elementary School Student" },
+    { kr: "중학생", en: "Middle School Student" },
+    { kr: "고등학생", en: "High School Student" },
+    { kr: "대학생", en: "University Student" },
+    { kr: "전도사", en: "Evangelist" },
+    { kr: "목사", en: "Pastor" },
+    { kr: "가정부", en: "Housekeeper" },
+    { kr: "교사", en: "Teacher" },
+    { kr: "지인", en: "acquaintance" },
+    { kr: "어머니", en: "mother" },
+    { kr: "아버지", en: "father" },
+    { kr: "친구", en: "friend" }
+  ];
+
+  for (const item of termsMap) {
+    result = result.split(item.kr).join(item.en);
+  }
+  return result;
+}
+
+function postProcessDomainTerms(text) {
+  if (!text || typeof text !== "string") return text || "";
+  let result = text;
+  result = result.replace(/evangelism meeting|gospel rally|gospel meeting/gi, "Evangelical Seminar");
+  result = result.replace(/salvation testimony/gi, "salvation testimony");
+  return result;
+}
+
 function base64UrlEncode(arrayBufferOrUint8Array) {
   const uint8 = new Uint8Array(arrayBufferOrUint8Array);
   let binary = "";
@@ -199,8 +244,68 @@ export default {
       return new Response(JSON.stringify({ ok: false, error: "Invalid passcode" }), { status: 401, headers: corsHeaders });
     }
 
+    // 3.4 Translation Endpoint (POST /translate)
+    const isTranslateReq = url.pathname === "/translate" || url.pathname.endsWith("/translate") || (jsonBody && jsonBody.action === "translate");
+    if (isTranslateReq) {
+      const fields = (jsonBody && jsonBody.fields && typeof jsonBody.fields === "object") ? jsonBody.fields : {};
+      
+      const systemPrompt = `You are a translator for an Ethiopian Christian mission archive. Translate the following Korean text snippet(s) into clear, natural, professional English suited for a mission archive.
+
+Strict Terminology Rules:
+- 전도집회 -> Evangelical Seminar
+- 구원 -> salvation
+- 구원받다 / 구원을 받다 -> receive salvation / be saved
+- 구원 간증 -> salvation testimony
+- 침례 -> baptism
+- 침례를 받다 -> be baptized
+- 복음을 전하다 -> preach the gospel / share the gospel
+- ELC -> ELC
+- WELC -> WELC
+- Keep proper names & places in standard English (e.g. Fikru, Abenezer Tadese, Addis Ababa, Adama, Bishoftu, Hawassa).
+- Do NOT translate URLs.
+- Return a valid JSON object mapping each input field key to its translated English string.`;
+
+      let translations = {};
+      try {
+        if (env.AI) {
+          const promptInput = `${systemPrompt}\n\nInput JSON to translate:\n${JSON.stringify(fields)}`;
+          const aiRes = await env.AI.run("@cf/meta/llama-3.1-8b-instruct", {
+            messages: [{ role: "user", content: promptInput }]
+          });
+          const rawText = (aiRes && aiRes.response) ? aiRes.response : "";
+          const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+          if (jsonMatch) {
+            translations = JSON.parse(jsonMatch[0]);
+          }
+        }
+      } catch(e) {
+        console.error("Workers AI translation error:", e);
+      }
+
+      // Fallback domain glossary application for missing keys
+      const finalTranslations = {};
+      for (const [key, rawVal] of Object.entries(fields)) {
+        if (typeof rawVal !== "string" || !rawVal.trim()) {
+          finalTranslations[key] = rawVal || "";
+          continue;
+        }
+        if (rawVal.startsWith("http://") || rawVal.startsWith("https://")) {
+          finalTranslations[key] = rawVal;
+          continue;
+        }
+
+        let translated = translations[key];
+        if (!translated || typeof translated !== "string" || translated === rawVal) {
+          translated = applyFallbackDomainGlossary(rawVal);
+        }
+        finalTranslations[key] = postProcessDomainTerms(translated);
+      }
+
+      return new Response(JSON.stringify({ ok: true, translations: finalTranslations }), { status: 200, headers: corsHeaders });
+    }
+
     // 3.5 Shared Data Sync Endpoint (POST /sync)
-    const isSyncReq = url.pathname === "/sync" || url.pathname.endsWith("/sync") || (jsonBody && (jsonBody.action === "sync_events" || jsonBody.action === "sync_data"));
+    const isSyncReq = url.pathname === "/sync" || url.pathname.endsWith("/sync") || (jsonBody && (jsonBody.action === "sync_events" || jsonBody.action === "sync_members" || jsonBody.action === "sync_history" || jsonBody.action === "sync_data"));
     if (isSyncReq) {
       if (!env.AUTH_SESSION_SECRET) {
         return new Response(JSON.stringify({ error: "Server Configuration Error: AUTH_SESSION_SECRET missing." }), { status: 500, headers: corsHeaders });
@@ -213,11 +318,28 @@ export default {
         return new Response(JSON.stringify({ error: "Forbidden: Admin privileges required." }), { status: 403, headers: corsHeaders });
       }
 
-      if (jsonBody && jsonBody.action === "sync_events") {
-        const eventsData = jsonBody.events || [];
+      const action = jsonBody ? jsonBody.action : "";
+      let repoPath = "";
+      let commitData = null;
+      let commitMessage = "";
+
+      if (action === "sync_events") {
+        repoPath = "data/events.json";
+        commitData = jsonBody.events || [];
+        commitMessage = "Sync shared calendar events data";
+      } else if (action === "sync_members") {
+        repoPath = "data/members.json";
+        commitData = jsonBody.members || [];
+        commitMessage = "Sync shared member directory data and translations";
+      } else if (action === "sync_history") {
+        repoPath = "data/history.json";
+        commitData = jsonBody.history || [];
+        commitMessage = "Sync shared gospel history timeline data and translations";
+      }
+
+      if (repoPath && commitData) {
         const githubPat = env.GITHUB_PAT || env.GITHUB_TOKEN;
         if (githubPat) {
-          const repoPath = "data/events.json";
           const githubApiUrl = `https://api.github.com/repos/wjdgns131/ethiopia_gospel_archive/contents/${repoPath}`;
           
           let sha = "";
@@ -231,7 +353,7 @@ export default {
             }
           } catch(e) {}
 
-          const jsonStr = JSON.stringify(eventsData, null, 2);
+          const jsonStr = JSON.stringify(commitData, null, 2);
           const uint8 = new TextEncoder().encode(jsonStr);
           let binary = "";
           for (let i = 0; i < uint8.byteLength; i++) {
@@ -240,7 +362,7 @@ export default {
           const base64Content = btoa(binary);
 
           const commitBody = {
-            message: "Sync shared calendar events data",
+            message: commitMessage,
             content: base64Content,
             branch: "main"
           };

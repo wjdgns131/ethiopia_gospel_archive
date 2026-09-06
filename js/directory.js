@@ -15,6 +15,7 @@ class DirectoryComponent {
 
     this.initGlobalEventDelegation();
     this.initFormListeners();
+    this.fetchRemoteMembers();
   }
 
   // 1. Centralized Safe Event Delegation (DOM 클릭 이벤트 통일 수신기)
@@ -499,6 +500,14 @@ class DirectoryComponent {
         if (relationInput) relationInput.value = m.inviterRelation || m.relation || "";
         if (youtubeInput) youtubeInput.value = m.youtube || m.youtubeLink || "";
         if (testimonyInput) testimonyInput.value = m.testimony || m.desc || "";
+        
+        const jobEnEl = document.getElementById("fieldJobEn");
+        if (jobEnEl) jobEnEl.value = m.jobEn || "";
+        const relEnEl = document.getElementById("fieldInviterRelationEn");
+        if (relEnEl) relEnEl.value = m.inviterRelationEn || "";
+        const testEnEl = document.getElementById("fieldTestimonyEn");
+        if (testEnEl) testEnEl.value = m.testimonyEn || "";
+
         this.tempMemberPhoto = m.photo || m.image || "";
       }
     } else {
@@ -514,6 +523,14 @@ class DirectoryComponent {
       if (relationInput) relationInput.value = "";
       if (youtubeInput) youtubeInput.value = "";
       if (testimonyInput) testimonyInput.value = "";
+      
+      const jobEnEl = document.getElementById("fieldJobEn");
+      if (jobEnEl) jobEnEl.value = "";
+      const relEnEl = document.getElementById("fieldInviterRelationEn");
+      if (relEnEl) relEnEl.value = "";
+      const testEnEl = document.getElementById("fieldTestimonyEn");
+      if (testEnEl) testEnEl.value = "";
+
       this.tempMemberPhoto = "";
     }
 
@@ -775,6 +792,40 @@ class DirectoryComponent {
     }
   }
 
+  async fetchRemoteMembers() {
+    try {
+      const res = await fetch(`data/members.json?t=${Date.now()}`);
+      if (res.ok) {
+        const remoteMembers = await res.json();
+        if (Array.isArray(remoteMembers) && remoteMembers.length > 0) {
+          window.DEFAULT_MEMBERS = remoteMembers;
+          this.render();
+        }
+      }
+    } catch (e) {}
+  }
+
+  async syncMembersToWorker(allMembers) {
+    try {
+      const token = sessionStorage.getItem("ethiopia_auth_token");
+      if (!token) return;
+      const workerUrl = window.CF_WORKER_UPLOAD_URL || "https://ethiopia-archive-proxy.wjdgns131.workers.dev";
+      const syncEndpoint = `${workerUrl.replace(/\/+$/, '')}/sync`;
+
+      await fetch(syncEndpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          action: "sync_members",
+          members: allMembers
+        })
+      }).catch(() => {});
+    } catch(e) {}
+  }
+
   saveMemberFromForm() {
     const nameVal = document.getElementById("fieldName")?.value.trim();
     if (!nameVal) {
@@ -785,46 +836,49 @@ class DirectoryComponent {
     const idVal = document.getElementById("memberId")?.value || `mem-${Date.now()}`;
     const relationVal = document.getElementById("fieldInviterRelation")?.value.trim() || "";
 
+    const manualJobEn = document.getElementById("fieldJobEn")?.value.trim();
+    const manualRelationEn = document.getElementById("fieldInviterRelationEn")?.value.trim();
+    const manualTestimonyEn = document.getElementById("fieldTestimonyEn")?.value.trim();
+
     const members = this.getStoredMembers();
     const existingIdx = members.findIndex(x => x && String(x.id) === String(idVal));
+    const existing = existingIdx >= 0 ? members[existingIdx] : {};
 
-    let memberData;
+    const prevMeta = existing.translationMeta || {};
+    const translationMeta = {
+      jobEn: manualJobEn ? "manual" : (prevMeta.jobEn || "auto"),
+      inviterRelationEn: manualRelationEn ? "manual" : (prevMeta.inviterRelationEn || "auto"),
+      testimonyEn: manualTestimonyEn ? "manual" : (prevMeta.testimonyEn || "auto")
+    };
+
+    let memberData = {
+      ...existing,
+      id: idVal,
+      name: nameVal,
+      category: document.getElementById("fieldCategory")?.value || existing.category || "saved",
+      age: document.getElementById("fieldAge")?.value.trim() || existing.age || "",
+      region: document.getElementById("fieldRegion")?.value.trim() || existing.region || "아디스아바바",
+      job: document.getElementById("fieldJob")?.value.trim() || existing.job || "",
+      assemblyMonth: document.getElementById("fieldAssemblyMonth")?.value.trim() || existing.assemblyMonth || "",
+      inviter: document.getElementById("fieldInviter")?.value.trim() || existing.inviter || "",
+      inviterRelation: relationVal || existing.inviterRelation || "",
+      photo: this.tempMemberPhoto || existing.photo || existing.image || "images/members/mem_pdf-mem-1.jpg",
+      youtube: document.getElementById("fieldYoutube")?.value.trim() || existing.youtube || "",
+      testimony: document.getElementById("fieldTestimony")?.value.trim() || existing.testimony || "",
+      jobEn: manualJobEn || existing.jobEn || "",
+      inviterRelationEn: manualRelationEn || existing.inviterRelationEn || "",
+      testimonyEn: manualTestimonyEn || existing.testimonyEn || "",
+      translationMeta: translationMeta,
+      translationStatus: "translating"
+    };
+
     if (existingIdx >= 0) {
-      const existing = members[existingIdx];
-      memberData = {
-        ...existing,
-        id: idVal,
-        name: nameVal,
-        category: document.getElementById("fieldCategory")?.value || existing.category || "saved",
-        age: document.getElementById("fieldAge")?.value.trim() || existing.age || "",
-        region: document.getElementById("fieldRegion")?.value.trim() || existing.region || "아디스아바바",
-        job: document.getElementById("fieldJob")?.value.trim() || existing.job || "",
-        assemblyMonth: document.getElementById("fieldAssemblyMonth")?.value.trim() || existing.assemblyMonth || "",
-        inviter: document.getElementById("fieldInviter")?.value.trim() || existing.inviter || "",
-        inviterRelation: relationVal || existing.inviterRelation || "",
-        photo: this.tempMemberPhoto || existing.photo || existing.image || "images/members/mem_pdf-mem-1.jpg",
-        youtube: document.getElementById("fieldYoutube")?.value.trim() || existing.youtube || "",
-        testimony: document.getElementById("fieldTestimony")?.value.trim() || existing.testimony || ""
-      };
       members[existingIdx] = memberData;
     } else {
-      memberData = {
-        id: idVal,
-        name: nameVal,
-        category: document.getElementById("fieldCategory")?.value || "saved",
-        age: document.getElementById("fieldAge")?.value.trim() || "",
-        region: document.getElementById("fieldRegion")?.value.trim() || "아디스아바바",
-        job: document.getElementById("fieldJob")?.value.trim() || "",
-        assemblyMonth: document.getElementById("fieldAssemblyMonth")?.value.trim() || "",
-        inviter: document.getElementById("fieldInviter")?.value.trim() || "",
-        inviterRelation: relationVal,
-        photo: this.tempMemberPhoto || "images/members/mem_pdf-mem-1.jpg",
-        youtube: document.getElementById("fieldYoutube")?.value.trim() || "",
-        testimony: document.getElementById("fieldTestimony")?.value.trim() || ""
-      };
       members.push(memberData);
     }
 
+    // Step 1: Immediate Korean Save (0.01s UI update)
     if (window.db && typeof window.db.updateMember === 'function' && existingIdx >= 0) {
       window.db.updateMember(memberData);
     } else if (window.db && typeof window.db.addMember === 'function' && existingIdx < 0) {
@@ -838,8 +892,54 @@ class DirectoryComponent {
     if (modal) modal.classList.add("hidden");
 
     this.render();
-    if (window.showToast) window.showToast(`✨ ${nameVal} 님의 사진 및 정보가 저장되었습니다!`);
-    else alert(`✨ ${nameVal} 님의 사진 및 정보가 성공적으로 저장되었습니다!`);
+    if (window.showToast) window.showToast(`✨ ${nameVal} 님의 정보가 즉시 저장되었습니다! (영어 번역 진행 중...)`);
+    else alert(`✨ ${nameVal} 님의 정보가 즉시 저장되었습니다! (영어 번역 진행 중...)`);
+
+    // Step 2: Background Async Translation
+    (async () => {
+      try {
+        const toTranslate = {};
+        if (translationMeta.jobEn === "auto" && memberData.job && memberData.job !== existing.job) {
+          toTranslate.jobEn = memberData.job;
+        }
+        if (translationMeta.inviterRelationEn === "auto" && memberData.inviterRelation && memberData.inviterRelation !== existing.inviterRelation) {
+          toTranslate.inviterRelationEn = memberData.inviterRelation;
+        }
+        if (translationMeta.testimonyEn === "auto" && memberData.testimony && memberData.testimony !== existing.testimony) {
+          toTranslate.testimonyEn = memberData.testimony;
+        }
+
+        if (Object.keys(toTranslate).length > 0 && window.i18n && typeof window.i18n.translateKoreanFields === "function") {
+          const res = await window.i18n.translateKoreanFields(toTranslate);
+          if (res.jobEn && translationMeta.jobEn === "auto") memberData.jobEn = res.jobEn;
+          if (res.inviterRelationEn && translationMeta.inviterRelationEn === "auto") memberData.inviterRelationEn = res.inviterRelationEn;
+          if (res.testimonyEn && translationMeta.testimonyEn === "auto") memberData.testimonyEn = res.testimonyEn;
+          memberData.translationStatus = "translated";
+        } else {
+          memberData.translationStatus = "translated";
+        }
+      } catch (err) {
+        console.warn("Background member translation failed:", err);
+        memberData.translationStatus = "pending";
+      }
+
+      const latestMembers = this.getStoredMembers();
+      const idx = latestMembers.findIndex(x => x && String(x.id) === String(idVal));
+      if (idx >= 0) latestMembers[idx] = memberData;
+      else latestMembers.push(memberData);
+
+      localStorage.setItem("ethiopia_members", JSON.stringify(latestMembers));
+      window.DEFAULT_MEMBERS = latestMembers;
+
+      this.render();
+      await this.syncMembersToWorker(latestMembers);
+
+      if (memberData.translationStatus === "translated") {
+        if (window.showToast) window.showToast(`🌐 ${nameVal} 님의 영어 번역이 생성되고 중앙 동기화되었습니다!`);
+      } else {
+        if (window.showToast) window.showToast(`ℹ️ ${nameVal} 님의 정보 저장은 완료되었으며, 영어 번역은 보류(Pending) 상태입니다.`);
+      }
+    })();
   }
 
   openMemberDetailModal(memberId) {

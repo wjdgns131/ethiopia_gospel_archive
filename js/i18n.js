@@ -1199,20 +1199,27 @@ A total of 28 people were baptized.`
       if (this.currentLang === "ko") return member;
 
       const idKey = member.id || member.name;
-      const customEn = (idKey && MEMBER_EN_MAP[idKey]) ? MEMBER_EN_MAP[idKey] : {};
+      const mapEn = (idKey && typeof MEMBER_EN_MAP !== "undefined" && MEMBER_EN_MAP[idKey]) ? MEMBER_EN_MAP[idKey] : {};
 
-      const translatedRegion = customEn.region || (member.region ? this.getRegionTranslation(member.region) : member.region);
-      const translatedJob = customEn.job || (member.job ? (occupationTranslations[member.job.trim()] || this.translateContent(member.job)) : member.job);
-      // member.inviter is a person/group name: keep raw original unless explicitly set in MEMBER_EN_MAP
-      const translatedInviter = customEn.inviter || (member.inviter ? this.translateContent(member.inviter) : member.inviter);
-      const translatedName = customEn.name || member.name;
+      // 1st priority: MEMBER_EN_MAP manual override
+      // 2nd priority: member.*En field
+      // 3rd priority: occupationTranslations / termReplacements dictionary
+      // 4th priority: raw Korean text
+      const translatedName = mapEn.name || member.nameEn || member.name;
+      const translatedRegion = mapEn.region || member.regionEn || (member.region ? (REGION_EN_MAP[member.region] || this.getRegionTranslation(member.region)) : member.region);
+      const translatedJob = mapEn.job || (member.jobEn && member.jobEn.trim() ? member.jobEn : (member.job ? (occupationTranslations[member.job.trim()] || this.translateContent(member.job)) : member.job));
+      const translatedInviter = mapEn.inviter || member.inviterEn || member.inviter;
+      const translatedInviterRelation = mapEn.inviterRelation || (member.inviterRelationEn && member.inviterRelationEn.trim() ? member.inviterRelationEn : (member.inviterRelation ? this.translateContent(member.inviterRelation) : member.inviterRelation));
+      const translatedTestimony = mapEn.testimony || (member.testimonyEn && member.testimonyEn.trim() ? member.testimonyEn : member.testimony);
 
       return {
         ...member,
         name: translatedName,
         region: translatedRegion,
         job: translatedJob,
-        inviter: translatedInviter
+        inviter: translatedInviter,
+        inviterRelation: translatedInviterRelation,
+        testimony: translatedTestimony
       };
     }
 
@@ -1221,14 +1228,12 @@ A total of 28 people were baptized.`
       if (this.currentLang === "ko") return historyItem;
 
       const idKey = historyItem.id;
-      const customEn = (idKey && HISTORY_EN_MAP[idKey]) ? HISTORY_EN_MAP[idKey] : {};
+      const mapEn = (idKey && typeof HISTORY_EN_MAP !== "undefined" && HISTORY_EN_MAP[idKey]) ? HISTORY_EN_MAP[idKey] : {};
 
-      const translatedTitle = customEn.title || this.translateContent(historyItem.title);
-      // Location: prefer customEn.location -> translateContent -> raw location
-      const translatedLocation = customEn.location || (historyItem.location ? this.translateContent(historyItem.location) : historyItem.location);
-      const translatedDesc = customEn.desc || historyItem.desc; // Fallback to raw desc
-      // Date: keep raw original date as-is (do NOT translate)
-      const translatedDate = customEn.date || historyItem.date;
+      const translatedTitle = mapEn.title || (historyItem.titleEn && historyItem.titleEn.trim() ? historyItem.titleEn : this.translateContent(historyItem.title));
+      const translatedLocation = mapEn.location || (historyItem.locationEn && historyItem.locationEn.trim() ? historyItem.locationEn : (historyItem.location ? this.translateContent(historyItem.location) : historyItem.location));
+      const translatedDesc = mapEn.desc || (historyItem.descEn && historyItem.descEn.trim() ? historyItem.descEn : historyItem.desc);
+      const translatedDate = mapEn.date || historyItem.dateEn || historyItem.date;
 
       return {
         ...historyItem,
@@ -1237,6 +1242,40 @@ A total of 28 people were baptized.`
         desc: translatedDesc,
         date: translatedDate
       };
+    }
+
+    async translateKoreanFields(fieldsObj) {
+      if (!fieldsObj || typeof fieldsObj !== "object" || Object.keys(fieldsObj).length === 0) return {};
+      const workerUrl = window.CF_WORKER_UPLOAD_URL || "https://ethiopia-archive-proxy.wjdgns131.workers.dev";
+      const endpoint = `${workerUrl.replace(/\/+$/, '')}/translate`;
+
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 4000);
+
+        const res = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "translate", fields: fieldsObj }),
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.translations) {
+            return data.translations;
+          }
+        }
+      } catch (e) {
+        console.warn("Background translation fetch failed, using fallback glossary:", e);
+      }
+
+      const fallbackTranslations = {};
+      for (const [key, val] of Object.entries(fieldsObj)) {
+        fallbackTranslations[key] = this.translateContent(val);
+      }
+      return fallbackTranslations;
     }
 
     // Dynamic Live Translator Engine
