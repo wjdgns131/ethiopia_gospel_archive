@@ -14,6 +14,7 @@ class TimelineComponent {
     this.legacyBase64Cache = {};
     this.pendingLegacyConversions = {};
     this.activeYear = null; // Filter state for Year 구분
+    this.remoteHistoryLoaded = false; // Central history.json loaded
     this.initEvents();
     this.fetchRemoteHistory();
   }
@@ -355,7 +356,7 @@ class TimelineComponent {
     }));
 
     try {
-      const overridesRaw = localStorage.getItem("ethiopia_history_overrides");
+      const overridesRaw = this.remoteHistoryLoaded ? null : localStorage.getItem("ethiopia_history_overrides");
       if (overridesRaw) {
         const overrides = JSON.parse(overridesRaw);
         if (overrides && typeof overrides === 'object') {
@@ -1112,6 +1113,7 @@ class TimelineComponent {
         const remoteHistory = await res.json();
         if (Array.isArray(remoteHistory) && remoteHistory.length > 0) {
           window.DEFAULT_HISTORY = remoteHistory;
+          this.remoteHistoryLoaded = true;
           this.render();
         }
       }
