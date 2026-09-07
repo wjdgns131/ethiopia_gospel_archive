@@ -192,11 +192,6 @@ class CalendarComponent {
   render() {
     if (!this.container) this.container = document.getElementById(this.containerId || "calendarContainer");
     if (!this.container) return;
-    if (window.isAdminLoggedIn && !window.isAdminLoggedIn()) {
-      this.container.innerHTML = "";
-      this.container.style.display = "none";
-      return;
-    }
 
     const year = this.currentDate.getFullYear();
     const month = this.currentDate.getMonth(); // 0-indexed (0 = Jan)
@@ -217,6 +212,7 @@ class CalendarComponent {
 
     // Custom Mission Events in current month (including multi-day date range matches!)
     let allEvents = this.getStoredEvents();
+    if (window.isAdminLoggedIn && !window.isAdminLoggedIn()) allEvents = [];
     const currentMonthStr = `${year}-${String(month + 1).padStart(2, '0')}`;
     const currentMonthEvents = allEvents.filter(e => {
       const s = e.date;
