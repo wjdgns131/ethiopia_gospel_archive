@@ -483,6 +483,7 @@ class DirectoryComponent {
 
   // Modals Implementation
   openEditModal(memberId = null) {
+    if (window.checkAdminPermission && !window.checkAdminPermission()) return;
     const modal = document.getElementById("memberEditModal");
     const titleEl = document.getElementById("memberEditModalTitle");
     if (!modal) return;
@@ -886,6 +887,7 @@ class DirectoryComponent {
     }
   }
   async saveMemberFromForm() {
+    if (window.checkAdminPermission && !window.checkAdminPermission()) return;
     const nameVal = document.getElementById("fieldName")?.value.trim();
     if (!nameVal) {
       alert("식구 이름을 입력해 주세요.");
