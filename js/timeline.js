@@ -1384,18 +1384,28 @@ class TimelineComponent {
     }
   }
 
-  deleteHistory(id) {
+  async deleteHistory(id) {
     if (window.checkAdminPermission && !window.checkAdminPermission()) return;
     if (confirm("정말로 이 역사 기록을 삭제하시겠습니까?")) {
       try {
         this.saveStoredHistory(null, id);
         this.render();
+
+        const currentList = this.getStoredHistory();
+        const syncRes = await this.syncHistoryToWorker(currentList);
+
+        if (syncRes && syncRes.ok) {
+          this.clearStoredHistoryOverride(id);
+          if (window.showToast) window.showToast("🗑️ 기록이 삭제되고 중앙 동기화되었습니다.");
+        } else {
+          if (window.showToast) window.showToast("⚠️ 화면에서는 삭제되었지만 중앙 동기화에 실패했습니다.");
+        }
       } catch(err) {
         console.error("Delete history error:", err);
+        if (window.showToast) window.showToast("⚠️ 기록 삭제 중 오류가 발생했습니다.");
       }
     }
   }
-
   formatParagraphs(text) {
     if (!text) return "";
     return text.split('\n\n').map(p => {
