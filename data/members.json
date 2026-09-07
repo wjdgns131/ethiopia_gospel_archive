@@ -1681,29 +1681,6 @@
     "translationStatus": "translating"
   },
   {
-    "id": "mem-1788788258580",
-    "name": "test",
-    "category": "saved",
-    "age": "",
-    "region": "아디스아바바",
-    "job": "",
-    "assemblyMonth": "2026.02",
-    "inviter": "",
-    "inviterRelation": "",
-    "photo": "images/members/mem_pdf-mem-1.jpg",
-    "youtube": "",
-    "testimony": "",
-    "jobEn": "",
-    "inviterRelationEn": "",
-    "testimonyEn": "",
-    "translationMeta": {
-      "jobEn": "auto",
-      "inviterRelationEn": "auto",
-      "testimonyEn": "auto"
-    },
-    "translationStatus": "translating"
-  },
-  {
     "id": "mem-1788788262913",
     "name": "test",
     "category": "saved",
