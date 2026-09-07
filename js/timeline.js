@@ -446,6 +446,38 @@ class TimelineComponent {
     return historyList;
   }
 
+  clearStoredHistoryOverride(id) {
+    try {
+      const raw = localStorage.getItem("ethiopia_history_overrides");
+      if (!raw) return;
+
+      const overrides = JSON.parse(raw);
+      if (!overrides || typeof overrides !== "object") return;
+
+      if (overrides.modified && typeof overrides.modified === "object") {
+        delete overrides.modified[id];
+      }
+
+      if (Array.isArray(overrides.added)) {
+        overrides.added = overrides.added.filter(
+          h => h && String(h.id) !== String(id)
+        );
+      }
+
+      if (Array.isArray(overrides.deleted)) {
+        overrides.deleted = overrides.deleted.filter(
+          deletedId => String(deletedId) !== String(id)
+        );
+      }
+
+      localStorage.setItem(
+        "ethiopia_history_overrides",
+        JSON.stringify(overrides)
+      );
+    } catch (e) {
+      console.warn("Failed to clear history override:", e);
+    }
+  }
   saveStoredHistory(savedItem, deleteId = null) {
     this.migrateLegacyStorageIfNeeded();
 
@@ -1586,7 +1618,8 @@ class TimelineComponent {
 
     if (syncRes && syncRes.ok) {
       item.syncStatus = "synced";
-      this.saveStoredHistory(item);
+      this.clearStoredHistoryOverride(item.id);
+      await this.fetchRemoteHistory();
       this.render();
       if (window.showToast) window.showToast("✨ 중앙 동기화가 성공적으로 완료되었습니다!");
     } else {
