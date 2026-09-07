@@ -12,6 +12,7 @@ class DirectoryComponent {
     this.renderedCount = 20;
     this.container = document.getElementById("memberGrid");
     this.activeFiltersBadge = document.getElementById("activeFilterBar");
+    this.remoteMembersLoaded = false;
 
     this.initGlobalEventDelegation();
     this.initFormListeners();
@@ -253,7 +254,7 @@ class DirectoryComponent {
       return window.db.getMembers();
     }
     try {
-      const local = localStorage.getItem("ethiopia_members");
+      const local = this.remoteMembersLoaded ? null : localStorage.getItem("ethiopia_members");
       if (local) {
         const parsed = JSON.parse(local);
         if (Array.isArray(parsed) && parsed.length > 0) return parsed;
@@ -797,8 +798,9 @@ class DirectoryComponent {
       const res = await fetch(`data/members.json?t=${Date.now()}`);
       if (res.ok) {
         const remoteMembers = await res.json();
-        if (Array.isArray(remoteMembers) && remoteMembers.length > 0) {
+        if (Array.isArray(remoteMembers)) {
           window.DEFAULT_MEMBERS = remoteMembers;
+          this.remoteMembersLoaded = true;
           this.render();
         }
       }
