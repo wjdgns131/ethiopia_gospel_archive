@@ -1367,6 +1367,8 @@ class TimelineComponent {
         this.render();
 
         if (translateSuccess && syncRes && syncRes.ok) {
+          this.clearStoredHistoryOverride(historyData.id);
+          await this.fetchRemoteHistory();
           if (window.showToast) window.showToast("🌐 영어 번역이 생성되고 중앙 동기화되었습니다!");
         } else if (translateSuccess && (!syncRes || !syncRes.ok)) {
           if (window.showToast) window.showToast("⚠️ 영어 번역은 완료되었지만 중앙 동기화에 실패했습니다.");
@@ -1396,6 +1398,8 @@ class TimelineComponent {
         const syncRes = await this.syncHistoryToWorker(currentList);
 
         if (syncRes && syncRes.ok) {
+          this.clearStoredHistoryOverride(id);
+          await this.fetchRemoteHistory();
           if (window.showToast) window.showToast("🗑️ 기록이 삭제되고 중앙 동기화되었습니다.");
         } else {
           if (window.showToast) window.showToast("⚠️ 화면에서는 삭제되었지만 중앙 동기화에 실패했습니다.");
@@ -1605,6 +1609,8 @@ class TimelineComponent {
     this.render();
 
     if (translateSuccess && syncRes && syncRes.ok) {
+          this.clearStoredHistoryOverride(historyData.id);
+          await this.fetchRemoteHistory();
       if (window.showToast) window.showToast("🌐 복음 역사 영어 번역이 성공적으로 생성되고 동기화되었습니다!");
     } else if (translateSuccess && (!syncRes || !syncRes.ok)) {
       if (window.showToast) window.showToast("⚠️ 영어 번역은 완료되었지만 중앙 동기화에 실패했습니다.");
