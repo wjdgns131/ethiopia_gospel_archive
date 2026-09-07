@@ -839,7 +839,7 @@ class DirectoryComponent {
     }
   }
 
-  saveMemberFromForm() {
+  async saveMemberFromForm() {
     const nameVal = document.getElementById("fieldName")?.value.trim();
     if (!nameVal) {
       alert("식구 이름을 입력해 주세요.");
@@ -899,6 +899,13 @@ class DirectoryComponent {
     } else {
       localStorage.setItem("ethiopia_members", JSON.stringify(members));
       window.DEFAULT_MEMBERS = members;
+    }
+
+    // Step 1.5: Immediate central sync
+    const initialMembers = this.getStoredMembers();
+    const initialSyncRes = await this.syncMembersToWorker(initialMembers);
+    if (!initialSyncRes || !initialSyncRes.ok) {
+      console.warn("Initial member central sync failed:", initialSyncRes);
     }
 
     const modal = document.getElementById("memberEditModal");
