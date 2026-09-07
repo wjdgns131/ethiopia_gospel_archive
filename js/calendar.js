@@ -100,7 +100,7 @@ class CalendarComponent {
       const workerUrl = window.CF_WORKER_UPLOAD_URL || "https://ethiopia-archive-proxy.wjdgns131.workers.dev";
       const syncEndpoint = `${workerUrl.replace(/\/+$/, '')}/sync`;
 
-      await fetch(syncEndpoint, {
+      const syncRes = await fetch(syncEndpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -110,7 +110,9 @@ class CalendarComponent {
           action: "sync_events",
           events: allEvents
         })
-      }).catch(() => {});
+      });
+      const syncText = await syncRes.text();
+      alert("달력 중앙 동기화 응답: HTTP " + syncRes.status + " / " + syncText);
     } catch(e) {}
   }
 
