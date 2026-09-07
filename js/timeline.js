@@ -1114,7 +1114,6 @@ class TimelineComponent {
         if (Array.isArray(remoteHistory) && remoteHistory.length > 0) {
           window.DEFAULT_HISTORY = remoteHistory;
           this.remoteHistoryLoaded = true;
-          alert("중앙 history.json 로드 성공: " + remoteHistory.length + "건 / 마지막: " + remoteHistory[remoteHistory.length - 1].date);
           this.render();
         }
       }
