@@ -854,6 +854,7 @@ class DirectoryComponent {
   }
 
   async deleteMember(id) {
+    if (window.checkAdminPermission && !window.checkAdminPermission()) return;
     if (!id) return;
 
     const members = this.getStoredMembers();

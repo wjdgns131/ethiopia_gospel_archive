@@ -39,6 +39,7 @@ class CalendarComponent {
   }
 
   openAddEventModal(dateStr = "") {
+    if (window.checkAdminPermission && !window.checkAdminPermission()) return;
     const modal = document.getElementById("calendarEventModal");
     if (!modal) return;
 
@@ -127,6 +128,7 @@ class CalendarComponent {
     }
   }
   async saveEventFromForm() {
+    if (window.checkAdminPermission && !window.checkAdminPermission()) return;
     const startVal = document.getElementById("fieldEventStartDate").value;
     let endVal = document.getElementById("fieldEventEndDate").value;
     const titleVal = document.getElementById("fieldEventTitle").value.trim();
@@ -171,6 +173,7 @@ class CalendarComponent {
   }
 
   async deleteEvent(id) {
+    if (window.checkAdminPermission && !window.checkAdminPermission()) return;
     if (!id) return;
     if (confirm("정말로 이 일정을 삭제하시겠습니까?")) {
       let allEvents = this.getStoredEvents().filter(e => e && String(e.id) !== String(id));
@@ -189,6 +192,11 @@ class CalendarComponent {
   render() {
     if (!this.container) this.container = document.getElementById(this.containerId || "calendarContainer");
     if (!this.container) return;
+    if (window.isAdminLoggedIn && !window.isAdminLoggedIn()) {
+      this.container.innerHTML = "";
+      this.container.style.display = "none";
+      return;
+    }
 
     const year = this.currentDate.getFullYear();
     const month = this.currentDate.getMonth(); // 0-indexed (0 = Jan)
