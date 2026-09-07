@@ -1395,7 +1395,6 @@ class TimelineComponent {
         const syncRes = await this.syncHistoryToWorker(currentList);
 
         if (syncRes && syncRes.ok) {
-          this.clearStoredHistoryOverride(id);
           if (window.showToast) window.showToast("🗑️ 기록이 삭제되고 중앙 동기화되었습니다.");
         } else {
           if (window.showToast) window.showToast("⚠️ 화면에서는 삭제되었지만 중앙 동기화에 실패했습니다.");
