@@ -19,6 +19,7 @@ class CalendarComponent {
     this.containerId = containerId || "calendarContainer";
     this.container = document.getElementById(this.containerId);
     this.currentDate = new Date();
+    this.remoteEventsLoaded = false;
     this.initEvents();
     this.fetchRemoteEvents();
   }
@@ -63,8 +64,9 @@ class CalendarComponent {
       const res = await fetch(`data/events.json?t=${Date.now()}`);
       if (res.ok) {
         const remoteEvents = await res.json();
-        if (Array.isArray(remoteEvents) && remoteEvents.length > 0) {
+        if (Array.isArray(remoteEvents)) {
           window.DEFAULT_EVENTS = remoteEvents;
+          this.remoteEventsLoaded = true;
           this.render();
         }
       }
@@ -78,7 +80,7 @@ class CalendarComponent {
 
     let localEvents = [];
     try {
-      const local = localStorage.getItem("ethiopia_events");
+      const local = this.remoteEventsLoaded ? null : localStorage.getItem("ethiopia_events");
       if (local) {
         localEvents = JSON.parse(local);
         if (!Array.isArray(localEvents)) localEvents = [];
@@ -96,7 +98,8 @@ class CalendarComponent {
   async syncEventsToWorker(allEvents) {
     try {
       const token = sessionStorage.getItem("ethiopia_auth_token");
-      if (!token) return;
+      if (!token) return { ok: false, error: "No auth token" };
+
       const workerUrl = window.CF_WORKER_UPLOAD_URL || "https://ethiopia-archive-proxy.wjdgns131.workers.dev";
       const syncEndpoint = `${workerUrl.replace(/\/+$/, '')}/sync`;
 
@@ -111,12 +114,19 @@ class CalendarComponent {
           events: allEvents
         })
       });
-      const syncText = await syncRes.text();
-      alert("달력 중앙 동기화 응답: HTTP " + syncRes.status + " / " + syncText);
-    } catch(e) {}
-  }
 
-  saveEventFromForm() {
+      const data = await syncRes.json().catch(() => ({}));
+
+      if (syncRes.ok && data && data.ok) {
+        return { ok: true, synced: true };
+      }
+
+      return { ok: false, error: data.error || `HTTP ${syncRes.status}` };
+    } catch(e) {
+      return { ok: false, error: e.message || "Sync failed" };
+    }
+  }
+  async saveEventFromForm() {
     const startVal = document.getElementById("fieldEventStartDate").value;
     let endVal = document.getElementById("fieldEventEndDate").value;
     const titleVal = document.getElementById("fieldEventTitle").value.trim();
@@ -148,21 +158,30 @@ class CalendarComponent {
     localStorage.setItem("ethiopia_events", JSON.stringify(allEvents));
     window.DEFAULT_EVENTS = allEvents;
 
-    this.syncEventsToWorker(allEvents);
+    const syncRes = await this.syncEventsToWorker(allEvents);
 
     document.getElementById("calendarEventModal").classList.add("hidden");
-    if (window.showToast) window.showToast("✨ 일정이 성공적으로 등록되었습니다!");
-    else alert("일정이 달력에 등록되었습니다!");
+    if (syncRes && syncRes.ok) {
+      if (window.showToast) window.showToast("일정이 중앙에 저장되었습니다!");
+      else alert("일정이 중앙에 저장되었습니다!");
+    } else {
+      alert("일정은 이 기기에 저장되었지만 중앙 동기화에 실패했습니다.\n" + ((syncRes && syncRes.error) || ""));
+    }
     this.render();
   }
 
-  deleteEvent(id) {
+  async deleteEvent(id) {
     if (!id) return;
     if (confirm("정말로 이 일정을 삭제하시겠습니까?")) {
       let allEvents = this.getStoredEvents().filter(e => e && String(e.id) !== String(id));
       localStorage.setItem("ethiopia_events", JSON.stringify(allEvents));
       window.DEFAULT_EVENTS = allEvents;
-      this.syncEventsToWorker(allEvents);
+      const syncRes = await this.syncEventsToWorker(allEvents);
+      if (syncRes && syncRes.ok) {
+        if (window.showToast) window.showToast("일정이 중앙에서 삭제되었습니다!");
+      } else {
+        alert("이 기기에서는 삭제되었지만 중앙 동기화에 실패했습니다.\n" + ((syncRes && syncRes.error) || ""));
+      }
       this.render();
     }
   }
