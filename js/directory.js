@@ -58,6 +58,10 @@ class DirectoryComponent {
         e.preventDefault();
         e.stopPropagation();
         this.openEditModal(id);
+      } else if (action === "delete-member") {
+        e.preventDefault();
+        e.stopPropagation();
+        this.deleteMember(id);
       } else if (action === "open-member-detail") {
         e.preventDefault();
         this.openMemberDetailModal(id);
@@ -410,6 +414,16 @@ class DirectoryComponent {
     editBtn.style.cssText = "background:transparent; color:var(--text-muted); border:none; padding:2px 6px; font-size:0.85rem; cursor:pointer; border-radius:4px;";
     editBtn.innerHTML = `<i class="fa-solid fa-pen-to-square"></i>`;
     nameRow.appendChild(editBtn);
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.type = "button";
+    deleteBtn.setAttribute("data-action", "delete-member");
+    deleteBtn.setAttribute("data-id", m.id);
+    deleteBtn.title = isEn ? `Delete ${m.name}` : `${m.name} 삭제`;
+    deleteBtn.className = "hover-text-danger";
+    deleteBtn.style.cssText = "background:transparent; color:#ef4444; border:none; padding:2px 6px; font-size:0.85rem; cursor:pointer; border-radius:4px;";
+    deleteBtn.innerHTML = `<i class="fa-solid fa-trash"></i>`;
+    nameRow.appendChild(deleteBtn);
 
     topInfo.appendChild(nameRow);
 
@@ -839,6 +853,37 @@ class DirectoryComponent {
     }
   }
 
+  async deleteMember(id) {
+    if (!id) return;
+
+    const members = this.getStoredMembers();
+    const member = members.find(m => m && String(m.id) === String(id));
+    if (!member) return;
+
+    const memberName = member.name || "이 식구";
+
+    if (!confirm(`${memberName} 식구의 정보를 정말 삭제하시겠습니까?\n\n삭제하면 다른 기기에서도 삭제됩니다.`)) {
+      return;
+    }
+
+    const updatedMembers = members.filter(m => !m || String(m.id) !== String(id));
+
+    localStorage.setItem("ethiopia_members", JSON.stringify(updatedMembers));
+    localStorage.setItem("ethiopia_members_v2", JSON.stringify(updatedMembers));
+    window.DEFAULT_MEMBERS = updatedMembers;
+
+    this.render();
+
+    const syncRes = await this.syncMembersToWorker(updatedMembers);
+
+    if (syncRes && syncRes.ok) {
+      if (window.showToast) {
+        window.showToast(`${memberName} 식구의 정보가 중앙에서 삭제되었습니다.`);
+      }
+    } else {
+      alert(`이 기기에서는 삭제되었지만 중앙 동기화에 실패했습니다.\n${(syncRes && syncRes.error) || ""}`);
+    }
+  }
   async saveMemberFromForm() {
     const nameVal = document.getElementById("fieldName")?.value.trim();
     if (!nameVal) {
