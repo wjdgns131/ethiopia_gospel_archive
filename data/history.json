@@ -1,5 +1,22 @@
 [
   {
+    "id": "hist-1788770509820",
+    "date": "2026.09.06",
+    "title": "침례식",
+    "location": "모임집, 아디스아바바",
+    "desc": "침례의 의미가 잘 설명되어 있는 로마서 6장 말씀을 함께 들은 뒤, 8월 집회에서 구원받은 형제자매 6명에게 침례를 주었습니다.",
+    "images": [],
+    "titleEn": "Baptism Ceremony",
+    "locationEn": "Moim House, Addis Ababa",
+    "descEn": "After sharing Romans 6, which clearly explains the meaning of baptism, we held a Baptism Ceremony for the 6 brothers and sisters who received salvation at the August Evangelical Seminar.",
+    "translationMeta": {
+      "titleEn": "auto",
+      "locationEn": "auto",
+      "descEn": "auto"
+    },
+    "translationStatus": "translated"
+  },
+  {
     "id": "hist-1788719318691",
     "date": "2026.09.06",
     "title": "침례식",
