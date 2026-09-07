@@ -505,6 +505,7 @@ class TimelineComponent {
           overrides.deleted.push(deleteId);
         }
         delete overrides.modified[deleteId];
+        overrides.added = overrides.added.filter(h => h && String(h.id) !== String(deleteId));
       } else {
         overrides.added = overrides.added.filter(h => h && String(h.id) !== String(deleteId));
       }
