@@ -364,7 +364,7 @@ class TimelineComponent {
           let overridesDirty = false;
 
           if (Array.isArray(deleted) && deleted.length > 0) {
-            historyList = historyList.filter(item => item && !deleted.includes(item.id));
+            historyList = historyList.filter(item => item && !deleted.some(deletedId => String(deletedId) === String(item.id)));
           }
 
           historyList = historyList.map(item => {
