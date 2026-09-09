@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 에티오피아 선교 아카이브 - 교제 & 선교 활동 모듈
  */
 
@@ -7,10 +7,75 @@ class FellowshipComponent {
     this.activeCategory = "all"; // all | fellowship | house | outreach | study | other
     this.tempFellowshipImages = [];
     this.container = document.getElementById("fellowshipGridContainer") || document.getElementById("assemblyGrid");
+    this.remoteFellowshipLoaded = false;
     this.initEvents();
+    this.fetchRemoteFellowship();
   }
 
+  async fetchRemoteFellowship() {
+    try {
+      const res = await fetch(`data/fellowship.json?t=${Date.now()}`);
+      if (res.ok) {
+        const remoteFellowship = await res.json();
+        if (Array.isArray(remoteFellowship)) {
+          window.DEFAULT_FELLOWSHIP = remoteFellowship;
+          this.remoteFellowshipLoaded = true;
+          this.render();
+        }
+      }
+    } catch (e) {
+      console.warn("Remote fellowship load failed:", e);
+    }
+  }
+  async uploadFellowshipPhotoToWorker(file, fellowshipId) {
+    if (!file) return null;
+
+    const workerUrl = window.CF_WORKER_UPLOAD_URL || "https://ethiopia-archive-proxy.wjdgns131.workers.dev";
+    const authToken = sessionStorage.getItem("ethiopia_auth_token") || "";
+
+    if (!authToken) {
+      alert("관리자 인증 정보가 없습니다. 다시 로그인해 주세요.");
+      return null;
+    }
+
+    const cleanId = String(fellowshipId || "general").replace(/[^a-zA-Z0-9_-]/g, "");
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("historyId", cleanId);
+    formData.append("contentType", "fellowship");
+    formData.append("originalFileName", file.name || "photo.jpg");
+
+    try {
+      const response = await fetch(workerUrl, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${authToken}`
+        },
+        body: formData
+      });
+
+      if (!response.ok) {
+        const errJson = await response.json().catch(() => ({}));
+        throw new Error(errJson.error || `HTTP ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      if (result && result.success && result.path) {
+        return result.path;
+      }
+
+      return null;
+    } catch (err) {
+      console.warn("Fellowship photo upload failed:", err.message || err);
+      return null;
+    }
+  }
   getStoredFellowship() {
+    if (window.DEFAULT_FELLOWSHIP && Array.isArray(window.DEFAULT_FELLOWSHIP)) {
+      return [...window.DEFAULT_FELLOWSHIP];
+    }
     if (window.db && typeof window.db.getFellowship === "function") return window.db.getFellowship();
     try {
       const data = JSON.parse(localStorage.getItem("ethiopia_fellowship") || "[]");
@@ -18,10 +83,42 @@ class FellowshipComponent {
     } catch(e) { return []; }
   }
 
-  saveStoredFellowship(list) {
-    localStorage.setItem("ethiopia_fellowship", JSON.stringify(list));
-  }
+  async syncFellowshipToWorker(allFellowship) {
+    try {
+      const token = sessionStorage.getItem("ethiopia_auth_token");
+      if (!token) return { ok: false, error: "No auth token" };
 
+      const workerUrl = window.CF_WORKER_UPLOAD_URL || "https://ethiopia-archive-proxy.wjdgns131.workers.dev";
+      const syncEndpoint = `${workerUrl.replace(/\/+$/, '')}/sync`;
+
+      const syncRes = await fetch(syncEndpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          action: "sync_fellowship",
+          fellowship: allFellowship
+        })
+      });
+
+      const data = await syncRes.json().catch(() => ({}));
+
+      if (syncRes.ok && data && data.ok) {
+        return { ok: true, synced: true };
+      }
+
+      return { ok: false, error: data.error || `HTTP ${syncRes.status}` };
+    } catch (e) {
+      return { ok: false, error: e.message || "Sync failed" };
+    }
+  }
+  saveStoredFellowship(list) {
+    // Fellowship data is stored centrally.
+    // Do not store photos/Base64 data in localStorage.
+    window.DEFAULT_FELLOWSHIP = Array.isArray(list) ? [...list] : [];
+  }
   initEvents() {
     // Category Tabs Listener
     const tabs = document.querySelectorAll("#fellowshipCategoryTabs .cat-tab");
@@ -168,20 +265,32 @@ class FellowshipComponent {
 
     const modal = document.getElementById("fellowshipEditModal");
     const saveBtn = modal ? modal.querySelector("button[type='submit']") : null;
+
     if (saveBtn) {
       saveBtn.disabled = true;
-      saveBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> 사진 압축 처리 중...`;
+      saveBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> 사진 준비 중...`;
     }
 
-    if (window.showToast) window.showToast("📷 사진을 최적화 압축하는 중입니다...");
-
-    const fileArray = Array.from(files);
-    const results = await Promise.all(fileArray.map(file => this.processPhotoFile(file)));
+    if (window.showToast) window.showToast("📷 사진을 업로드할 준비 중입니다...");
 
     if (!this.tempFellowshipImages) this.tempFellowshipImages = [];
-    results.forEach(dataUrl => {
-      if (dataUrl) this.tempFellowshipImages.push(dataUrl);
-    });
+
+    for (const file of Array.from(files)) {
+      if (!file || !file.type.startsWith("image/")) continue;
+
+      if (file.size > 15 * 1024 * 1024) {
+        alert(`사진 용량이 15MB를 초과합니다. (${(file.size / 1024 / 1024).toFixed(1)}MB)`);
+        continue;
+      }
+
+      const previewUrl = URL.createObjectURL(file);
+
+      this.tempFellowshipImages.push({
+        type: "new_file",
+        file: file,
+        previewUrl: previewUrl
+      });
+    }
 
     this.renderPhotoPreviews();
 
@@ -192,7 +301,6 @@ class FellowshipComponent {
 
     if (window.showToast) window.showToast("✨ 활동 소식 사진이 첨부되었습니다!");
   }
-
   renderPhotoPreviews() {
     const previewContainer = document.getElementById("fellowshipImagesPreview");
     if (!previewContainer) return;
@@ -202,22 +310,35 @@ class FellowshipComponent {
       return;
     }
 
-    previewContainer.innerHTML = this.tempFellowshipImages.map((src, idx) => `
-      <div style="position:relative; width:90px; height:90px; border-radius:10px; overflow:hidden; border:2px solid var(--border-color); box-shadow:0 3px 10px rgba(0,0,0,0.15);">
-        <img src="${src}" style="width:100%; height:100%; object-fit:cover;" />
-        <button type="button" onclick="event.stopPropagation(); window.fellowshipComponent.removePhoto(${idx})" title="삭제" style="position:absolute; top:3px; right:3px; background:rgba(239,68,68,0.9); color:#fff; border:none; border-radius:50%; width:22px; height:22px; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center;">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-    `).join('');
+    previewContainer.innerHTML = this.tempFellowshipImages.map((item, idx) => {
+      const src = (item && typeof item === "object" && item.type === "new_file")
+        ? item.previewUrl
+        : item;
+
+      return `
+        <div style="position:relative; width:90px; height:90px; border-radius:10px; overflow:hidden; border:2px solid var(--border-color); box-shadow:0 3px 10px rgba(0,0,0,0.15);">
+          <img src="${src}" style="width:100%; height:100%; object-fit:cover;" />
+          <button type="button" onclick="event.stopPropagation(); window.fellowshipComponent.removePhoto(${idx})" title="삭제" style="position:absolute; top:3px; right:3px; background:rgba(239,68,68,0.9); color:#fff; border:none; border-radius:50%; width:22px; height:22px; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      `;
+    }).join('');
   }
 
   removePhoto(idx) {
     if (!this.tempFellowshipImages) return;
+
+    const item = this.tempFellowshipImages[idx];
+    if (item && typeof item === "object" && item.type === "new_file" && item.previewUrl) {
+      try {
+        URL.revokeObjectURL(item.previewUrl);
+      } catch(e) {}
+    }
+
     this.tempFellowshipImages.splice(idx, 1);
     this.renderPhotoPreviews();
   }
-
   getCategoryLabel(cat) {
     switch (cat) {
       case "fellowship": return { text: "☕ 교제", color: "#0284c7", bg: "#f0f9ff" };
@@ -256,7 +377,7 @@ class FellowshipComponent {
     modal.classList.remove("hidden");
   }
 
-  saveFellowshipFromForm() {
+  async saveFellowshipFromForm() {
     if (window.checkAdminPermission && !window.checkAdminPermission()) return;
 
     const id = document.getElementById("fieldFellowshipId").value;
@@ -272,34 +393,94 @@ class FellowshipComponent {
       return;
     }
 
-    const itemData = {
-      id: id || ("fel-" + Date.now()),
-      date, category, title, location, participants, desc,
-      images: this.tempFellowshipImages || []
-    };
+    const fellowshipId = id || ("fel-" + Date.now());
+    const rawImages = this.tempFellowshipImages || [];
+    const finalImages = [];
 
-    if (window.db && typeof window.db.addFellowship === "function" && typeof window.db.updateFellowship === "function") {
-      if (id) {
-        window.db.updateFellowship(itemData);
-      } else {
-        window.db.addFellowship(itemData);
+    const modal = document.getElementById("fellowshipEditModal");
+    const saveBtn = modal ? modal.querySelector("button[type='submit']") : null;
+
+    if (saveBtn) {
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> 저장 중...`;
+    }
+
+    try {
+      for (const imageItem of rawImages) {
+        if (imageItem && typeof imageItem === "object" && imageItem.type === "new_file") {
+          if (!imageItem.file) continue;
+
+          if (window.showToast) {
+            window.showToast("📷 사진을 업로드하는 중입니다...");
+          }
+
+          const uploadedPath = await this.uploadFellowshipPhotoToWorker(
+            imageItem.file,
+            fellowshipId
+          );
+
+          if (!uploadedPath) {
+            throw new Error("사진 업로드에 실패했습니다.");
+          }
+
+          finalImages.push(uploadedPath);
+        } else if (typeof imageItem === "string" && imageItem) {
+          finalImages.push(imageItem);
+        }
       }
-    } else {
-      const list = this.getStoredFellowship();
+
+      const itemData = {
+        id: fellowshipId,
+        date,
+        category,
+        title,
+        location,
+        participants,
+        desc,
+        images: finalImages
+      };
+
+      let list = this.getStoredFellowship();
       const idx = list.findIndex(f => f.id === itemData.id);
+
       if (idx >= 0) {
         list[idx] = itemData;
       } else {
         list.push(itemData);
       }
+
       this.saveStoredFellowship(list);
+      window.DEFAULT_FELLOWSHIP = [...list];
+
+      const syncRes = await this.syncFellowshipToWorker(list);
+
+      if (syncRes && syncRes.ok) {
+        if (window.showToast) {
+          window.showToast("✨ 활동 소식이 중앙에 저장되었습니다!");
+        } else {
+          alert("활동 소식이 중앙에 저장되었습니다!");
+        }
+      } else {
+        alert(
+          "활동 소식은 이 기기에 저장되었지만 중앙 동기화에 실패했습니다.\n" +
+          ((syncRes && syncRes.error) || "")
+        );
+      }
+
+      document.getElementById("fellowshipEditModal")?.classList.add("hidden");
+      this.tempFellowshipImages = [...finalImages];
+      this.render();
+
+    } catch (err) {
+      console.error("Fellowship save error:", err);
+      alert("활동 소식을 저장하지 못했습니다.\n" + (err.message || err));
+    } finally {
+      if (saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = `저장하기`;
+      }
     }
-
-    document.getElementById("fellowshipEditModal")?.classList.add("hidden");
-    if (window.showToast) window.showToast("✨ 활동 소식이 성공적으로 저장되었습니다!");
-    this.render();
   }
-
   deleteFellowship(id) {
     if (window.checkAdminPermission && !window.checkAdminPermission()) return;
 
@@ -408,3 +589,10 @@ class FellowshipComponent {
 window.FellowshipComponent = FellowshipComponent;
 // Backwards compatibility alias
 window.AssembliesComponent = FellowshipComponent;
+
+
+
+
+
+
+

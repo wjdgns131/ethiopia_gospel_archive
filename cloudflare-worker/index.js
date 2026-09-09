@@ -1,10 +1,10 @@
 /**
- * 에티오피아 선교 아카이브 - Cloudflare Worker 보안 인증 및 원본 이미지 업로드 프록시
+ * ??믨퀡堉???덈룛????ル맪爰??熬곣뫖異?????- Cloudflare Worker ?곌랜?삯뇡??筌뤾쑴理??????沅?????嶺뚯솘? ???놁Ŧ???熬곣뫁夷??
  * 
- * Cloudflare Worker Secret 환경변수:
- * - env.ADMIN_PASSCODE: 관리자 비밀번호
- * - env.COWORKER_PASSCODE: 동역자 비밀번호
- * - env.AUTH_SESSION_SECRET: HMAC-SHA256 세션 서명용 시크릿
+ * Cloudflare Worker Secret ???삵렱?곌떠???
+ * - env.ADMIN_PASSCODE: ??㉱?洹먮봿???????뺢퀡???
+ * - env.COWORKER_PASSCODE: ???덉뿴???????뺢퀡???
+ * - env.AUTH_SESSION_SECRET: HMAC-SHA256 ?筌뤾쑬????類ㅺ뎄?????れ씩??
  * - env.GITHUB_PAT: GitHub Fine-grained Personal Access Token
  */
 
@@ -14,29 +14,29 @@ function applyFallbackDomainGlossary(text) {
 
   let result = text;
   const termsMap = [
-    { kr: "전도집회", en: "Evangelical Seminar" },
-    { kr: "구원받다", en: "receive salvation" },
-    { kr: "구원을 받다", en: "receive salvation" },
-    { kr: "구원 간증", en: "salvation testimony" },
-    { kr: "구원간증", en: "salvation testimony" },
-    { kr: "구원", en: "salvation" },
-    { kr: "침례를 받다", en: "be baptized" },
-    { kr: "침례를받다", en: "be baptized" },
-    { kr: "침례", en: "baptism" },
-    { kr: "복음을 전하다", en: "preach the gospel" },
-    { kr: "복음을전하다", en: "preach the gospel" },
-    { kr: "초등학생", en: "Elementary School Student" },
-    { kr: "중학생", en: "Middle School Student" },
-    { kr: "고등학생", en: "High School Student" },
-    { kr: "대학생", en: "University Student" },
-    { kr: "전도사", en: "Evangelist" },
-    { kr: "목사", en: "Pastor" },
-    { kr: "가정부", en: "Housekeeper" },
-    { kr: "교사", en: "Teacher" },
-    { kr: "지인", en: "acquaintance" },
-    { kr: "어머니", en: "mother" },
-    { kr: "아버지", en: "father" },
-    { kr: "친구", en: "friend" }
+    { kr: "?熬곣뫀利꿰춯?뚯탴??, en: "Evangelical Seminar" },
+    { kr: "??뚮봿?싩뛾?녿즴??, en: "receive salvation" },
+    { kr: "??뚮봿????꾩룇猷??, en: "receive salvation" },
+    { kr: "??뚮봿???띠룄?닷폑?, en: "salvation testimony" },
+    { kr: "??뚮봿?싨뤆?꾩뫒凉?, en: "salvation testimony" },
+    { kr: "??뚮봿??, en: "salvation" },
+    { kr: "?곸굹維????꾩룇猷??, en: "be baptized" },
+    { kr: "?곸굹維???뽯닑???, en: "be baptized" },
+    { kr: "?곸굹維?", en: "baptism" },
+    { kr: "?곌랜踰????熬곥굥由??, en: "preach the gospel" },
+    { kr: "?곌랜踰??熬곣뫗???濡ル펲", en: "preach the gospel" },
+    { kr: "?貫?꾥린???뉖Ц", en: "Elementary School Student" },
+    { kr: "繞벿살탴???, en: "Middle School Student" },
+    { kr: "??μ쪚甕???뉖Ц", en: "High School Student" },
+    { kr: "?????뉖Ц", en: "University Student" },
+    { kr: "?熬곣뫀利??, en: "Evangelist" },
+    { kr: "嶺뚮ㅄ維쀦쾮?, en: "Pastor" },
+    { kr: "?띠럾??筌?", en: "Housekeeper" },
+    { kr: "??흮亦?, en: "Teacher" },
+    { kr: "嶺뚯솘???, en: "acquaintance" },
+    { kr: "??????, en: "mother" },
+    { kr: "?熬곣뫁?붺춯?뼿", en: "father" },
+    { kr: "?곸궡裕??, en: "friend" }
   ];
 
   for (const item of termsMap) {
@@ -91,7 +91,7 @@ async function getCryptoKey(secretStr) {
 
 async function createHMACSessionToken(role, secretStr) {
   const nowSec = Math.floor(Date.now() / 1000);
-  const expSec = nowSec + (12 * 3600); // 12시간 만료
+  const expSec = nowSec + (12 * 3600); // 12??蹂?뜟 嶺뚮씭??쭩?
   const nonceBytes = crypto.getRandomValues(new Uint8Array(8));
   let nonceHex = "";
   for (let i = 0; i < nonceBytes.length; i++) {
@@ -258,13 +258,13 @@ Do not perform word-for-word substitution.
 Return only the English translation.
 
 Use the following terminology consistently:
-- 전도집회 = Evangelical Seminar
-- 구원 = salvation
-- 구원받다 = be saved / receive salvation according to context
-- 구원 간증 = salvation testimony
-- 침례 = baptism
-- 침례를 받다 = be baptized
-- 복음을 전하다 = preach the gospel / share the gospel
+- ?熬곣뫀利꿰춯?뚯탴??= Evangelical Seminar
+- ??뚮봿??= salvation
+- ??뚮봿?싩뛾?녿즴??= be saved / receive salvation according to context
+- ??뚮봿???띠룄?닷폑?= salvation testimony
+- ?곸굹維? = baptism
+- ?곸굹維????꾩룇猷??= be baptized
+- ?곌랜踰????熬곥굥由??= preach the gospel / share the gospel
 - ELC = ELC
 - WELC = WELC
 
@@ -301,7 +301,7 @@ Return a valid JSON object mapping each input field key to its translated Englis
           }
 
           let translated = translations[key];
-          if (translated && typeof translated === "string" && !/[가-힣]/.test(translated)) {
+          if (translated && typeof translated === "string" && !/[?띠럾?-??/.test(translated)) {
             finalTranslations[key] = postProcessDomainTerms(translated);
           } else {
             // Free-form fields should remain empty if AI translation fails or contains Korean
@@ -316,7 +316,7 @@ Return a valid JSON object mapping each input field key to its translated Englis
     }
 
     // 3.5 Shared Data Sync Endpoint (POST /sync)
-    const isSyncReq = url.pathname === "/sync" || url.pathname === "/sync/" || url.pathname.endsWith("/sync") || (jsonBody && (jsonBody.action === "sync_events" || jsonBody.action === "sync_members" || jsonBody.action === "sync_history" || jsonBody.action === "sync_data"));
+    const isSyncReq = url.pathname === "/sync" || url.pathname === "/sync/" || url.pathname.endsWith("/sync") || (jsonBody && (jsonBody.action === "sync_events" || jsonBody.action === "sync_members" || jsonBody.action === "sync_history" || jsonBody.action === "sync_fellowship" || jsonBody.action === "sync_data"));
     if (isSyncReq) {
       if (!env.AUTH_SESSION_SECRET) {
         return new Response(JSON.stringify({ error: "Server Configuration Error: AUTH_SESSION_SECRET missing." }), { status: 500, headers: corsHeaders });
@@ -346,6 +346,10 @@ Return a valid JSON object mapping each input field key to its translated Englis
         repoPath = "data/history.json";
         commitData = jsonBody.history || [];
         commitMessage = "Sync shared gospel history timeline data and translations";
+      } else if (action === "sync_fellowship") {
+        repoPath = "data/fellowship.json";
+        commitData = jsonBody.fellowship || [];
+        commitMessage = "Sync shared fellowship and ministry activity data";
       }
 
       if (repoPath && commitData) {
@@ -477,12 +481,18 @@ Return a valid JSON object mapping each input field key to its translated Englis
       const normalizedId = cleanHistoryId.startsWith("hist-") ? cleanHistoryId.substring(5) : cleanHistoryId;
 
       const subFolder = formData.get("subFolder");
+      const contentType = formData.get("contentType") || "history";
       let folderPath = "images/history";
-      if (subFolder === "highres" || subFolder === "original" || subFolder === "thumb") {
+      let filePrefix = "hist";
+      if (contentType === "fellowship") {
+        folderPath = "images/fellowship";
+        filePrefix = "fel";
+      } else if (subFolder === "highres" || subFolder === "original" || subFolder === "thumb") {
         folderPath = `images/history/${subFolder}`;
       }
 
-      const filename = `hist-${normalizedId}-${timestamp}-${randomHash}${ext}`;
+
+      const filename = `${filePrefix}-${normalizedId}-${timestamp}-${randomHash}${ext}`;
       const repoPath = `${folderPath}/${filename}`;
 
       // Convert Original File ArrayBuffer to Base64 for GitHub API
