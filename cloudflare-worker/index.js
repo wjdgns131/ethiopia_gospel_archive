@@ -14,29 +14,29 @@ function applyFallbackDomainGlossary(text) {
 
   let result = text;
   const termsMap = [
-    { kr: "?熬곣뫀利꿰춯?뚯탴??, en: "Evangelical Seminar" },
-    { kr: "??뚮봿?싩뛾?녿즴??, en: "receive salvation" },
-    { kr: "??뚮봿????꾩룇猷??, en: "receive salvation" },
-    { kr: "??뚮봿???띠룄?닷폑?, en: "salvation testimony" },
-    { kr: "??뚮봿?싨뤆?꾩뫒凉?, en: "salvation testimony" },
-    { kr: "??뚮봿??, en: "salvation" },
-    { kr: "?곸굹維????꾩룇猷??, en: "be baptized" },
-    { kr: "?곸굹維???뽯닑???, en: "be baptized" },
-    { kr: "?곸굹維?", en: "baptism" },
-    { kr: "?곌랜踰????熬곥굥由??, en: "preach the gospel" },
-    { kr: "?곌랜踰??熬곣뫗???濡ル펲", en: "preach the gospel" },
-    { kr: "?貫?꾥린???뉖Ц", en: "Elementary School Student" },
-    { kr: "繞벿살탴???, en: "Middle School Student" },
-    { kr: "??μ쪚甕???뉖Ц", en: "High School Student" },
-    { kr: "?????뉖Ц", en: "University Student" },
-    { kr: "?熬곣뫀利??, en: "Evangelist" },
-    { kr: "嶺뚮ㅄ維쀦쾮?, en: "Pastor" },
-    { kr: "?띠럾??筌?", en: "Housekeeper" },
-    { kr: "??흮亦?, en: "Teacher" },
-    { kr: "嶺뚯솘???, en: "acquaintance" },
-    { kr: "??????, en: "mother" },
-    { kr: "?熬곣뫁?붺춯?뼿", en: "father" },
-    { kr: "?곸궡裕??, en: "friend" }
+    { kr: "\uC804\uB3C4\uC9D1\uD68C", en: "Evangelical Seminar" },
+    { kr: "\uAD6C\uC6D0\uBC1B\uB2E4", en: "receive salvation" },
+    { kr: "\uAD6C\uC6D0\uC744 \uBC1B\uB2E4", en: "receive salvation" },
+    { kr: "\uAD6C\uC6D0\uAC04\uC99D", en: "salvation testimony" },
+    { kr: "\uAD6C\uC6D0 \uAC04\uC99D", en: "salvation testimony" },
+    { kr: "\uAD6C\uC6D0", en: "salvation" },
+    { kr: "\uCE68\uB840\uBC1B\uB2E4", en: "be baptized" },
+    { kr: "\uCE68\uB840\uB97C \uBC1B\uB2E4", en: "be baptized" },
+    { kr: "\uCE68\uB840", en: "baptism" },
+    { kr: "\uBCF5\uC74C\uC744 \uC804\uD558\uB2E4", en: "preach the gospel" },
+    { kr: "\uBCF5\uC74C \uC804\uD558\uB2E4", en: "preach the gospel" },
+    { kr: "\uCD08\uB4F1\uD559\uC0DD", en: "Elementary School Student" },
+    { kr: "\uC911\uD559\uC0DD", en: "Middle School Student" },
+    { kr: "\uACE0\uB4F1\uD559\uC0DD", en: "High School Student" },
+    { kr: "\uB300\uD559\uC0DD", en: "University Student" },
+    { kr: "\uC804\uB3C4\uC778", en: "Evangelist" },
+    { kr: "\uBAA9\uC0AC", en: "Pastor" },
+    { kr: "\uAC00\uC815\uBD80", en: "Housekeeper" },
+    { kr: "\uC120\uC0DD\uB2D8", en: "Teacher" },
+    { kr: "\uC9C0\uC778", en: "acquaintance" },
+    { kr: "\uC5B4\uBA38\uB2C8", en: "mother" },
+    { kr: "\uC544\uBC84\uC9C0", en: "father" },
+    { kr: "\uCE5C\uAD6C", en: "friend" }
   ];
 
   for (const item of termsMap) {
@@ -301,7 +301,7 @@ Return a valid JSON object mapping each input field key to its translated Englis
           }
 
           let translated = translations[key];
-          if (translated && typeof translated === "string" && !/[?띠럾?-??/.test(translated)) {
+          if (translated && typeof translated === "string" && !/[\uAC00-\uD7A3]/.test(translated)) {
             finalTranslations[key] = postProcessDomainTerms(translated);
           } else {
             // Free-form fields should remain empty if AI translation fails or contains Korean
@@ -383,6 +383,54 @@ Return a valid JSON object mapping each input field key to its translated Englis
             if (getRes.ok) {
               const getData = await getRes.json();
               sha = getData.sha || "";
+
+              // Protect fellowship data from stale clients overwriting newer photos.
+              if (action === "sync_fellowship" && getData.content) {
+                try {
+                  const rawBase64 = getData.content.replace(/\s/g, "");
+                  const binaryExisting = atob(rawBase64);
+                  const existingBytes = Uint8Array.from(
+                    binaryExisting,
+                    c => c.charCodeAt(0)
+                  );
+                  const existingFellowship = JSON.parse(
+                    new TextDecoder().decode(existingBytes)
+                  );
+
+                  if (Array.isArray(existingFellowship) && Array.isArray(commitData)) {
+                    const mergedById = new Map();
+
+                    for (const oldItem of existingFellowship) {
+                      if (oldItem && oldItem.id) {
+                        mergedById.set(oldItem.id, oldItem);
+                      }
+                    }
+
+                    for (const newItem of commitData) {
+                      if (!newItem || !newItem.id) continue;
+
+                      const oldItem = mergedById.get(newItem.id);
+
+                      if (oldItem) {
+                        const oldImages = Array.isArray(oldItem.images) ? oldItem.images : [];
+                        const newImages = Array.isArray(newItem.images) ? newItem.images : [];
+
+                        mergedById.set(newItem.id, {
+                          ...oldItem,
+                          ...newItem,
+                          images: [...new Set([...oldImages, ...newImages])]
+                        });
+                      } else {
+                        mergedById.set(newItem.id, newItem);
+                      }
+                    }
+
+                    commitData = [...mergedById.values()];
+                  }
+                } catch (mergeErr) {
+                  console.error("FELLOWSHIP MERGE ERROR:", mergeErr.message || mergeErr);
+                }
+              }
             }
           } catch(e) {}
 
