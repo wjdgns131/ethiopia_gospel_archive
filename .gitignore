@@ -1,9 +1,3 @@
-.DS_Store
-*.pyc
-__pycache__/
-.idea/
-.vscode/
-scratch/
-*.backup.js
-scratch_*.js
-
+﻿node_modules/
+*.backup-*
+github-index-check.html
