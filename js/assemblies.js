@@ -133,7 +133,7 @@ class FellowshipComponent {
             const canvas = document.createElement("canvas");
             let w = img.width;
             let h = img.height;
-            const maxDim = 720;
+            const maxDim = 480;
             if (w > maxDim || h > maxDim) {
               if (w > h) {
                 h = Math.round((h * maxDim) / w);
@@ -149,7 +149,7 @@ class FellowshipComponent {
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = "high";
             ctx.drawImage(img, 0, 0, w, h);
-            resolve(canvas.toDataURL("image/jpeg", 0.68));
+            resolve(canvas.toDataURL("image/jpeg", 0.50));
           } catch(err) {
             console.error("Canvas compression error, using raw DataURL:", err);
             resolve(rawDataUrl);
