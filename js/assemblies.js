@@ -69,7 +69,7 @@ class FellowshipComponent {
       return null;
     } catch (err) {
       console.warn("Fellowship photo upload failed:", err.message || err);
-      return null;
+      throw err;
     }
   }
   getStoredFellowship() {
