@@ -1,5 +1,5 @@
-/**
- * 에티오피아 선교 아카이브 - 교제 & 선교 활동 모듈
+﻿/**
+ * ?먰떚?ㅽ뵾???좉탳 ?꾩뭅?대툕 - 援먯젣 & ?좉탳 ?쒕룞 紐⑤뱢
  */
 
 class FellowshipComponent {
@@ -8,6 +8,18 @@ class FellowshipComponent {
     this.tempFellowshipImages = [];
     this.container = document.getElementById("fellowshipGridContainer") || document.getElementById("assemblyGrid");
     this.initEvents();
+  }
+
+  getStoredFellowship() {
+    if (window.db && typeof window.db.getFellowship === "function") return window.db.getFellowship();
+    try {
+      const data = JSON.parse(localStorage.getItem("ethiopia_fellowship") || "[]");
+      return Array.isArray(data) ? data : [];
+    } catch(e) { return []; }
+  }
+
+  saveStoredFellowship(list) {
+    localStorage.setItem("ethiopia_fellowship", JSON.stringify(list));
   }
 
   initEvents() {
@@ -158,10 +170,10 @@ class FellowshipComponent {
     const saveBtn = modal ? modal.querySelector("button[type='submit']") : null;
     if (saveBtn) {
       saveBtn.disabled = true;
-      saveBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> 사진 압축 처리 중...`;
+      saveBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ?ъ쭊 ?뺤텞 泥섎━ 以?..`;
     }
 
-    if (window.showToast) window.showToast("📷 사진을 최적화 압축하는 중입니다...");
+    if (window.showToast) window.showToast("?벜 ?ъ쭊??理쒖쟻???뺤텞?섎뒗 以묒엯?덈떎...");
 
     const fileArray = Array.from(files);
     const results = await Promise.all(fileArray.map(file => this.processPhotoFile(file)));
@@ -175,10 +187,10 @@ class FellowshipComponent {
 
     if (saveBtn) {
       saveBtn.disabled = false;
-      saveBtn.innerHTML = `저장하기`;
+      saveBtn.innerHTML = `??ν븯湲?;
     }
 
-    if (window.showToast) window.showToast("✨ 활동 소식 사진이 첨부되었습니다!");
+    if (window.showToast) window.showToast("???쒕룞 ?뚯떇 ?ъ쭊??泥⑤??섏뿀?듬땲??");
   }
 
   renderPhotoPreviews() {
@@ -186,14 +198,14 @@ class FellowshipComponent {
     if (!previewContainer) return;
 
     if (!this.tempFellowshipImages || this.tempFellowshipImages.length === 0) {
-      previewContainer.innerHTML = `<p style="font-size:0.82rem; color:var(--text-muted); width:100%; margin:0.3rem 0;">📷 첨부된 사진이 없습니다. 버튼 클릭, 드래그 또는 Ctrl+V로 추가할 수 있습니다.</p>`;
+      previewContainer.innerHTML = `<p style="font-size:0.82rem; color:var(--text-muted); width:100%; margin:0.3rem 0;">?벜 泥⑤????ъ쭊???놁뒿?덈떎. 踰꾪듉 ?대┃, ?쒕옒洹??먮뒗 Ctrl+V濡?異붽??????덉뒿?덈떎.</p>`;
       return;
     }
 
     previewContainer.innerHTML = this.tempFellowshipImages.map((src, idx) => `
       <div style="position:relative; width:90px; height:90px; border-radius:10px; overflow:hidden; border:2px solid var(--border-color); box-shadow:0 3px 10px rgba(0,0,0,0.15);">
         <img src="${src}" style="width:100%; height:100%; object-fit:cover;" />
-        <button type="button" onclick="event.stopPropagation(); window.fellowshipComponent.removePhoto(${idx})" title="삭제" style="position:absolute; top:3px; right:3px; background:rgba(239,68,68,0.9); color:#fff; border:none; border-radius:50%; width:22px; height:22px; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+        <button type="button" onclick="event.stopPropagation(); window.fellowshipComponent.removePhoto(${idx})" title="??젣" style="position:absolute; top:3px; right:3px; background:rgba(239,68,68,0.9); color:#fff; border:none; border-radius:50%; width:22px; height:22px; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center;">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
@@ -208,11 +220,11 @@ class FellowshipComponent {
 
   getCategoryLabel(cat) {
     switch (cat) {
-      case "fellowship": return { text: "☕ 교제", color: "#0284c7", bg: "#f0f9ff" };
-      case "daily": return { text: "🏠 일상", color: "#166534", bg: "#f0fdf4" };
-      case "visit": return { text: "🚗 탐방", color: "#b45309", bg: "#fffbeb" };
-      case "book": return { text: "📚 책자", color: "#6b21a8", bg: "#faf5ff" };
-      default: return { text: "📌 기타", color: "#475569", bg: "#f8fafc" };
+      case "fellowship": return { text: "??援먯젣", color: "#0284c7", bg: "#f0f9ff" };
+      case "daily": return { text: "?룧 ?쇱긽", color: "#166534", bg: "#f0fdf4" };
+      case "visit": return { text: "?슅 ?먮갑", color: "#b45309", bg: "#fffbeb" };
+      case "book": return { text: "?뱴 梨낆옄", color: "#6b21a8", bg: "#faf5ff" };
+      default: return { text: "?뱦 湲고?", color: "#475569", bg: "#f8fafc" };
     }
   }
 
@@ -223,7 +235,7 @@ class FellowshipComponent {
     if (!modal) return;
 
     const titleEl = document.getElementById("fellowshipEditModalTitle");
-    const list = window.db ? window.db.getFellowship() : [];
+    const list = this.getStoredFellowship();
     const item = id ? list.find(f => f.id === id) : null;
 
     document.getElementById("fieldFellowshipId").value = item ? item.id : "";
@@ -238,7 +250,7 @@ class FellowshipComponent {
     this.renderPhotoPreviews();
 
     if (titleEl) {
-      titleEl.innerText = item ? "교제 & 선교 활동 소식 수정" : "새 교제 & 선교 활동 소식 작성";
+      titleEl.innerText = item ? "援먯젣 & ?좉탳 ?쒕룞 ?뚯떇 ?섏젙" : "??援먯젣 & ?좉탳 ?쒕룞 ?뚯떇 ?묒꽦";
     }
 
     modal.classList.remove("hidden");
@@ -256,7 +268,7 @@ class FellowshipComponent {
     const desc = document.getElementById("fieldFellowshipDesc").value.trim();
 
     if (!title || !date) {
-      alert("날짜와 제목을 입력해 주세요.");
+      alert("?좎쭨? ?쒕ぉ???낅젰??二쇱꽭??");
       return;
     }
 
@@ -266,24 +278,33 @@ class FellowshipComponent {
       images: this.tempFellowshipImages || []
     };
 
-    if (window.db) {
+    if (window.db && typeof window.db.addFellowship === "function" && typeof window.db.updateFellowship === "function") {
       if (id) {
         window.db.updateFellowship(itemData);
       } else {
         window.db.addFellowship(itemData);
       }
+    } else {
+      const list = this.getStoredFellowship();
+      const idx = list.findIndex(f => f.id === itemData.id);
+      if (idx >= 0) {
+        list[idx] = itemData;
+      } else {
+        list.push(itemData);
+      }
+      this.saveStoredFellowship(list);
     }
 
     document.getElementById("fellowshipEditModal")?.classList.add("hidden");
-    if (window.showToast) window.showToast("✨ 활동 소식이 성공적으로 저장되었습니다!");
+    if (window.showToast) window.showToast("???쒕룞 ?뚯떇???깃났?곸쑝濡???λ릺?덉뒿?덈떎!");
     this.render();
   }
 
   deleteFellowship(id) {
     if (window.checkAdminPermission && !window.checkAdminPermission()) return;
 
-    if (confirm("정말로 이 활동 소식을 삭제하시겠습니까?")) {
-      if (window.db) window.db.deleteFellowship(id);
+    if (confirm("?뺣쭚濡????쒕룞 ?뚯떇????젣?섏떆寃좎뒿?덇퉴?")) {
+      if (window.db && typeof window.db.deleteFellowship === "function") { window.db.deleteFellowship(id); } else { const list = this.getStoredFellowship().filter(f => f.id !== id); this.saveStoredFellowship(list); }
       this.render();
     }
   }
@@ -292,7 +313,7 @@ class FellowshipComponent {
     this.container = document.getElementById("fellowshipGridContainer") || document.getElementById("assemblyGrid");
     if (!this.container) return;
 
-    const list = window.db ? window.db.getFellowship() : [];
+    const list = this.getStoredFellowship();
     const isAdmin = window.isAdminLoggedIn ? window.isAdminLoggedIn() : false;
 
     // Filter by activeCategory
@@ -304,8 +325,8 @@ class FellowshipComponent {
       this.container.innerHTML = `
         <div class="empty-state" style="padding:3rem 1rem; text-align:center; width:100%; color:var(--text-secondary);">
           <i class="fa-solid fa-camera-retro" style="font-size:2.8rem; color:#cbd5e1; margin-bottom:1rem; display:block;"></i>
-          <h3 style="font-size:1.15rem; font-weight:700; color:var(--text-primary); margin-bottom:0.4rem;">등록된 교제 & 활동 소식이 없습니다.</h3>
-          <p style="font-size:0.9rem;">[새 활동 소식 작성하기] 버튼을 눌러 성도 교제 및 일상 소식을 올려보세요.</p>
+          <h3 style="font-size:1.15rem; font-weight:700; color:var(--text-primary); margin-bottom:0.4rem;">?깅줉??援먯젣 & ?쒕룞 ?뚯떇???놁뒿?덈떎.</h3>
+          <p style="font-size:0.9rem;">[???쒕룞 ?뚯떇 ?묒꽦?섍린] 踰꾪듉???뚮윭 ?깅룄 援먯젣 諛??쇱긽 ?뚯떇???щ젮蹂댁꽭??</p>
         </div>
       `;
       return;
@@ -338,10 +359,10 @@ class FellowshipComponent {
 
                 ${isAdmin ? `
                   <div style="display:flex; gap:0.5rem; margin-left:auto;">
-                    <button type="button" class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); window.fellowshipComponent.openEditModal('${item.id}')" title="수정">
-                      <i class="fa-solid fa-pen"></i> 수정
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); window.fellowshipComponent.openEditModal('${item.id}')" title="?섏젙">
+                      <i class="fa-solid fa-pen"></i> ?섏젙
                     </button>
-                    <button type="button" class="btn btn-danger btn-sm icon-only" onclick="event.stopPropagation(); window.fellowshipComponent.deleteFellowship('${item.id}')" title="삭제">
+                    <button type="button" class="btn btn-danger btn-sm icon-only" onclick="event.stopPropagation(); window.fellowshipComponent.deleteFellowship('${item.id}')" title="??젣">
                       <i class="fa-solid fa-trash-can"></i>
                     </button>
                   </div>
@@ -361,7 +382,7 @@ class FellowshipComponent {
               <!-- Participants Tagging -->
               ${item.participants ? `
                 <div style="margin-bottom:1.4rem; background:#f8fafc; padding:0.65rem 1rem; border-radius:12px; border:1px solid #e2e8f0; font-size:0.9rem; font-weight:700; color:#334155; display:flex; align-items:center; gap:8px;">
-                  <i class="fa-solid fa-users" style="color:#0284c7;"></i> 함께한 식구: <span style="color:#0369a1;">${item.participants}</span>
+                  <i class="fa-solid fa-users" style="color:#0284c7;"></i> ?④퍡???앷뎄: <span style="color:#0369a1;">${item.participants}</span>
                 </div>
               ` : ''}
 
@@ -387,3 +408,5 @@ class FellowshipComponent {
 window.FellowshipComponent = FellowshipComponent;
 // Backwards compatibility alias
 window.AssembliesComponent = FellowshipComponent;
+
+
