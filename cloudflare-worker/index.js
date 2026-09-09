@@ -179,7 +179,7 @@ export default {
     }
 
     const url = new URL(request.url);
-    const contentType = request.headers.get("Content-Type") || "";
+    const requestContentType = request.headers.get("Content-Type") || "";
 
     // Extract Authorization Header if present
     const authHeader = request.headers.get("Authorization") || "";
@@ -207,7 +207,7 @@ export default {
 
     // 3. Login Auth Endpoint (POST /auth)
     let jsonBody = null;
-    if (contentType.includes("application/json")) {
+    if (requestContentType.includes("application/json")) {
       try {
         jsonBody = await request.clone().json();
       } catch (ex) {}
@@ -327,6 +327,14 @@ Return a valid JSON object mapping each input field key to its translated Englis
       const payload = await verifyHMACSessionToken(bearerToken, env.AUTH_SESSION_SECRET);
       if (!payload || payload.role !== "admin") {
         return new Response(JSON.stringify({ error: "Forbidden: Admin privileges required." }), { status: 403, headers: corsHeaders });
+      }
+
+      if (!jsonBody) {
+        try {
+          jsonBody = await request.clone().json();
+        } catch (ex) {
+          console.error("SYNC JSON PARSE ERROR:", ex.message || ex);
+        }
       }
 
       const action = jsonBody ? jsonBody.action : "";
@@ -481,10 +489,10 @@ Return a valid JSON object mapping each input field key to its translated Englis
       const normalizedId = cleanHistoryId.startsWith("hist-") ? cleanHistoryId.substring(5) : cleanHistoryId;
 
       const subFolder = formData.get("subFolder");
-      const contentType = formData.get("contentType") || "history";
+      const formContentType = formData.get("contentType") || "history";
       let folderPath = "images/history";
       let filePrefix = "hist";
-      if (contentType === "fellowship") {
+      if (formContentType === "fellowship") {
         folderPath = "images/fellowship";
         filePrefix = "fel";
       } else if (subFolder === "highres" || subFolder === "original" || subFolder === "thumb") {
