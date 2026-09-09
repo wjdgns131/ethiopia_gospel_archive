@@ -2000,6 +2000,12 @@ class TimelineComponent {
     const members = (window.db && typeof window.db.getMembers === 'function') ? window.db.getMembers() : (window.DEFAULT_MEMBERS || (typeof DEFAULT_MEMBERS !== 'undefined' ? DEFAULT_MEMBERS : []));
     if (!historyItem || !historyItem.date) return [];
 
+    // Explicit testimony-member links take priority over automatic date matching
+    if (Array.isArray(historyItem.testimonyMemberIds) && historyItem.testimonyMemberIds.length > 0) {
+      const ids = historyItem.testimonyMemberIds.map(id => String(id));
+      return members.filter(m => m && ids.includes(String(m.id)));
+    }
+
     // Baptism events (침례식) are not salvation events (members were saved in prior seminars)
     const titleLower = String(historyItem.title || "").toLowerCase();
     const titleEnLower = String(historyItem.titleEn || "").toLowerCase();

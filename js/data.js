@@ -1630,6 +1630,7 @@ const DEFAULT_HISTORY = [
   },
   {
     "id": "hist-202404",
+    "testimonyMemberIds": ["pdf-mem-1"],
     "date": "2024년 4월",
     "title": "온라인 집회 진행 & 에티오피아 첫 구원 열매",
     "location": "온라인 (BIT channel)",
@@ -1642,6 +1643,7 @@ const DEFAULT_HISTORY = [
   },
   {
     "id": "hist-202408",
+    "testimonyMemberIds": ["pdf-mem-3"],
     "date": "2024년 8월",
     "title": "암하라어 더빙 완성 후 첫 온라인 집회",
     "location": "온라인 (BIT channel)",
@@ -1654,6 +1656,7 @@ const DEFAULT_HISTORY = [
   },
   {
     "id": "hist-202410",
+    "testimonyMemberIds": ["pdf-mem-2"],
     "date": "2024년 10월",
     "title": "서아프리카팀 방문",
     "location": "에티오피아 (아디스아바바)",
@@ -1784,6 +1787,7 @@ const DEFAULT_HISTORY = [
   },
   {
     "id": "hist-20251212",
+    "testimonyMemberIds": ["pdf-mem-10", "pdf-mem-11", "pdf-mem-12", "pdf-mem-13", "pdf-mem-14"],
     "date": "2025.12.12 ~ 12.14",
     "title": "모임집에서의 첫 전도집회, 복음의 불씨를 지피다",
     "location": "에티오피아 (아디스아바바 모임집)",
@@ -1962,6 +1966,7 @@ const DEFAULT_HISTORY = [
       "images/history/hist-hist-181-0.jpg"
     ],
     "id": "hist-1788369417375",
+    "testimonyMemberIds": ["pdf-mem-76", "pdf-mem-77", "pdf-mem-78", "pdf-mem-79", "pdf-mem-80", "pdf-mem-81", "pdf-mem-82", "pdf-mem-83"],
     "titleEn": "Baptism Service",
     "descEn": "Held a joyful Baptism Service on August 16, 2026, confirming the faith and salvation of newly saved brothers and sisters."
   },
