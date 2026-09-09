@@ -1,4 +1,4 @@
-﻿/**
+/**
  * 에티오피아 선교 아카이브 - 교제 & 선교 활동 모듈
  */
 
@@ -572,7 +572,7 @@ class FellowshipComponent {
                 <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap:0.9rem; margin-top:1.2rem;">
                   ${images.map((img, imgIdx) => `
                     <div style="position:relative; max-height:360px; min-height:200px; border-radius:12px; overflow:hidden; border:1px solid var(--border-color); cursor:pointer; background:#0f172a; box-shadow:0 4px 12px rgba(0,0,0,0.08);" onclick="window.timelineComponent ? window.timelineComponent.openPhotoLightbox(${JSON.stringify(images).replace(/"/g, '&quot;')}, ${imgIdx}) : window.open('${img}', '_blank')">
-                      <img src="${img}" style="width:100%; max-height:360px; object-fit:contain; display:block; margin:0 auto;" class="hover-scale-img" />
+                      <img src="${img.startsWith('data:') ? img : img + '?v=20260910_FELLOWSHIP_IMG1'}" style="width:100%; max-height:360px; object-fit:contain; display:block; margin:0 auto;" class="hover-scale-img" />
                     </div>
                   `).join('')}
                 </div>
