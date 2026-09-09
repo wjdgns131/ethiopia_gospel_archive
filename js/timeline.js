@@ -1112,7 +1112,12 @@ class TimelineComponent {
       if (res.ok) {
         const remoteHistory = await res.json();
         if (Array.isArray(remoteHistory) && remoteHistory.length > 0) {
-          window.DEFAULT_HISTORY = remoteHistory;
+          const currentHistory = Array.isArray(window.DEFAULT_HISTORY) ? window.DEFAULT_HISTORY : [];
+          const testimonyLinksById = new Map(currentHistory.filter(h => h && Array.isArray(h.testimonyMemberIds) && h.testimonyMemberIds.length > 0).map(h => [String(h.id), h.testimonyMemberIds]));
+          window.DEFAULT_HISTORY = remoteHistory.map(h => {
+            const links = h && testimonyLinksById.get(String(h.id));
+            return links ? { ...h, testimonyMemberIds: links } : h;
+          });
           this.remoteHistoryLoaded = true;
           this.render();
         }
