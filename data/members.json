@@ -492,7 +492,7 @@
   {
     "id": "pdf-mem-15",
     "name": "Yewbdar Hailu",
-    "category": "saved",
+    "category": "disrupter",
     "age": "32세",
     "region": "아다마",
     "job": "복지단체 교사/ 리더",
@@ -504,7 +504,14 @@
     "testimony": "",
     "registeredYear": 2026,
     "jobEn": "복지단체 Teacher/ 리더",
-    "inviterRelationEn": "acquaintance"
+    "inviterRelationEn": "acquaintance",
+    "testimonyEn": "",
+    "translationMeta": {
+      "jobEn": "manual",
+      "inviterRelationEn": "manual",
+      "testimonyEn": "auto"
+    },
+    "translationStatus": "translating"
   },
   {
     "id": "pdf-mem-16",
