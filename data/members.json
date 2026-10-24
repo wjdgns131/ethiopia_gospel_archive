@@ -41,7 +41,7 @@
     "category": "saved",
     "age": "38세",
     "region": "아디스아바바",
-    "job": "의류 판매",
+    "job": "의류 판매, (현) ELC Staff",
     "assemblyMonth": "2026.2.06~08",
     "inviter": "엘리야나",
     "inviterRelation": "어머니",
@@ -51,7 +51,13 @@
     "registeredYear": 2026,
     "jobEn": "의류 판매",
     "inviterRelationEn": "어머니",
-    "testimonyEn": "https://drive.google.com/file/d/12vOaKVYGJEtXI7fSBI3TeUrRLHprgyOZ/view?usp=sharing"
+    "testimonyEn": "https://drive.google.com/file/d/12vOaKVYGJEtXI7fSBI3TeUrRLHprgyOZ/view?usp=sharing",
+    "translationMeta": {
+      "jobEn": "manual",
+      "inviterRelationEn": "manual",
+      "testimonyEn": "manual"
+    },
+    "translationStatus": "translating"
   },
   {
     "id": "mem-gudina2026-4",
