@@ -423,7 +423,7 @@
   {
     "id": "pdf-mem-11",
     "name": "Ahimed Seid",
-    "category": "saved",
+    "category": "disrupter",
     "age": "32세",
     "region": "아다마",
     "job": "(전) 선지자 현) elc staff",
@@ -435,7 +435,14 @@
     "testimony": "",
     "registeredYear": 2026,
     "jobEn": "(전) 선지자 현) elc staff",
-    "inviterRelationEn": "acquaintance"
+    "inviterRelationEn": "acquaintance",
+    "testimonyEn": "",
+    "translationMeta": {
+      "jobEn": "manual",
+      "inviterRelationEn": "manual",
+      "testimonyEn": "auto"
+    },
+    "translationStatus": "translating"
   },
   {
     "id": "pdf-mem-12",
