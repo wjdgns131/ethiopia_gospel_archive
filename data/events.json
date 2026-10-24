@@ -115,5 +115,14 @@
     "category": "other",
     "location": "구디나툼사 수양관",
     "desc": ""
+  },
+  {
+    "id": "evt_1792824413004_st4b4",
+    "date": "2026-10-22",
+    "endDate": "2026-10-26",
+    "title": "DSW",
+    "category": "assembly",
+    "location": "",
+    "desc": ""
   }
 ]
