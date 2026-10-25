@@ -1,5 +1,35 @@
 [
   {
+    "id": "hist-1792940321893",
+    "date": "2026. 09. 24~28",
+    "title": "전도집회",
+    "location": "DSW Youth training center, 비쇼프투",
+    "desc": "비쇼프투 지역에서 새로운 집회 장소를 발견하고, 현지 형제자매들의 적극적인 전도와 초청을 통해 신규 참석자 33명이 참석한 가운데 전도집회를 집회를 치렀습니다.",
+    "images": [
+      {
+        "highres": "images/history/highres/hist-1792940321893-20261025145842-hyll.webp",
+        "thumbnail": "images/history/thumb/hist-1792940321893-20261025145845-rreb.webp"
+      },
+      {
+        "highres": "images/history/highres/hist-1792940321893-20261025145848-mcps.webp",
+        "thumbnail": "images/history/thumb/hist-1792940321893-20261025145851-5zyt.webp"
+      },
+      {
+        "highres": "images/history/highres/hist-1792940321893-20261025145858-m7tt.webp",
+        "thumbnail": "images/history/thumb/hist-1792940321893-20261025145901-lrzf.webp"
+      }
+    ],
+    "titleEn": "Evangelical Seminar",
+    "locationEn": "DSW Youth training center, Bishoftu",
+    "descEn": "In the Bishoftu area, a new meeting place was found, and through the active evangelism and invitations of local brothers and sisters, 33 new attendees attended the Evangelical Seminar.",
+    "translationMeta": {
+      "titleEn": "auto",
+      "locationEn": "auto",
+      "descEn": "auto"
+    },
+    "translationStatus": "translated"
+  },
+  {
     "id": "hist-1792931024089",
     "date": "2026년 09월 13일~",
     "title": "에티오피아 에스라 학교 개설을 위한 두 형제의 방문",
