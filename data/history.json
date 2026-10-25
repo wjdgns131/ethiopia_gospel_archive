@@ -1,5 +1,22 @@
 [
   {
+    "id": "hist-1792936011697",
+    "date": "2026년 10월 17일",
+    "title": "Test",
+    "location": "아디스아바바",
+    "desc": "Test",
+    "images": [],
+    "titleEn": "",
+    "locationEn": "Addis Ababa",
+    "descEn": "",
+    "translationMeta": {
+      "titleEn": "auto",
+      "locationEn": "auto",
+      "descEn": "auto"
+    },
+    "translationStatus": "pending"
+  },
+  {
     "id": "hist-1792931024089",
     "date": "2026년 09월 13일~",
     "title": "에티오피아 에스라 학교 개설을 위한 두 형제의 방문",
