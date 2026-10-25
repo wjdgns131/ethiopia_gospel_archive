@@ -1154,7 +1154,9 @@ class TimelineComponent {
         }
         return { ok: false, error: data.error || "Sync error" };
       }
-      return { ok: false, error: `HTTP ${res.status}` };
+      const errorBody = await res.text().catch(() => "");
+      console.error("History sync failed:", res.status, errorBody);
+      return { ok: false, error: `HTTP ${res.status}: ${errorBody.slice(0, 300)}` };
     } catch(e) {
       return { ok: false, error: e.message || "Network error" };
     }
