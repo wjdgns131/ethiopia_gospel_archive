@@ -356,7 +356,7 @@ class TimelineComponent {
     }));
 
     try {
-      const overridesRaw = this.remoteHistoryLoaded ? null : localStorage.getItem("ethiopia_history_overrides");
+      const overridesRaw = localStorage.getItem("ethiopia_history_overrides");
       if (overridesRaw) {
         const overrides = JSON.parse(overridesRaw);
         if (overrides && typeof overrides === 'object') {
@@ -1125,10 +1125,11 @@ class TimelineComponent {
     } catch(e) {}
   }
 
-  async syncHistoryToWorker(allHistory) {
+  async syncHistoryToWorker(allHistory, changeId, deleteRecord = false) {
     try {
       const token = sessionStorage.getItem("ethiopia_auth_token") || localStorage.getItem("ethiopia_archive_auth_token") || "";
       if (!token) return { ok: false, error: "No auth token" };
+      if (!changeId) return { ok: false, error: "Missing history item ID" };
       const workerUrl = window.CF_WORKER_UPLOAD_URL || "https://ethiopia-archive-proxy.wjdgns131.workers.dev";
       const syncEndpoint = `${workerUrl.replace(/\/+$/, '')}/sync`;
 
@@ -1139,8 +1140,10 @@ class TimelineComponent {
           "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify({
-          action: "sync_history",
-          history: allHistory
+          action: "sync_history_item",
+          operation: deleteRecord ? "delete" : "upsert",
+          id: String(changeId),
+          item: deleteRecord ? null : allHistory.find(h => h && String(h.id) === String(changeId))
         })
       });
 
@@ -1370,7 +1373,7 @@ class TimelineComponent {
         historyData.translationStatus = translateSuccess ? "translated" : "pending";
         this.saveStoredHistory(historyData);
         const currentList = this.getStoredHistory();
-        const syncRes = await this.syncHistoryToWorker(currentList);
+        const syncRes = await this.syncHistoryToWorker(currentList, historyData.id);
         this.render();
 
         if (translateSuccess && syncRes && syncRes.ok) {
@@ -1402,7 +1405,7 @@ class TimelineComponent {
         this.render();
 
         const currentList = this.getStoredHistory();
-        const syncRes = await this.syncHistoryToWorker(currentList);
+        const syncRes = await this.syncHistoryToWorker(currentList, id, true);
 
         if (syncRes && syncRes.ok) {
           this.clearStoredHistoryOverride(id);
@@ -1612,11 +1615,11 @@ class TimelineComponent {
 
     item.translationStatus = translateSuccess ? "translated" : "pending";
     this.saveStoredHistory(item);
-    const syncRes = await this.syncHistoryToWorker(this.getStoredHistory());
+    const syncRes = await this.syncHistoryToWorker(this.getStoredHistory(), item.id);
     this.render();
 
     if (translateSuccess && syncRes && syncRes.ok) {
-          this.clearStoredHistoryOverride(historyData.id);
+          this.clearStoredHistoryOverride(item.id);
           await this.fetchRemoteHistory();
       if (window.showToast) window.showToast("🌐 복음 역사 영어 번역이 성공적으로 생성되고 동기화되었습니다!");
     } else if (translateSuccess && (!syncRes || !syncRes.ok)) {
@@ -1637,7 +1640,7 @@ class TimelineComponent {
     }
 
     const currentList = this.getStoredHistory();
-    const syncRes = await this.syncHistoryToWorker(currentList);
+    const syncRes = await this.syncHistoryToWorker(currentList, item.id);
 
     if (syncRes && syncRes.ok) {
       item.syncStatus = "synced";

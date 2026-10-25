@@ -316,7 +316,7 @@ Return a valid JSON object mapping each input field key to its translated Englis
     }
 
     // 3.5 Shared Data Sync Endpoint (POST /sync)
-    const isSyncReq = url.pathname === "/sync" || url.pathname === "/sync/" || url.pathname.endsWith("/sync") || (jsonBody && (jsonBody.action === "sync_events" || jsonBody.action === "sync_members" || jsonBody.action === "sync_history" || jsonBody.action === "sync_fellowship" || jsonBody.action === "sync_data"));
+    const isSyncReq = url.pathname === "/sync" || url.pathname === "/sync/" || url.pathname.endsWith("/sync") || (jsonBody && (jsonBody.action === "sync_events" || jsonBody.action === "sync_members" || jsonBody.action === "sync_history" || jsonBody.action === "sync_history_item" || jsonBody.action === "sync_fellowship" || jsonBody.action === "sync_data"));
     if (isSyncReq) {
       if (!env.AUTH_SESSION_SECRET) {
         return new Response(JSON.stringify({ error: "Server Configuration Error: AUTH_SESSION_SECRET missing." }), { status: 500, headers: corsHeaders });
@@ -350,10 +350,12 @@ Return a valid JSON object mapping each input field key to its translated Englis
         repoPath = "data/members.json";
         commitData = jsonBody.members || [];
         commitMessage = "Sync shared member directory data and translations";
-      } else if (action === "sync_history") {
+      } else if (action === "sync_history_item") {
         repoPath = "data/history.json";
-        commitData = jsonBody.history || [];
-        commitMessage = "Sync shared gospel history timeline data and translations";
+        commitData = [];
+        commitMessage = "Sync one gospel history entry safely";
+      } else if (action === "sync_history") {
+        return new Response(JSON.stringify({ error: "Outdated client: full history replacement disabled. Please refresh the website." }), { status: 409, headers: corsHeaders });
       } else if (action === "sync_fellowship") {
         repoPath = "data/fellowship.json";
         commitData = jsonBody.fellowship || [];
@@ -383,6 +385,28 @@ Return a valid JSON object mapping each input field key to its translated Englis
             if (getRes.ok) {
               const getData = await getRes.json();
               sha = getData.sha || "";
+
+              // Apply only the requested history change against the latest GitHub file.
+              if (action === "sync_history_item") {
+                if (!getData.content) throw new Error("History file content missing");
+                const bytes = Uint8Array.from(atob(getData.content.replace(/\s/g, "")), c => c.charCodeAt(0));
+                const current = JSON.parse(new TextDecoder().decode(bytes));
+                if (!Array.isArray(current) || current.length < 1) throw new Error("History integrity guard: empty history");
+                const operation = jsonBody.operation;
+                const id = String(jsonBody.id || "");
+                if (!id || !["upsert", "delete"].includes(operation)) throw new Error("Invalid history change");
+                const idx = current.findIndex(h => h && String(h.id) === id);
+                if (operation === "delete") {
+                  if (idx < 0) throw new Error("History entry not found for deletion");
+                  current.splice(idx, 1);
+                } else {
+                  const item = jsonBody.item;
+                  if (!item || String(item.id) !== id || !item.title || !item.date) throw new Error("Invalid history item");
+                  if (idx < 0) current.unshift(item);
+                  else current[idx] = { ...current[idx], ...item };
+                }
+                commitData = current;
+              }
 
               // Protect fellowship data from stale clients overwriting newer photos.
               if (action === "sync_fellowship" && getData.content) {
@@ -431,8 +455,14 @@ Return a valid JSON object mapping each input field key to its translated Englis
                   console.error("FELLOWSHIP MERGE ERROR:", mergeErr.message || mergeErr);
                 }
               }
+            } else if (action === "sync_history_item") {
+              throw new Error(`Cannot read current history: HTTP ${getRes.status}`);
             }
-          } catch(e) {}
+          } catch(e) {
+            if (action === "sync_history_item") {
+              return new Response(JSON.stringify({ error: `History safety check failed: ${e.message || e}` }), { status: 409, headers: corsHeaders });
+            }
+          }
 
           const jsonStr = JSON.stringify(commitData, null, 2);
           const uint8 = new TextEncoder().encode(jsonStr);
