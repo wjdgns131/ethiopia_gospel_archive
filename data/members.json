@@ -1548,7 +1548,7 @@
   },
   {
     "id": "pdf-mem-90",
-    "name": "Betse'lotAbraham",
+    "name": "Betse'lot Abraham",
     "category": "saved",
     "age": "16세",
     "region": "아다마",
@@ -1561,7 +1561,14 @@
     "testimony": "",
     "registeredYear": 2026,
     "jobEn": "Student",
-    "inviterRelationEn": "큰 딸"
+    "inviterRelationEn": "큰 딸",
+    "testimonyEn": "",
+    "translationMeta": {
+      "jobEn": "manual",
+      "inviterRelationEn": "manual",
+      "testimonyEn": "auto"
+    },
+    "translationStatus": "translating"
   },
   {
     "id": "pdf-mem-91",
